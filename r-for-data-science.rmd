@@ -302,7 +302,7 @@ ggplot(mpg, aes(displ, hwy)) +
   geom_point(stroke = 7, color = "white") +
   geom_point(size = 5, aes(displ, hwy, color = drv))
 ```
-## 3.7 Statistical Transformations
+## Section 3.7: Statistical Transformations
 ```{r}
 ggplot(data = diamonds) + 
   geom_bar(aes(cut))
@@ -325,13 +325,13 @@ ggplot(data = demo) +
   geom_bar(aes(cut, freq), stat = "identity")
 ```
 
-
-### Using a prop stat rather than count on the bar geom
 ```{r}
+# Using a prop stat rather than count on the bar geom
 ggplot(diamonds) + 
   geom_bar(aes(cut, y = stat(prop), group = 1))
 ```
-### 3.7.1 Exercises
+
+### Section 3.7.1: Exercises
 ```{r}
 # Plotting with a summary statistic
 ggplot(diamonds) + 

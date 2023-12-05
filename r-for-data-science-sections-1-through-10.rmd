@@ -1,0 +1,2066 @@
+---
+title: "R-For-Data-Science-§1:10"
+author: "Evan-Woods"
+date: "2023-11-10"
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+
+```{r}
+if (!require(dplyr)) install.packages("dplyr")
+# if (!require(stargazer)) install.packages("stargazer")
+if (!require(tidyverse)) install.packages("tidyverse")
+if(!require(nycflights13)) install.packages("nycflights13")
+# if (!require(shiny)) install.packages("shiny")
+# if(!require(Lahman)) install.packages("Lahman")
+if(!require(ggplot2)) install.packages("ggplot2")
+# if(!require(EnvStats)) install.packages("EnvStats")
+# library(EnvStats)
+library(tidyverse)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+```{r}
+# knitr::knit_exit()
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## 3.1 Data Visualization
+
+### 3.1.1 Prerequisites
+```{r}
+mpg <- mpg
+```
+```{r}
+?mpg
+```
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(aes(displ, hwy))
+```
+
+
+```{r ggplot graphing template}
+#ggplot(data = <DATA>) + 
+#  <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
+```
+
+```{r}
+ggplot(data = mpg)
+```
+```{r}
+mpg
+```
+```{r 3.2.4 Exercises}
+# Scatterplot of hwy vs cyl
+ggplot(mpg) +
+  geom_point(aes(class, drv))
+```
+```{r}
+ggplot(mpg) +
+  geom_point(aes(hwy, displ, color = class))
+```
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(hwy, displ, size = class))
+```
+```{r}
+ggplot(mpg) +
+  geom_point(aes(hwy, displ, alpha = class))
+```
+```{r}
+ggplot(data = mpg) + 
+  geom_point(aes(x = displ, y = hwy), color = "blue")
+```
+```{r}
+# [Shapes](https://d33wubrfki0l68.cloudfront.net/cc94c11128cb951a9fd833667d7c8e726cde8448/b3728/visualize_files/figure-html/shapes-1.png)
+ggplot(mpg) + 
+  geom_point(aes(displ, hwy), shape = 1)
+```
+```{r View the data}
+str(mpg)
+```
+```{r}
+ggplot(mpg) +
+  geom_point(aes(displ, hwy,  color = trans))
+```
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(displ, hwy, color = year, alpha = year))
+  labs(color = mpg$year)
+```
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(displ, hwy, stroke = 5))
+```
+
+
+```{r}
+?aes
+```
+
+
+```{r}
+?geom_point
+```
+
+
+## Section 3.5: Facets
+```{r}
+ggplot(data = mpg) + 
+  geom_point(aes(displ, hwy)) + 
+  facet_wrap(~ model)
+```
+
+```{r}
+str(mpg)
+```
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(displ, hwy)) + 
+  facet_wrap(drv ~ cyl)
+```
+```{r}
+?mpg
+```
+
+```{r}
+mpg$cyl
+```
+
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(displ, hwy)) + 
+  facet_grid(. ~ cyl)
+```
+```{r faceting on a continuous variable}
+ggplot(mpg) +
+  geom_point(aes(displ, hwy)) + 
+  facet_wrap(~cty)
+```
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(drv, cyl)) +
+  facet_grid(drv ~ cyl)
+```
+
+```{r}
+ggplot(mpg) +
+  geom_point(aes(displ, hwy)) +
+  facet_grid(drv ~ .)
+```
+
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(displ, hwy)) +
+  facet_grid(. ~ cyl)
+```
+```{r}
+ggplot(data = mpg) +
+  geom_point(aes(displ, hwy)) +
+  facet_wrap(~class, nrow = 2)
+```
+```{r}
+ggplot(data = mpg) +
+  geom_point(aes(displ, hwy, color = class)) +
+  facet_wrap(~ class)
+```
+
+
+```{r}
+?facet_wrap
+```
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(aes(displ, hwy))
+```
+
+```{r}
+?geom_smooth
+```
+
+
+```{r}
+ggplot(mpg) +
+  geom_smooth(aes(displ, hwy))
+```
+```{r}
+ggplot(mpg) +
+  geom_smooth(aes(displ, hwy, linetype = drv, color =drv)) + 
+  geom_point(aes(displ, hwy, color = drv))
+```
+```{r}
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point() +
+  geom_smooth()
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = class)) + 
+  geom_smooth()
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = class))+
+  geom_smooth(data = filter(mpg, class == "subcompact"), se = FALSE)
+
+
+```
+
+```{r}
+?geom_boxplot
+```
+
+
+```{r}
+# Boxplot
+ggplot(mpg, aes(displ)) +
+  geom_boxplot() 
+
+# Histogram
+ggplot(mpg, aes(displ)) + 
+  geom_histogram()
+
+# Line Graph
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_smooth(se = FALSE)
+
+# Area Graph
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_area()
+```
+
+
+
+```{r}
+ggplot(mpg, aes(displ, hwy, color = drv )) + 
+  geom_point() +
+  geom_smooth(se = FALSE)
+#geom_point(show.legend = FALSE) +
+ # geom_smooth(se = FALSE, show.legend = FALSE)
+  
+```
+```{r}
+?geom_point
+```
+
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(size = 5) +
+  geom_smooth(size = 3, se = FALSE)
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_smooth(size = 3, aes(displ, hwy, group =drv), se = FALSE) +
+  geom_point(size = 5)  
+
+ggplot(mpg, aes(displ, hwy, color = drv)) +
+  geom_smooth(size = 3, se = FALSE) + 
+  geom_point(size = 5)
+
+ggplot(mpg) + 
+  geom_point(size = 5, aes(displ, hwy, color = drv)) +
+  geom_smooth(size = 3, aes(displ, hwy), se = FALSE)
+
+ggplot(mpg) + 
+  geom_point(size = 3, aes(displ, hwy, color = drv)) +
+  geom_smooth(aes(displ, hwy, linetype = drv), se = FALSE, size = 2) 
+
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(stroke = 7, color = "white") +
+  geom_point(size = 5, aes(displ, hwy, color = drv))
+```
+## Section 3.7: Statistical Transformations
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(aes(cut))
+```
+```{r}
+ggplot(diamonds) + 
+  stat_count(aes(cut))
+```
+```{r}
+demo <- tribble(
+  ~cut, ~freq, 
+  "Fair", 1610, 
+  "Good", 4906,
+  "Very Good", 12082,
+  "Premium", 13791,
+  "Ideal", 21551
+)
+
+ggplot(data = demo) + 
+  geom_bar(aes(cut, freq), stat = "identity")
+```
+
+```{r}
+# Using a prop stat rather than count on the bar geom
+ggplot(diamonds) + 
+  geom_bar(aes(cut, y = stat(prop), group = 1))
+```
+
+### Section 3.7.1: Exercises
+```{r}
+# Plotting with a summary statistic
+ggplot(diamonds) + 
+  stat_summary(
+    aes(cut, depth), 
+      fun.min = min, 
+      fun.max = max, 
+      fun = median
+  )
+
+# Plotting with a geom_pointrange
+ggplot(diamonds) +
+  geom_pointrange(
+    mapping = aes(cut, depth), 
+    stat = "summary",
+    fun.min = min,
+    fun.max = max,
+    fun = median
+  )
+
+```
+
+```{r}
+# Bar
+ggplot(diamonds) +
+  geom_bar(aes(cut))
+```
+```{r}
+# Example of geometric column
+df <- data.frame(trt = c("a", "b", "c"), outcome = c(2.3, 1.9, 3.2))
+ggplot(df, aes(trt, outcome)) + 
+  geom_col()
+```
+### The difference between geom_bar & geom_col
+```{r}
+# The difference between a geom_bar & a geom_col is a geom_bar uses a stat_count whereas geom_col uses values of of a variable. This is useful when you desire to plot categorical data against numerical data. 
+```
+
+
+### geom pairs
+```{r}
+# stat_bin : geom_bar
+# stat_count : geom_bar
+# stat_density : geom_area
+# stat_bin_2d : geom_tile
+# stat_bin_hex : geom_hex
+# stat_density_2d : geom_density_2d
+# stat_ellipse : geom_path
+# stat_contour : geom_contour
+# stat_summary_hex : geom_hex
+# stat_summary_2d : geom_tile
+# stat_boxplot : geom_boxplot
+# stat_ydensity : geom_violin
+# stat_ecdf : geom_step
+# stat_quantile : geom_quantile
+# stat_smooth : geom_smooth
+# stat_function : geom_function
+# stat_qq : geom_point
+# stat_sum : geom_point
+# stat_summary : geom_pointrange
+# stat_summary_bin : geom_pointrange
+# stat_identity : geom_point
+# stat_unique : geom_point
+```
+
+### stat_smooth
+```{r}
+# [statsmooth docs](https://ggplot2.tidyverse.org/reference/geom_smooth.html#computed-variables)
+# Stat smooth computes: 
+#   y or x as the predicted value
+#   ymin or xmin: lower pointwise confidence interval around the mean
+#   ymax or xmax: upper pointwise confidence interval around the mean
+#   se as standard error
+
+# Parameters:
+# mapping
+# data
+# position
+# method
+# formula
+# se
+# na.rm
+# orientation
+# show.legend
+# inherit.aes
+# geom, stat
+# n: number of points at which to evaluate smoother
+# span : controls the amount of smoothing
+# fullrange 
+# level: confidence interval to use
+# method.args
+```
+
+```{r}
+# I need to add groups because each column will not automatically sort the data proportionally into groups. Bar by default does not use a variable as a value in the y column. Therefore proportionally all data is being read into every column until the data is sorted into groups by declaring group = 1.
+
+ggplot(data = diamonds) + 
+  geom_bar(aes(color, after_stat(prop), group = 1))
+
+ggplot(diamonds) + 
+  geom_bar(aes(x = cut, fill = color, y = after_stat(prop), group = 1))
+```
+
+
+## 3.8 Position adjustments
+```{r}
+
+# Bar plots are quantities stacked on top of each other by default
+ggplot(diamonds) +
+  geom_bar(aes(cut, color = cut))
+
+ggplot(diamonds) +
+  geom_bar(aes(cut, fill = cut))
+
+ggplot(diamonds) + 
+  geom_bar(aes(x = cut, fill = clarity))
+```
+```{r}
+# bars
+# Identity will overlay the bars on each other
+ggplot(diamonds, aes(cut, fill = clarity)) +
+  geom_bar(alpha = 1/5, position = "identity")
+
+ggplot(diamonds, aes(cut, color = clarity)) + 
+  geom_bar(fill = NA, position = "identity")
+
+# Dodge will show the bars side by side
+ggplot(diamonds, aes(cut, fill = clarity)) + 
+  geom_bar(position = "dodge")
+
+# Fill stacks the bars as in default but the bars are each the same height
+ggplot(diamonds, aes(cut, fill = clarity)) + 
+  geom_bar(position = "fill")
+```
+#### Jitter 
+```{r}
+# This will add small amounts of random noise to make all points visible.
+ggplot(mpg) +
+  geom_point(aes(displ, hwy), position = "jitter")
+
+ggplot(mpg) +
+  geom_jitter(aes(displ, hwy))
+```
+
+### 3.8.1 Exercises
+```{r}
+# This plot needed color and jitter to show all the points
+ggplot(mpg, aes(cty, hwy, color = cty)) +
+  geom_jitter(width = 1, height = 1)
+
+ggplot(mpg, aes(cty, hwy, color = cty)) +
+  geom_count()
+# The width param will control the amount of jitter
+# geom_count will map the point position to area whereas geom_jitter maps the point to a slightly different point
+```
+
+```{r}
+ggplot(mpg) +
+  geom_boxplot(aes(cty, hwy, position = "jitter")) +
+  coord_flip()
+```
+
+### 3.9 Coordinate Systems
+
+```{r}
+# coord_flip() to flip axis
+# coord_quickmap to set aspect ratio for maps
+# coord_polar() uses polar coordinates
+bar <- ggplot(diamonds) + 
+  geom_bar(
+    aes(cut, fill = cut), 
+    show.legend = FALSE,
+    width = 1
+  ) + 
+  theme(aspect.ratio = 1) +
+  labs(x = NULL, y = NULL)
+
+bar + coord_flip()
+bar + coord_polar()
+```
+
+```{r}
+world <- map_data("world")
+
+ggplot(world, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", color = "black")
+
+ggplot(world, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", color = "black") +
+  coord_quickmap()
+
+```
+### 3.9.1 Exercises
+```{r}
+# Creating a pie chart from a stacked bar chart
+ggplot(diamonds) +
+  geom_bar(aes(x = factor(1), fill = factor(cut)), position = "fill") +
+  coord_polar(theta = "y") +
+  xlab("") +
+  ylab("") +
+  labs(fill = "Cut")
+```
+```{r}
+# coord_fixed fixes the aspect ratio such that x and y are 1
+ggplot(mpg, aes(cty, hwy))+
+  geom_point() + 
+  geom_abline() +
+  coord_fixed()
+
+ggplot(mpg, aes(cty, hwy))+
+  geom_point() + 
+  geom_abline()
+```
+
+## 3.10 Code Template
+```{r}
+#ggplot(data = <DATA>) +
+#  <GEOM_FUNCTION>(
+#    mapping = aes(<MAPPINGS>), 
+#    stat = <STAT>,
+#    position = <POSITION>
+#  ) +
+#  <COORDINATE_FUNCTION> + 
+#  <FACET_FUNCTION>
+```
+
+# 4 Workflow 
+```{r}
+ggplot(dota = mpg) +
+  geom_point(mpg, mapping = aes(x = displ, y = hwy))
+
+filter(mpg, cyl == 8)
+filter(diamonds, carat > 3)
+```
+## 5 Data Transformation
+```{r}
+if(!require("nycflights13")) install.packages("nycflights13")
+library(nycflights13)
+library(tidyverse)
+```
+### 5.2 Filter
+```{r}
+filter(flights, month == 1, day == 1)
+```
+#### Floating point numbers
+```{r}
+near(sqrt(2) ^ 2, 2)
+sqrt(2) ^ 2 == 2 # floating point precision is causing a flase
+```
+
+#### logical boolean operations
+```{r}
+TRUE & TRUE
+FALSE | FALSE
+xor(FALSE, TRUE)
+```
+```{r}
+filter(flights, month == 11 | month == 12)
+```
+
+```{r}
+# Finding months equal to november or december
+nov_dec <- filter(flights, month %in% c(11, 12))
+nov_dec
+```
+#### 5.2.4 Exercises
+```{r}
+(arr_delay_2_or_more_hours <- filter(flights, arr_delay >= 120))
+(filter(flights, dest %in% c("IAH", "HOU")))
+(filter(flights, carrier %in% c("UA", "AA", "Delta")))
+(filter(flights, month %in% c(7, 8, 9)))
+(filter(flights, arr_delay == 0, arr_time > 120))
+(filter(flights, arr_delay >= 60, arr_time < 30))
+(filter(flights, sched_dep_time > 0, sched_dep_time < 600))
+(filter(flights, between(sched_dep_time, 0, 600))) # between is inclusive of the left and right ends
+```
+
+```{r}
+summarise(flights)
+```
+### 5.3 Arrange Rows
+```{r}
+# reoder columns
+arrange(flights,  day, year, month)
+
+# reorder columns in descending order
+arrange(flights, desc(dep_delay))
+arrange(flights, is.na(carrier))
+```
+```{r}
+summarise(flights)
+```
+##### 5.3.1 Exercises
+
+```{r}
+# Sorting all missing values at the start
+df <- tibble(x = c(1, NA, 3))
+filter(df, x > 1)
+arrange(df, desc(is.na(x)))
+
+# sort flights to find the most delayed flights
+arrange(flights, dep_delay)
+speed <- flights$distance/flights$air_time
+(flights$speed <- speed)
+arrange(flights, desc(speed))
+  
+
+# flights that traveled the farthest
+arrange(flights, desc(distance))
+
+# flights that traveled the shortest
+arrange(flights, distance)
+
+# 
+```
+
+### 5.4 Select 
+```{r Selecting Columns By Name}
+select(flights, year, month, day)
+```
+```{r Select all columns between year & day}
+select(flights, year:day)
+```
+```{r select all columns excluding year & day}
+select(flights, -(year:day))
+
+```
+
+```{r Select Helper Functions}
+# starts_with("abc")
+# ends_with("abc")
+# contains("jks")
+# matches("(.)\\1") # matches a regular expression
+```
+
+
+```{r}
+flights_sml <- select(flights, 
+                      year:day,
+                      ends_with("delay"),
+                      distance,
+                      air_time
+                      )
+```
+
+
+```{r}
+# rename will rename all the variables that aren't mentioned when using a select
+rename(flights_sml, arrival_delay = arr_delay)
+```
+```{r}
+flights_sml
+```
+
+#### 5.4.1 Excercises
+```{r}
+select(flights, dep_time, dep_delay, arr_time, arr_delay)
+select(flights, dep_delay, arr_time, arr_delay, dep_time)
+# ... this will extend to include all orderings of dep_delay, arr_time, arr_delay, & dep_time
+select(flights, dep_delay, dep_delay) # duplicates are listed only once
+
+# selecting all_of(vars) will select all of the variables listed in var from a dataset. If the variables are not in a dataset, this will cause an error.
+# selecting any_of(vars) will not throw an error when any one variable is not in the dataset. 
+# i.e. 
+vars <- c("Sepal.Length", "Sepal.Width")
+#starwars %>% select(all_of(vars))
+starwars %>% select(any_of(vars))
+# any_of is useful for removing any of the variables in a list
+iris %>% select(-any_of(vars))
+```
+
+
+### 5.5 Mutate
+```{r}
+# Mutate will add new rows to a dataset
+
+flights_sml <- select(flights, 
+                      year:day,
+                      ends_with("delay"),
+                      distance,
+                      air_time
+                      )
+
+mutate(flights_sml, gain = dep_delay - arr_delay, speed = (distance / air_time) * 60)
+
+# transmute will only refer to columns that were just created:
+transmute(flights, gain = dep_delay - arr_delay, hours = air_time * 60, gain_per_hour = gain / hours)
+```
+
+```{r}
+(x <- 1:10)
+lead(x)
+lag(x)
+# lead()
+# compute running differences x - lag(x)
+# compute when values change x != lag(x)
+
+```
+
+```{r}
+(x)
+cumsum(x)
+cummean(x)
+
+# cumprod
+
+# cummin
+# cummax
+```
+
+
+```{r Rank}
+y <- c(1,2,2,NA, 3, 4)
+min_rank(y)
+min_rank(desc(y))
+
+# row_number()
+# dense_rank()
+# percent_rank()
+# cume_dist()
+```
+
+
+#### 5.5 Modular arithmetic
+```{r}
+transmute(flights, hour = dep_time %/% 100, minutes = dep_time %/% 100)
+```
+
+
+```{r}
+  summarise(flights, delay = mean(dep_delay, na.rm = TRUE))
+```
+
+```{r}
+  by_dest <- group_by(flights, dest)
+```
+
+```{r}
+  delay <- summarise(by_dest, count = n(), dist = mean(distance, na.rm = TRUE), delay = mean(arr_delay, na.rm = TRUE))
+  (delay <- filter(delay, count > 20, dest != "HNL"))
+#  (delay <- filter(delay, count > 10, delay < 6))
+
+# group_by(flights, dest) %>% summarise(flights, count = n(), dist = mean(distance, na.rm = TRUE), delay = mean(arr_delay, na.rm = TRUE))
+
+
+ggplot(data = delay, mapping = aes(x = dist, y = delay)) + 
+  geom_point(aes(size = count, alpha = 1/3)) + 
+  geom_smooth(se = FALSE)
+```
+```{r}
+
+delays <- flights %>% group_by(dest) %>% summarise(count = n(), dist = mean(distance, na.rm = TRUE), delay = mean(arr_delay, na.rm =TRUE))
+```
+
+```{r}
+dep_time <- group_by(flights, dep_time)
+dep_time %>% summarise(count = n(), delay = mean(arr_delay, na.rm = TRUE))
+```
+```{r}
+summarise(group_by(flights, dep_delay))
+```
+
+```{r}
+x <- c(5,1,3,2,2, NA)
+min_rank(x)
+```
+
+
+#### 5.5.2 Exercises
+```{r}
+# Converting flights scheduled depart time from hours since midnight to minutes
+flights_sched_dep_time_hours <- flights$sched_dep_time %/% 100
+flights_sched_dep_time_minutes <- flights$sched_dep_time %% 100
+flights_sched_dep_time_total_minutes <- flights_sched_dep_time_hours * 60 + flights_sched_dep_time_minutes
+flights$sched_dep_time <- flights_sched_dep_time_total_minutes
+```
+
+```{r}
+# Converting flights arrival time from hours since midnight to minutes
+flights_arr_time_hours <- flights$arr_time %/% 100
+flights_arr_time_minutes <- flights$arr_time %% 100
+flights_arr_time_total_minutes <- flights_arr_time_hours * 60 + flights_arr_time_minutes
+flights$arr_time <- flights_arr_time_total_minutes
+```
+
+```{r}
+# Converting flights depart time from hours since midnight to minutes
+flights_dep_time_hours <- flights$dep_time %/% 100
+flights_dep_time_minutes <- flights$dep_time %% 100
+flights_dep_time_total_minutes <- flights_dep_time_hours * 60 + flights_dep_time_minutes
+flights$dep_time <- flights_dep_time_total_minutes
+(flights)
+```
+
+
+
+
+```{r}
+air_time <- flights$air_time
+arr_dep <- flights$arr_time - flights$dep_time
+```
+
+```{r}
+# Find the 10 most delayed flights using a ranking function. 
+
+####
+delays <- flights$arr_delay + flights$dep_delay
+flights <- mutate(flights, delays)
+flight_delays <- (select(flights, delays, everything()))
+group_by(flight_delays, delays)
+delays_groups <- group_by(flight_delays,delays)
+delays_groups
+
+```
+
+```{r}
+delays <- flights$arr_delay + flights$dep_delay
+
+# flights %>% group_by(delays) %>% summarise(count = n())
+
+delays_ranked <- min_rank(delays)
+flights <- mutate(flights, delays = flights$arr_delay + flights$dep_delay) %>% select(delays, everything())
+
+flights
+```
+
+```{r}
+flights <- mutate(flights, delay_rank = min_rank(desc(delays))) %>% select(delay_rank, everything())
+
+(ten_most_delayed_flights <- subset(flights, delay_rank <= 10) %>% arrange(delay_rank))
+```
+
+```{r}
+(ten_most_delayed_flights)
+```
+
+
+```{r}
+# Quesion 5
+# 1:3 + 1:10 returns the sum of 1 - 3 and 1 - 3 followed by the sum of 1 - 3 and  4 - 6 until the limit is of 10 is reached in the longer sequence. The shorter sequence is cycled until the longer sequence completes within the sum. 
+1:3 + 1:10
+```
+
+```{r}
+# Quesion 6
+# sin
+# cos
+# tan
+
+# acos
+# asin
+# atan
+# atan2
+
+# cospi
+# sinpi
+# tanpi
+
+```
+
+```{r 5.6 Grouped summaries with summarise}
+summarise(flights, delay = mean(dep_delay, na.rm = TRUE))
+```
+
+```{r}
+by_day <- group_by(flights, year, month, day)
+```
+
+```{r}
+summarise(by_day, delay = mean(dep_delay, na.rm = TRUE))
+```
+
+```{r}
+by_dest <- group_by(flights, dest)
+delay <- summarise(by_dest, count = n(), dist = mean(distance, na.rm = TRUE), delay = mean(arr_delay, na.rm = TRUE))
+delay <- filter(delay, count > 20, dest != "NHL")
+
+ggplot(data = delay, mapping = aes(x = dist, y = delay)) + 
+  geom_point(aes(size = count), alpha = 1/3) +
+  geom_smooth(se = FALSE)
+```
+
+```{r}
+delays <- flights %>% 
+  group_by(dest) %>%
+  summarise(
+    count = n(), 
+    dist = mean(distance, na.rm = TRUE),
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) %>%
+  filter(count > 20, dest != "HNL")
+
+
+```
+
+## 5.6.2 Missing Values
+```{r}
+flights %>%
+  group_by(year, month, day) %>%
+  summarise(mean = mean(dep_delay))
+```
+
+```{r}
+not_cancelled <- flights %>%
+  filter(!is.na(dep_delay), !is.na(arr_delay))
+
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  summarise(mean = mean(dep_delay))
+```
+
+## Section 5.6.3: Counts
+
+```{r}
+# count(n()) count values
+# count non-missing values (sum(!is.na(x)))
+delays <- not_cancelled %>%
+  group_by(tailnum) %>%
+  summarise(delay = mean(arr_delay))
+
+ggplot(data = delays, mapping = aes(x = delay)) +
+  geom_freqpoly(binwidth = 10)
+```
+
+```{r}
+delays <- not_cancelled %>%
+  group_by(tailnum) %>%
+  summarise(
+    delay = mean(arr_delay, na.rm = TRUE), 
+    n = n()
+  )
+
+ggplot(data = delays, mapping = aes(x = n, y = delay)) + 
+  geom_point(alpha = 1/10)
+```
+
+
+### 5.6.3 Counts
+```{r}
+not_cancelled <- flights %>% filter(!is.na(dep_delay), !is.na(arr_delay))
+
+not_cancelled %>% group_by(year, month, day) %>% summarise(mean = mean(dep_delay))
+```
+
+
+```{r}
+delays <- not_cancelled %>% group_by(tailnum) %>% summarise(delay = mean(arr_delay))
+
+ggplot(delays, mapping = aes(delay)) + 
+  geom_freqpoly(binwidth = 10)
+```
+
+```{r}
+delays <- not_cancelled %>% group_by(tailnum) %>% summarise(delay = mean(arr_delay, na.rm = TRUE), n = n())
+
+ggplot(data = delays, mapping = aes(x = n, y = delay))+
+  geom_point(alpha = 1/10)
+```
+
+```{r}
+batting <- as_tibble(Lahman::Batting)
+```
+
+```{r}
+batting
+```
+
+
+```{r}
+batters <- batting %>% group_by(playerID) %>% summarise(ba = sum(H, na.rm = TRUE) / sum(AB, na.rm = TRUE), ab = sum(AB, na.rm = TRUE))
+```
+
+```{r}
+batters %>% filter(ab > 100) %>% ggplot(mapping = aes(x = ab, y = ba)) + 
+  geom_point() + 
+  geom_smooth(se = FALSE)
+```
+
+
+```{r}
+batters %>%
+  arrange(desc(ba))
+```
+#### 5.6.4 Useful Summary Functions
+```{r}
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  summarise(
+    avg_delay1 = mean(arr_delay),
+    avg_delay2 = mean(arr_delay[arr_delay>0])
+  )
+```
+
+```{r}
+not_cancelled %>% 
+  group_by(dest) %>% 
+  summarise(distance_sd = sd(distance)) %>%
+  arrange(desc(distance_sd))
+```
+
+```{r}
+# When do the first and last flights leave each day?
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  summarise(
+    first = min(dep_time),
+    last = max(dep_time)
+  )
+```
+
+```{r}
+# Select the first element
+first(not_cancelled$arr_delay)
+
+# Select the last element
+last(not_cancelled$arr_delay)
+
+# Select the nth element
+nth(not_cancelled$arr_delay, 3)
+
+# Selecting the 3rd element of the arr_delay array
+not_cancelled$arr_delay[4]
+
+# Selecting the 1st column of the not_cancelled dataframe
+not_cancelled[1]
+
+```
+
+```{r}
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  mutate(r = min_rank(desc(dep_time))) %>%
+  filter(r %in% range(r))
+```
+
+```{r}
+
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  mutate(r = min_rank(desc(dep_time))) %>%
+  filter(r %in% range(r))
+
+```
+```{r}
+
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  mutate(r = min_rank(desc(dep_time))) %>%
+  filter(r %in% range(r))
+```
+
+```{r}
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  mutate(r = min_rank(desc(dep_time))) %>%
+  filter(r %in% range(r))
+```
+
+```{r}
+ not_cancelled %>%
+  group_by(year, month, day) %>%
+  mutate(r = min_rank(desc(dep_time))) %>%
+  filter(r %in% range(r))
+```
+
+```{r}
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  mutate(r = min_rank(desc(dep_time))) %>%
+  filter(r %in% range(r))
+```
+
+```{r}
+ not_cancelled %>%
+  group_by(year, month, day) %>%
+  mutate(r = min_rank(desc(dep_time))) %>%
+  filter(r %in% range(r))
+```
+
+```{r}
+# sum(!is.na(x)) # number of non-missing values
+
+not_cancelled_greatest_dep_time <- not_cancelled %>%
+  group_by(year, month, day) %>%
+  mutate(r = min_rank(desc(dep_time))) %>%
+  filter(r %in% range(r))
+
+(not_cancelled_greatest_dep_time)
+
+sum(!is.na(not_cancelled_greatest_dep_time)) # number of non-missing values
+
+sum(!is.na(not_cancelled_greatest_dep_time)) # number of non-missing values
+
+sum(!is.na(not_cancelled_greatest_dep_time)) # number of non-missing values 
+
+sum(!is.na(not_cancelled_greatest_dep_time)) # number of non-missing values 
+
+sum(!is.na(not_cancelled_greatest_dep_time)) # number of non-missing values 
+
+n_distinct(not_cancelled_greatest_dep_time) # count the number of distinct values
+
+n_distinct(not_cancelled_greatest_dep_time) # count the number of distinct values
+
+n_distinct(not_cancelled_greatest_dep_time) # count the number of distinct values
+
+n_distinct(not_cancelled_greatest_dep_time) # count the number of distinct values
+
+n_distinct(not_cancelled_greatest_dep_time) # count the number of distinct values
+
+n_distinct(not_cancelled_greatest_dep_time) # count the number of distinct values
+
+n_distinct(not_cancelled_greatest_dep_time) # count the number of distinct values
+
+```
+
+```{r}
+# Count
+not_cancelled %>%
+  count(dest)
+```
+
+```{r}
+ not_cancelled %>% 
+  count(dep_time)
+```
+
+```{r}
+# counting the total number of miles a plane flew
+not_cancelled %>%
+  count(tailnum, wt = distance)
+```
+
+```{r}
+not_cancelled
+```
+
+
+```{r}
+ not_cancelled %>%
+  count(tailnum, wt = day)
+```
+
+```{r}
+not_cancelled %>% 
+  group_by(year, month, day) %>%
+  summarise(n_early = sum(dep_time > 500))
+```
+
+```{r}
+
+# Summary will peel off one layer of grouping for each call
+
+daily <- group_by(flights, year, month, day)
+
+(per_day <- summarise(daily, flights = n())) # counting the number of flights each day
+
+(per_month <- summarise(per_day, flights = sum(flights))) # summing the number of flights in the day column for each group month
+
+
+(number_of_months_in_a_year <- summarise(per_month, flights = n())) # The count of the number of months in a year
+
+(per_year <- summarise(per_month, flights = sum(flights))) # The sum of the flights for all the months for all the days in a given year. 
+
+# This takes the sum of all the flights. 
+daily %>%
+  ungroup() %>%            # no longer grouped by date
+  summarise(flights = n()) # all flights
+
+```
+
+#### 5.6.7 Exercises
+```{r}
+# arrival delay & departure delay are equally as important; You cannot distinguish the reason for a delay based on the fact that the plane is late or early.
+
+not_cancelled %>% group_by(dest) %>% summarise(n())
+
+not_cancelled %>% group_by(tailnum, distance) %>% summarise(distance = n())
+
+# dep_delay could still exist even if the flight is canceled. Because there is a delay does not mean the entire flight is cancelled. The columns are equally important.
+
+cancelled_flights_per_day <- filter(flights, is.na(dep_delay)) %>% group_by(day) %>% count()
+
+average_delay <- flights %>% group_by(day) %>% summarise(avg_delay = mean(arr_delay, na.rm = TRUE))
+
+cancelled_flights_per_day_average_delay<- mutate(average_delay, cancelled_flights_per_day) %>% rename(cancelled_flights_per_day = n)
+
+# cancelled_flights_per_day_average_delay <- rename(temp, cancelled_flights_per_day = n)
+
+cancelled_flights_per_day_average_delay <- mutate(cancelled_flights_per_day_average_delay, proportion = cancelled_flights_per_day / avg_delay)
+
+#count(flights, is.na(dep_delay)) 
+
+```
+
+```{r}
+ggplot(cancelled_flights_per_day_average_delay) + 
+  geom_point(aes(x = day, y = avg_delay)) +
+  geom_smooth(aes(x = day, y = proportion), se = FALSE) +
+  ylab("Average Delay") +
+  labs(title = "Proportion of cancelled flights with respect to average delay")
+```
+
+```{r 5.6.7.5 which carrier has the worst delays}
+# Which carrier has the worst delays?
+carrier_delays_ranked <- nycflights13::flights
+
+(carrier_delays_ranked <- carrier_delays_ranked %>% mutate(ranked_delay = min_rank(desc(arr_delay))) %>% select (ranked_delay, carrier, everything()) %>% arrange(ranked_delay))
+
+filter(carrier_delays_ranked, ranked_delay < 6)
+```
+
+```{r}
+carrier_delays_ranked
+```
+
+
+```{r}
+# 5.6.7.5 disentangle the effects of bad airports vs. bad carriers
+# Which carrier has the worst delays? Challenge: can you disentangle the effects of bad airports vs. bad carriers? Why/why not? (Hint: think about flights %>% group_by(carrier, dest) %>% summarise(n()))
+
+# compare the average of arrival delays to a destination vs the average of delays by carrier
+
+# temp <- carrier_delays_ranked %>% group_by(carrier, dest) %>% summarise(n())
+
+average_carrier_delays <- carrier_delays_ranked %>% group_by(carrier) %>% summarise(average_carrier_delay = mean(arr_delay, na.rm = TRUE))
+
+average_dest_delays <- carrier_delays_ranked %>% group_by(dest) %>% summarise(average_destination_delay = mean(arr_delay, na.rm = TRUE))
+
+(top_ten_greatest_delays <- carrier_delays_ranked %>% select(ranked_delay, carrier, dest) %>% filter(ranked_delay < 10))
+
+(average_carrier_delays)
+
+(average_dest_delays)
+
+(first_obs <- filter(first(top_ten_greatest_delays)))
+filter(average_carrier_delays, carrier == "HA")
+filter(average_dest_delays, dest == "HNL")
+
+# carrier_str <- str(first_obs["carrier"])
+# filter(average_carrier_delays, carrier == carrier_str)
+```
+
+
+```{r}
+# 5.6.7.5 disentangle the effects of bad airports vs. bad carriers
+# The number of late arrivals / total flights by carrier
+
+
+(arrival_delays_greater_than_zero_grouped_by_carrier <- carrier_delays_ranked %>% group_by(carrier) %>% count(late_arrival = arr_delay > 0) %>% filter(late_arrival == TRUE) %>% select(carrier, n) %>% rename(late_arrival = n))
+
+(total_number_of_flights_by_carrier <- carrier_delays_ranked %>% group_by(carrier) %>% summarise(n()) %>% rename(total_flight = `n()`))
+
+# master_df <- data.frame(arrival_delays_greater_than_zero_grouped_by_carrier, total_number_of_flights_by_carrier)
+
+(arrival_delays_greater_than_zero_grouped_by_carrier$late_arrival /total_number_of_flights_by_carrier$total_flight)
+(arrival_delays_greater_than_zero_grouped_by_carrier$carrier)
+
+proportion_late_arrivals_total_flights_by_carrier <- data.frame(arrival_delays_greater_than_zero_grouped_by_carrier$carrier, 
+           arrival_delays_greater_than_zero_grouped_by_carrier$late_arrival,
+           total_number_of_flights_by_carrier$total_flight, 
+           arrival_delays_greater_than_zero_grouped_by_carrier$late_arrival /total_number_of_flights_by_carrier$total_flight)
+
+proportion_late_arrivals_total_flights_by_carrier <- proportion_late_arrivals_total_flights_by_carrier %>% rename(carrier = arrival_delays_greater_than_zero_grouped_by_carrier.carrier, late_arrival = arrival_delays_greater_than_zero_grouped_by_carrier.late_arrival, total_flight = total_number_of_flights_by_carrier.total_flight, proportion_late_arrivals = arrival_delays_greater_than_zero_grouped_by_carrier.late_arrival.total_number_of_flights_by_carrier.total_flight)
+```
+
+```{r}
+proportion_late_arrivals_total_flights_by_carrier
+```
+
+```{r}
+# 5.6.7.5 disentangle the effects of bad airports vs. bad carriers
+# The number of late arrivals / total flights to destination
+
+(arrival_delays_greater_than_zero_dest <- carrier_delays_ranked %>% group_by(dest) %>% count(late_arrival = arr_delay > 0) %>% filter(late_arrival == TRUE) %>% select(dest, n) %>% rename(late_arrival = n))
+
+(total_number_of_flights_by_dest <- carrier_delays_ranked %>% group_by(dest) %>% summarise(n()) %>% rename(total_flight = `n()`) %>% filter(dest != 'LEX' & dest != 'LGA'))
+
+
+
+(proportion_late_arrivals_total_flights_by_dest <- data.frame(total_number_of_flights_by_dest$dest, arrival_delays_greater_than_zero_dest$late_arrival, total_number_of_flights_by_dest$total_flight, arrival_delays_greater_than_zero_dest$late_arrival / total_number_of_flights_by_dest$total_flight))
+
+```
+
+```{r}
+proportion_late_arrivals_total_flights_by_dest
+```
+
+
+```{r}
+proportion_late_arrivals_total_flights_by_dest <- proportion_late_arrivals_total_flights_by_dest %>% 
+  rename(dest = total_number_of_flights_by_dest.dest,
+         late_arrival = arrival_delays_greater_than_zero_dest.late_arrival,
+         total_flight = total_number_of_flights_by_dest.total_flight,
+         proportion_late_arrivals = arrival_delays_greater_than_zero_dest.late_arrival.total_number_of_flights_by_dest.total_flight
+         )
+```
+```{r}
+proportion_late_arrivals_total_flights_by_dest
+```
+
+```{r}
+# 5.6.7.5 disentangle the effects of bad airports vs. bad carriers
+
+(first_obs <- filter(first(top_ten_greatest_delays)))
+filter(average_carrier_delays, carrier == "HA")
+filter(average_dest_delays, dest == "HNL")
+filter(proportion_late_arrivals_total_flights_by_dest, dest == "HNL")
+filter(proportion_late_arrivals_total_flights_by_carrier, carrier == "HA")
+
+# The proportion of late arrivals for the HNL dest is greater than the proportion of late arrivals for the HA carrier. Furthermore, the average carrier delay for the HA carrier is much less than the HNL destination. Therefore, the reason the reason the majority of late arrivals is from the HA carrier to the HNL destination is most likely because of the HNL destination, not because of the HA Carrier. This analysis could be done with a function for each pair in the ranked list of late arrivals. 
+
+```
+
+
+```{r}
+# 6
+# if sort is true, then count(sort= True) will show the largest groups at the top; only works for atomic and list types
+starwars %>% count(sex, gender, species, sort = TRUE)
+```
+### 5.7 Grouped mutates and filters
+
+```{r}
+# Quesion 1
+# Grouped mutates vs a normal mutate:
+# Grouped mutates will aggregate all values together in a group for all columns
+# normal mutates will alter the values by individual observations, leaving each column as a representation of a single observation 
+flights_sml <- select(flights, 
+                      year:day, 
+                      ends_with("delay"),
+                      distance, 
+                      air_time
+                      )
+```
+
+
+```{r Normal mutate}
+mutate(flights_sml, 
+       gain = dep_delay - arr_delay, 
+       speed = distance / air_time * 60
+       )
+```
+
+
+```{r }
+flights_sml %>%
+  group_by(year, month, day) %>%
+  filter(rank(desc(arr_delay)) < 10)
+```
+
+
+```{r which plane has the worst on-time record }
+# tailnum N384HA has the worst on-time record
+worst_on_time_record <- nycflights13::flights
+  names(flights)
+worst_on_time_record <- flights %>% select(-delay_rank, everything())
+worst_on_time_record %>% select(delays, tailnum, everything()) %>% arrange(desc(delays))
+```
+
+
+```{r What time of day should you fly if you want to avoid delays as much as possible}
+n_no_delay <- flights %>% group_by(sched_dep_time) %>% filter(delays <= 0) %>% summarise(delays) %>% count(sched_dep_time)
+sched_dep_time_no_delay_list <- unique(n_no_delay$sched_dep_time)
+
+n_delay_min <- flights %>% group_by(sched_dep_time) %>% filter(delays > 0) %>% summarise(delays) %>% count(sched_dep_time) %>% arrange(n)
+sched_dep_time_delay_list <- unique(n_delay_min$sched_dep_time)
+
+length(sched_dep_time_no_delay_list)
+length(sched_dep_time_delay_list)
+
+flights_to_find <- sched_dep_time_no_delay_list %in% sched_dep_time_delay_list
+
+scheduled_flights_with_no_delays <- sched_dep_time_delay_list[flights_to_find == FALSE]
+
+# n_no_delay %>% filter(sched_dep_time == 232)
+# n_no_delay %>% filter(sched_dep_time == 225)
+```
+
+```{r}
+flights %>% select(dest, everything())
+```
+
+```{r}
+flights
+```
+```{r}
+not_cancelled <- flights %>% filter(!is.na(dep_delay) | !is.na(arr_delay))
+```
+
+
+```{r for each destination compute the total minutes of delay}
+total_minutes_of_delay <- not_cancelled %>% filter(!is.na(delays))
+(delays_greater_than_zero <- total_minutes_of_delay %>% filter(delays > 0) %>% filter(!is.na(delays)))
+
+(total_minutes_of_delay_per_destination <- delays_greater_than_zero %>% group_by(dest) %>% filter(!is.na(delays)) %>% summarise(sum_delays = sum(delays)) %>% arrange(desc(dest)))
+
+total_minutes_of_delay_per_destination 
+
+```
+
+
+```{r  For each flight compute the proportion of total delay for its destination}
+
+delays_greater_than_zero_group_by_flights_dest <- delays_greater_than_zero %>% group_by(flight, dest) %>% select(flight, dest, delays, everything())
+
+left_join(delays_greater_than_zero_group_by_flights_dest, total_minutes_of_delay_per_destination, by=c('dest')) %>% mutate(proportion_delay_per_dest = delays/sum_delays) %>% select(flight, dest, delays, sum_delays, proportion_delay_per_dest, everything()) 
+
+```
+
+```{r}
+# Explore how the delay of a flight is related to the delay of an immediately preceding flight
+# how lag works
+# (x <- seq(1, 10))
+# (x_lag <- lag(x))
+# x - x_lag
+
+###
+comparison_of_flight_delay <- nycflights13::flights
+
+dep_time_hours <- comparison_of_flight_delay$dep_time %/% 100
+dep_time_minutes <- comparison_of_flight_delay$dep_time %% 100
+dep_time_min_since_midnight <- (dep_time_hours * 60) + (dep_time_minutes)
+comparison_of_flight_delay$dep_time_min_since_midnight <- dep_time_min_since_midnight
+
+comparison_of_flight_delay$total_delay <- comparison_of_flight_delay$dep_delay + comparison_of_flight_delay$arr_delay
+
+names(comparison_of_flight_delay)
+head(comparison_of_flight_delay)
+```
+
+
+```{r}
+# Explore how the delay of a flight is related to the delay of an immediately preceding flight
+comparison_of_flight_delay<- comparison_of_flight_delay %>%
+  select(year, month, day, flight, sched_dep_time, dep_time, total_delay, dep_time_min_since_midnight, sched_arr_time, everything()) %>% arrange(year, month, day, sched_dep_time)
+
+
+# comparison_of_flight_delay %>% select(dep_delay, flight, everything())
+# (comparison_of_flight_delay)
+```
+
+
+```{r}
+# Explore how the delay of a flight is related to the delay of an immediately preceding flight
+(comparison_of_flight_delay_no_na <- comparison_of_flight_delay %>% filter(!is.na(dep_delay)))
+```
+
+
+```{r}
+# Explore how the delay of a flight is related to the delay of an immediately preceding flight
+# After increase in the difference of delays between prior flights, there is a decrease in  of nearly the same magnitude from zero. It appears as if the planes are making up time lost from the previous delays by leaving early. 
+
+# (comparison_of_flight_delay_no_na)
+n_points = 100
+
+print("delay_first")
+(delay_first <- comparison_of_flight_delay$dep_delay[1:n_points])
+
+print("lag_delay_first")
+(lag_delay <- lag(comparison_of_flight_delay$dep_delay[1:n_points]))
+# (lag_delay_sum <- (delay_first + lag_delay))
+
+print("lag_delay_difference")
+(lag_delay_difference <- ( delay_first- lag_delay))
+```
+
+
+```{r}
+# Explore how the delay of a flight is related to the delay of an immediately preceding flight
+ggplot()+
+  geom_jitter(aes(x = seq(1:length(lag_delay_difference)), y = lag_delay_difference))
+  geom_smooth(aes(x = length(lag_delay_difference), y = lag_delay_difference))
+# (lag_delay_difference)
+
+# lag_delay_difference_no_NA <- lag_delay_difference[2:15]
+
+# typeof(lag_delay_difference_no_NA)
+
+# cumsum(lag(lag_delay_difference_no_NA))
+# cumsum(1:15)
+
+# comparison_of_flight_delay_no_na$flight
+```
+```{r 6: can you find flights that are suspiciously fast?}
+fast_flights <- comparison_of_flight_delay_no_na
+head(fast_flights)
+```
+
+
+```{r 6.1: can you find flights that are suspiciously fast?}
+fast_flights <- fast_flights %>% mutate(air_time_hour = (air_time / 60), mph = distance / air_time_hour)
+(fast_flights_arranged <- fast_flights %>% select(distance, air_time_hour, mph, flight, everything()) %>% arrange(desc(mph)))
+
+boxplot(fast_flights_arranged$mph, horizontal = TRUE, main = "mph")
+
+IQR(fast_flights_arranged$mph, na.rm = TRUE)
+quantile(fast_flights_arranged$mph, na.rm = TRUE)
+outlier_range = 1.5 * (iqr <- 438.1509 - 358.0892)
+
+median = 404.1509 
+
+q3 <- 438.8235
+
+outlier_bound <- outlier_range + q3
+```
+
+
+```{r 6.3: can you find flights that are suspiciously fast?}
+(proportional_air_time <- fast_flights_arranged 
+ %>% filter(!is.na(air_time_hour)) 
+ %>% group_by(flight, dest)
+ %>% summarise(air_time_hour_min = min(air_time_hour), air_time_hour_max = max(air_time_hour, rm.na = TRUE), air_time_hour_mean = mean(air_time_hour)) 
+ %>% mutate(air_time_max_per_min = air_time_hour_max / air_time_hour_min, air_time_hour_range = air_time_hour_max - air_time_hour_min) %>% select(dest, air_time_max_per_min, air_time_hour_max, air_time_hour_min, air_time_hour_range, air_time_hour_mean) %>% arrange(desc(air_time_max_per_min)))
+
+# These are the flights in order to greatest to least proportional air time. 
+proportional_air_time %>% arrange(desc(air_time_max_per_min)) %>% select(air_time_max_per_min, flight, dest, everything()) 
+
+boxplot(proportional_air_time$air_time_max_per_min, horizontal = TRUE, na.rm = TRUE, main = "Proportional Time in Air Relative to Shortest Flight")
+quantile(proportional_air_time$air_time_max_per_min)
+median <- 1.179104
+q1 <- 1.033333
+q3 <- 1.352941
+iqr <- q3 - q1
+upper_outlier_range <- 1.5 * iqr
+
+### Flights that are proportional outliers (Answer)
+proportional_air_time %>%
+  filter(air_time_max_per_min > (q3 + upper_outlier_range)) %>%
+  group_by(flight) %>%
+  arrange(desc(air_time_max_per_min)) %>%
+  select(flight, dest, air_time_max_per_min, air_time_hour_max, air_time_max_per_min, everything())
+
+```
+
+
+```{r 6.4: can you find flights that are suspiciously fast?}
+# Extra
+outlier_list <- fast_flights_arranged %>% filter(mph > outlier_bound) %>% arrange(desc(mph))
+proportional_air_time %>% filter(flight %in% outlier_list$flight) %>% arrange(desc(air_time_hour_range), flight)
+```
+```{r 7.1 Find all destinations that are flown by at least two carriers. Use that information to rank the carriers.}
+flights_two_carriers <- nycflights13::flights
+head(flights_two_carriers)
+```
+
+```{r 7.2 Find all destinations that are flown by at least two carriers. Use that information to rank the destinations.}
+# Answer
+dest_two_carriers <- nycflights13::flights
+dest_two_carriers_by_carrier <- dest_two_carriers %>% group_by(dest, carrier) %>% select(dest, carrier, everything()) %>% summarise()
+dest_two_carriers_by_carrier %>% mutate(dest_count = as.numeric(as.factor(dest))) %>% summarise(n_carriers_per_dest = sum(dest_count)) %>% select(dest, n_carriers_per_dest) %>% filter(n_carriers_per_dest > 2) %>% mutate(rank_carriers_per_dest = min_rank(n_carriers_per_dest)) %>% arrange(rank_carriers_per_dest)
+```
+
+
+```{r 7.3 Find all destinations that are flown by at least two carriers. Use that information to rank the carriers.}
+# carriers_by_flight <- flights_two_carriers %>% group_by(flight, carrier) %>% select(flight, carrier, everything()) %>% summarise()
+# carriers_by_flight %>% group_by(flight) %>% summarise(number_of_carriers = sum(flight)) %>% filter(number_of_carriers > 2) %>% mutate(rank = min_rank(desc(number_of_carriers))) %>% arrange(rank) %>% select(rank, flight, number_of_carriers, everything())
+# 
+# 
+# carriers_by_dest <- dest_two_carriers %>% group_by(flight, carrier) %>% select(flight, carrier, everything()) %>% summarise()
+# 
+# carriers_by_flight %>% group_by(flight) %>% summarise(number_of_carriers = sum(flight)) %>% filter(number_of_carriers > 2) %>% mutate(rank = min_rank(desc(number_of_carriers))) %>% arrange(rank) %>% select(rank, flight, number_of_carriers, everything())
+
+```
+
+
+```{r}
+# For each plane, count the number of flights before the first delay of greater than 1 hour
+  n_flights_before_first_delay_greater_than_1_hour <- comparison_of_flight_delay
+```
+
+
+```{r}
+# For each plane, count the number of flights before the first delay of greater than 1 hour
+  n_flights_before_first_delay_greater_than_1_hour
+```
+
+
+```{r}
+# For each plane, count the number of flights before the first delay of greater than 1 hour
+first_time_dep_delay_is_greater_than_one_hour <- first(n_flights_before_first_delay_greater_than_1_hour %>% group_by(year, month, day, sched_dep_time) %>% filter(dep_delay > 60) %>% arrange(year, month, day, sched_dep_time))
+
+(first_time_dep_delay_is_greater_than_one_hour)
+# (first_time_dep_delay_is_greater_than_one_hour$sched_dep_time)
+```
+
+
+```{r}
+# For each plane, count the number of flights before the first delay of greater than 1 hour
+### Answer
+n_flights_before_first_delay_greater_than_1_hour %>% group_by(year, month, day, sched_dep_time) %>% filter(
+  sched_dep_time < first_time_dep_delay_is_greater_than_one_hour$sched_dep_time & 
+    year <= first_time_dep_delay_is_greater_than_one_hour$year & 
+    month <= first_time_dep_delay_is_greater_than_one_hour$month & 
+    day <= first_time_dep_delay_is_greater_than_one_hour$day
+  ) %>% arrange(sched_dep_time)
+# nth(n_flights_before_first_delay_greater_than_1_hour <- n_flights_before_first_delay_greater_than_1_hour %>% group_by(year, month, day, sched_dep_time), 2)
+
+```
+
+
+
+## Section 7.3 Variation
+
+#### Section 7.3.4 Exercise:
+
+```{r}
+head(diamonds)
+```
+
+
+```{r 1. Explore the distribution of each of the x, y, and z variables in diamonds. }
+# The z axis is depth, the x & y axis are length and width.
+ggplot(diamonds) + 
+  geom_freqpoly(aes(x), color = "red", bins = 50) +
+  geom_freqpoly(aes(y), color = "green", bins = 50, linetype = "dashed") + 
+  geom_freqpoly(aes(z), color = "blue", bins = 50)
+```
+
+```{r 2. Explore the distribution of price}
+# There are no diamonds worth 1500. There are fewer diamonds worth 3000 - 4000 that 2000 - 3000 or 4000 - 5000.
+ggplot(diamonds, aes(price)) + 
+  geom_freqpoly(color = "darkgreen", binwidth = 20) +
+  coord_cartesian(x = c(0, 6000))
+
+```
+
+```{r 3.}
+# There are 1500 diamonds that are 0.99 carat & 1500 diamonds that are 1.0 carat 
+# ggplot(diamonds, aes(carat)) + 
+#   geom_freqpoly(color = "darkgreen", binwidth = .01) +
+#   xlim(x = c(0, 1.1)) + 
+#   ylim(y = c(0, 3000))
+
+# ggplot(diamonds, aes(carat)) + 
+#   geom_freqpoly(color = "darkgreen", binwidth = .01) +
+#   xlim(x = c(0, 1.5)) + 
+#   ylim(y = c(0, 3000))
+
+ggplot(diamonds, aes(carat)) + 
+  geom_freqpoly(color = "darkgreen") 
+  # xlim(x = c(0, 1.5)) + 
+  # ylim(y = c(0, 3000))
+
+```
+
+```{r 4. }
+# If you leave binwidth unset then the default binwidth of 30 will be used. If you try and zoom so only half a bar shows, then your bin width is too large for your current resolution & you need to scale it down so that you can view more points. 
+```
+
+
+## Section 7.4 Missing values
+
+```{r}
+diamonds %>% mutate(y_m = ifelse(y < 3 | y > 20, NA, y)) %>% select(y, y_m, everything()) %>% arrange(y)
+```
+
+
+```{r}
+# Drop values 
+diamonds %>% filter(between(y, 3, 20))
+# diamonds2 %>% select(y, everything()) %>% arrange(desc(y))
+```
+
+
+```{r}
+# replace missing values
+diamonds3 <- diamonds %>% mutate(y = ifelse(y < 3 | y > 20, NA, y))
+(diamonds3 %>% select(y, everything()) %>% arrange(y))
+```
+
+## Section 7.4.1 Exercises
+```{r}
+diamonds2 <- diamonds %>% select(y, everything()) %>% arrange(desc(y))
+```
+
+
+```{r}
+# Quesion 1
+# The default missing values are removed with a warning win geom_hist. This is the same as with geom_bar. There is no difference.
+
+ggplot(diamonds2) +
+  geom_histogram(aes(y), na.rm = TRUE)
+```
+
+```{r}
+# Quesion 2
+# It removes values that are NA.
+```
+
+
+## Section 7.5 Covariation
+```{r}
+
+
+```
+
+## Section 7.5.1.1 Exercises
+
+```{r}
+# Quesion 1
+nycflights13::flights %>% 
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + sched_min / 60
+  ) %>% 
+  ggplot(mapping = aes(sched_dep_time, y = after_stat(density))) + 
+    geom_freqpoly(mapping = aes(colour = cancelled), binwidth = 1/4)
+```
+
+```{r}
+# Quesion 2
+diamonds
+```
+
+
+```{r}
+# Quesion 2.1
+
+ggplot(data = diamonds, mapping = aes(x = price, y = after_stat(density))) + 
+  geom_freqpoly(mapping = aes(colour = cut), binwidth = 500) 
+    # geom_freqpoly(mapping = aes(colour = color), binwidth = 500) 
+
+# ggplot(data = diamonds, mapping = aes(x = price, y = after_stat(density))) + 
+#   geom_freqpoly(mapping = aes(colour = color), binwidth = 500)
+
+```
+```{r}
+# Quesion 3
+if(!require("ggstance")) install.packages("ggstance")
+library(ggstance)
+
+
+
+```
+
+
+
+```{r}
+# Load ggplot2 package
+library(ggplot2)
+
+# Create a sample data frame
+set.seed(123)
+df <- data.frame(value = rnorm(100))
+
+# Create a frequency polygon with a specified color
+ggplot(df, aes(x = value)) +
+  geom_freqpoly(color = "green") +
+  ggtitle("Frequency Polygon with Custom Color")
+```
+
+## Section 7.5.2 Two Categorical Variables
+
+```{r}
+diamonds %>%
+  count(color, cut) %>% mutate( n = n*.5)
+```
+
+
+```{r}
+ggplot(data = diamonds) +
+  geom_count(aes(cut, color))
+```
+
+
+
+### Section 7.5.2 Exercises
+```{r 1. How could you rescale the count dataset above to more clearly show the distribution of cut within colour, or colour within cut?}
+# I don't understand this question.
+diamonds_half_scale <- diamonds %>%
+  count(color, cut) %>% mutate( n = n*.5)
+```
+
+```{r}
+#  1.1
+ggplot(data = diamonds_half_scale) +
+  geom_count(aes(cut, color))
+```
+
+```{r}
+# Explore how average flight delays vary by destination and month of year
+(dest_month_avg_delay <- flights %>% group_by(month, dest) %>% select(dest, month, everything()) %>% summarise(avg_delay = mean(delays, na.rm = TRUE)))
+```
+
+
+```{r}
+# Explore how average flight delays vary by destination and month of year
+# There are too many destinations related to individual months. It could be improved by limiting the number of destinations on a given graph. 
+ggplot(dest_month_avg_delay) + 
+  geom_tile(aes(month, dest, fill = avg_delay))
+
+```
+
+```{r}
+# 3 Why is it slightly better to use aes(x = color, y = cut) rather than aes(x = cut, y = color) in the example above
+# There are increasing levels of quality from left to right. 
+```
+
+## Section 7.5.3 Two Continuous Variables
+```{r}
+# To use geom_hex
+if(!require("hexbin")) install.packages("hexbin")
+library(hexbin)
+```
+
+```{r}
+smaller <- diamonds %>%
+  filter(carat < 3)
+```
+
+
+```{r}
+ggplot(data = smaller) +
+  geom_bin2d(mapping = aes(x = carat, y = price))
+
+ggplot(data = smaller) + 
+  geom_hex(aes(carat, price))
+```
+```{r}
+# Display the number of points contained within a boxplot with varwidth = True; 
+# Display the same number of points in each bin with cut_number()
+
+ggplot(data = smaller, mapping = aes(x = carat, y = price)) +
+  geom_boxplot(aes(group = cut_number(carat, 20)))
+```
+
+### Section 7.5.3.1 Exercises
+```{r 1. What do you need to consider when using cut_width() vs cut_number()? How does that impact a visualisation of the 2d distribution of carat and price?}
+ # Cut width divides a variable into bins of a specified width. This will change the statistics of each boxplot-bin while keeping the width of the bin constant.
+  # Cut number defines the number of points that are allocated to a bin. The width of each bin in this case will vary, but the number of points in each bin will remain constant.
+
+# When using a frequency polygon, it is important to consider that cut width will divide the bins into a specified width. This means that a frequency polygon would have a specified density and a variable number of points for that density. This would increase the count of points per density for each point on the graph which would be visible by the height of the line on the frequency polygon.  With cut number, the width of each bin will vary, but the number of points in each bin will be the same. This would result in a line that has periods of wide girth followed by sharp spikes in count.
+```
+
+```{r 2 Visualize the distribution of carat partitioned by price}
+ggplot(data = smaller, mapping = aes(x = carat)) +
+  geom_freqpoly(aes(group = cut_number(price, 20))) +
+  labs(title = "Cut Number Freqpoly: Constant Number of Price Points Per Polygon")
+
+ggplot(data = smaller, mapping = aes(x = carat)) + 
+  geom_freqpoly(aes(group = cut_width(price, 20))) +
+  labs(title = "Cut Width Freqpoly: Constant Width of Price Points Per Polygon")
+
+ggplot(data = smaller, aes(carat)) +
+  geom_freqpoly() +
+  labs(title = "Standard Freqpoly")
+
+# ggplot(data = smaller, mapping = aes(x = price)) +
+#   geom_freqpoly(aes(group = cut_number(price, 20))) +
+#   labs(title = "Price: Cut Number Freqpoly (Number of Points is Constant)")
+# 
+# ggplot(data = smaller, mapping = aes(x = price)) +
+#   geom_freqpoly(aes(group = cut_width(price, 20))) +
+#   labs(title = "Price: Cut Width Freqpoly (Width is Constant)")
+# 
+# ggplot(data = smaller, aes(price)) +
+#   geom_freqpoly() +
+#   labs(title = "Price: Standard Freqpoly")
+```
+```{r 3 How does the price distribution of very large diamonds compare to small diamonds. Does it surprise you?}
+# The price distribution is greater for large diamonds as compared to small diamonds. This does not surprise me.
+```
+
+```{r}
+# Quesion 4
+ggplot(data = smaller) + 
+  geom_hex(aes(carat, price))
+```
+```{r}
+# Quesion 5
+# It is clear to see that there are outliers in a scatter plot as they are single points that are differentiated from the group. In a binned plot this would be indicated by a bin that was abnormally stretched. Without a reference group, normalcy of a binned plot's bin shape is speculative, whereas in a scatterplot, the majority of point grouping may be clearly defined.
+```
+
+## Section 10: Tibbles
+```{r}
+as_tibble(iris)
+```
+```{r}
+tibble(
+  x = 1:5,
+  y = 1, 
+  z = x ^ 2 + y
+)
+```
+
+```{r}
+tb <- tibble(
+  `:)` = "smile",
+  ` ` = "space",
+  `2000` = "number"
+)
+tb[["newcol"]] = "value"
+```
+
+
+```{r}
+tribble(
+  ~x, ~y, ~z,
+  #--|--|----
+  "a", 2, 3.6,
+  "b", 1, 8.5
+)
+```
+```{r eval = FALSE}
+nycflights13::flights %>% View()
+```
+
+
+```{r}
+# Width = Inf will display all the columns
+# print( n = number) will determine The number of of rows of the display
+nycflights13::flights %>% print(n = 10, width = Inf)
+```
+
+## Section 10.3.2 Subsetting
+```{r}
+df <- tibble(
+  x = runif(5),
+  y = rnorm(5)
+)
+```
+
+```{r}
+# Extract by Name
+df$x
+```
+
+
+```{r}
+# Extract by Name
+df[["x"]]
+```
+
+```{r}
+# Extract by position
+df[[1]]
+```
+```{r}
+# Similar to selecting x with a pipe
+df["x"]
+```
+```{r}
+# Extracting data with a pipe
+df %>% .$x
+df %>% .[["x"]]
+```
+
+
+# 10.5 exercises
+```{r 1. How can you tell if an object is a tibble?}
+# The description will be of "df" or "tibble" on a print of the data
+# using class will allow you to view the type of the data whether it be a dataframe of a tibble
+class(mtcars)
+class(tb)
+# print(mtcars)
+```
+
+```{r}
+# Quesion 2
+# The default data frame behaviors assign the value of "a" to x, y, and z rather than "xyz"
+df <- data.frame(abc = 1, xyz = "a")
+```
+```{r}
+df
+```
+
+
+```{r}
+# Quesion 2.1
+df$x
+```
+
+
+```{r}
+#  2.2
+df[, "xyz"]
+```
+
+
+```{r}
+#  2.3
+df[, c("abc", "xyz")]
+```
+```{r}
+var <- "mpg"
+
+tb1<- tibble(
+  mpg = "123",
+  abc = c("alphabet", "alphabet2")
+)
+
+tb1["abc"] # select the column (returned data is a tibble)
+tb1[["abc"]] # select the values of column "abc" (returned data is the type of the returned data)
+```
+```{r}
+# Quesion 4
+annoying <- tibble(
+  `1` = 1:10,
+  `2` = `1` * 2 + rnorm(length(`1`))
+)
+
+annoying[["1"]]
+annoying[["2"]]
+
+ggplot(annoying) + 
+  geom_point(aes(`1`, `2`))
+
+annoying[["3"]] = annoying[["2"]] / annoying[["1"]]
+
+(annoying)
+
+
+annoying <- annoying %>% rename("one" = `1`, "two" = `2`, "three" = `3`)
+annoying
+```
+
+```{r}
+# Quesion 5
+# tibble::enframe will frame data in tibble format. i.e.
+# enframe(1:3) produces a tibble
+# deframe will extract the data from the tibble, using the class of the data itself as the type of data: i.e.
+val <- deframe(enframe(1:3))
+class(val)
+val
+val[1]
+
+```
+```{r}
+# Quesion 6
+# max footer lines controls how many extra lines are printed at the footer of a tibble
+```
