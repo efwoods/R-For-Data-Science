@@ -1,0 +1,4689 @@
+---
+title: "R-For-Data-Science-§11:§20"
+author: "Evan-Woods"
+date: "2023-11-10"
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+
+```{r}
+if (!require(dplyr)) install.packages("dplyr")
+# if (!require(stargazer)) install.packages("stargazer")
+if (!require(tidyverse)) install.packages("tidyverse")
+if(!require(nycflights13)) install.packages("nycflights13")
+# if (!require(shiny)) install.packages("shiny")
+# if(!require(Lahman)) install.packages("Lahman")
+if(!require(ggplot2)) install.packages("ggplot2")
+# if(!require(EnvStats)) install.packages("EnvStats")
+# library(EnvStats)
+library(tidyverse)
+```
+
+## Section 11: Data Import
+
+```{r}
+# e_woods_matrix <- read_csv("trait_matrix.xlsx - Sheet 1.csv")
+# deepa_matrix <- read_csv("Candidate Rankings.xlsx - Sheet1.csv")
+# health <- read_csv("HealthAutoExport-2023-10-29-2023-11-05.json")
+# eye_classification <- read_csv("EEG_Eye_State_Classification.csv")
+
+# Define the character as na
+read_csv("a,b,c\n1,2,.", na=".")
+
+# Drop lines that start with a comment
+read_csv("# this is a comment\na,b,c\n1,2,.", comment = "#", na = ".")
+read_csv("# this is a comment
+         This is the second line of data
+         \na,b,c\n1,2,.", comment = "#", na = ".")
+# Passing column names as a character vector
+read_csv("1,2,3\n4,5,6,", col_names = c("x", "y", "z"))
+
+```
+#### 11.2.2 Exercises
+```{r}
+# read_delim will be used for "|" delimited files
+# read_csv and read_tsv have all arguments in common.
+# The most important arguments to read_fwf() are the file, col_positions, and col_types
+# pass in quote to read_csv to specify quotes
+
+# 5 there are only two columns
+read_csv("a,b\n1,2,3\n4,5,6") # reads this as a:1 , b:23
+
+# the column rows are not the same
+read_csv("a,b,c\n1,2\n1,2,3,4") # column c on row 1 is NA and 34 on row 2
+
+#
+
+```
+### 11.3 Parsing
+```{r}
+ # All data can be parsed. The types of parsing includes:
+# parse_number
+# parse_character
+# parse_factor
+# parse_datetime
+# parse_logical
+# parse_double
+
+# Parsing will handle character encodings, and locale so as to represent clean data. 
+
+# use guess_encoding() to guess the encoding of a character string
+```
+
+#### 11.3.5 Exercises
+```{r}
+# The most important arguments to locale are date_names, date_format, decimal_mark, & tz
+
+# There is an error that decimal_mark & grouping mark must be different if both are the same. 
+#parse_double("1,23", locale = locale(decimal_mark = ",", grouping_mark = (",")))
+
+# 
+parse_date("01/02/15", "%m/%d/%y")
+
+```
+
+### Section 12: Tidy Data
+
+### Section 12.2.1 Exercises:
+
+```{r}
+table1
+#> # A tibble: 6 × 4
+#>   country      year  cases population
+#>   <chr>       <dbl>  <dbl>      <dbl>
+#> 1 Afghanistan  1999    745   19987071
+#> 2 Afghanistan  2000   2666   20595360
+#> 3 Brazil       1999  37737  172006362
+#> 4 Brazil       2000  80488  174504898
+#> 5 China        1999 212258 1272915272
+#> 6 China        2000 213766 1280428583
+table2
+#> # A tibble: 12 × 4
+#>   country      year type           count
+#>   <chr>       <dbl> <chr>          <dbl>
+#> 1 Afghanistan  1999 cases            745
+#> 2 Afghanistan  1999 population  19987071
+#> 3 Afghanistan  2000 cases           2666
+#> 4 Afghanistan  2000 population  20595360
+#> 5 Brazil       1999 cases          37737
+#> 6 Brazil       1999 population 172006362
+#> # ℹ 6 more rows
+table3
+#> # A tibble: 6 × 3
+#>   country      year rate             
+#>   <chr>       <dbl> <chr>            
+#> 1 Afghanistan  1999 745/19987071     
+#> 2 Afghanistan  2000 2666/20595360    
+#> 3 Brazil       1999 37737/172006362  
+#> 4 Brazil       2000 80488/174504898  
+#> 5 China        1999 212258/1272915272
+#> 6 China        2000 213766/1280428583
+
+# Spread across two tibbles
+table4a  # cases
+#> # A tibble: 3 × 3
+#>   country     `1999` `2000`
+#>   <chr>        <dbl>  <dbl>
+#> 1 Afghanistan    745   2666
+#> 2 Brazil       37737  80488
+#> 3 China       212258 213766
+table4b  # population
+#> # A tibble: 3 × 3
+#>   country         `1999`     `2000`
+#>   <chr>            <dbl>      <dbl>
+#> 1 Afghanistan   19987071   20595360
+#> 2 Brazil       172006362  174504898
+#> 3 China       1272915272 1280428583
+```
+```{r}
+# Quesion 1
+# Table 1 organizes its columns by country, year, cases, and population. It organizes its rows numerically where each row represents data that is associated with a country. The data within the table are individual values. 
+table1
+#> # A tibble: 6 × 4
+#>   country      year  cases population
+#>   <chr>       <dbl>  <dbl>      <dbl>
+#> 1 Afghanistan  1999    745   19987071
+#> 2 Afghanistan  2000   2666   20595360
+#> 3 Brazil       1999  37737  172006362
+#> 4 Brazil       2000  80488  174504898
+#> 5 China        1999 212258 1272915272
+#> 6 China        2000 213766 1280428583
+#> 
+
+# Table 2 organizes its columns by country, year, type, & count. The rows are organized with cases and population variables in the type column. Each cell contains only one item which is either a variable or a name of a variable. This data is not tidy. 
+
+table2
+#> # A tibble: 12 × 4
+#>   country      year type           count
+#>   <chr>       <dbl> <chr>          <dbl>
+#> 1 Afghanistan  1999 cases            745
+#> 2 Afghanistan  1999 population  19987071
+#> 3 Afghanistan  2000 cases           2666
+#> 4 Afghanistan  2000 population  20595360
+#> 5 Brazil       1999 cases          37737
+#> 6 Brazil       1999 population 172006362
+#> # ℹ 6 more rows
+
+# Table 3 organizes its columns by country, year, & rate. The rows are organized by country. The rate column variables for each country contains values that are comprised of the count of cases divided by the population count. This data is not tidy. To tidy this data, I suggest adding the count of cases and population as columns and using the distinct values in these columns for rate. 
+
+table3
+#> # A tibble: 6 × 3
+#>   country      year rate             
+#>   <chr>       <dbl> <chr>            
+#> 1 Afghanistan  1999 745/19987071     
+#> 2 Afghanistan  2000 2666/20595360    
+#> 3 Brazil       1999 37737/172006362  
+#> 4 Brazil       2000 80488/174504898  
+#> 5 China        1999 212258/1272915272
+#> 6 China        2000 213766/1280428583
+#> 
+#> 
+
+
+# Table 4a & 4b contain tibbles such that the column names are country, `1999`, & `2000`. The rows are individual countries in both tibbles. The values in the tibbles are individual values. This data is not tidy because the column names are variables themselves: 1999 & 2000 are "year" variables. Furthermore, the data is split between two tibbles.  
+
+# Spread across two tibbles
+table4a  # cases
+#> # A tibble: 3 × 3
+#>   country     `1999` `2000`
+#>   <chr>        <dbl>  <dbl>
+#> 1 Afghanistan    745   2666
+#> 2 Brazil       37737  80488
+#> 3 China       212258 213766
+table4b  # population
+#> # A tibble: 3 × 3
+#>   country         `1999`     `2000`
+#>   <chr>            <dbl>      <dbl>
+#> 1 Afghanistan   19987071   20595360
+#> 2 Brazil       172006362  174504898
+#> 3 China       1272915272 1280428583
+```
+
+```{r}
+# Compute rate for table2 and table4a and table4b
+# Extract the number of TB cases per country per year From table2.
+n_cases_per_country <- table2 %>% group_by(type_cases = type == "cases") %>% filter(type_cases == TRUE) %>% group_by(country) %>% summarise(n_cases = sum(count))
+```
+
+
+```{r}
+# Compute rate for table2 and table4a and table4b
+n_years_per_country <- table2 %>% group_by(type_cases = type == "cases") %>% filter(type_cases == TRUE) %>% group_by(country, year) %>% summarise() %>% summarise(n_years = n())
+
+countries <- table2 %>% group_by(type_cases = type == "cases") %>% filter(type_cases == TRUE) %>% group_by(country) %>% summarise() 
+
+n_cases_per_year_per_country <- (n_cases_per_country$n_cases / n_years_per_country$n_years)
+
+(n_cases_per_year_per_country_tb <- tibble(countries, n_cases_per_year_per_country))
+
+# Extract the number of TB cases per country per year from tables 4a & 4b.
+countries <- table4a[["country"]]
+(counts_1999 <- table4a[["1999"]])
+(counts_2000 <- table4a[["2000"]])
+
+(counts_per_year <- (counts_1999 + counts_2000) / 2)
+(n_counts_per_country_per_year_4a <- tibble(countries, counts_per_year))
+```
+
+
+```{r 2.2 Extract the matching population per country per year for table2 and table4a and table4b}
+# table 2
+n_population_per_country <- table2 %>% group_by(type_cases = type == "population") %>% filter(type_cases == TRUE) %>% group_by(country) %>% summarise(n_population = sum(count))
+
+n_years_per_country <- table2 %>% group_by(type_cases = type == "cases") %>% filter(type_cases == TRUE) %>% group_by(country, year) %>% summarise() %>% summarise(n_years = n())
+
+countries <- table2 %>% group_by(type_cases = type == "cases") %>% filter(type_cases == TRUE) %>% group_by(country) %>% summarise() 
+
+n_population_per_year_per_country <- (n_population_per_country$n_population / n_years_per_country$n_years)
+
+n_population_per_year_per_country_tb <- tibble(countries, n_population_per_year_per_country)
+
+# Table4b
+
+# population
+(countries_4b <- table4b[["country"]])
+(population_1999_4b <- table4b[["1999"]])
+(population_2000_4b <- table4b[["2000"]])
+population_per_year_4b <- (population_1999_4b + population_2000_4b) / 2
+
+n_population_per_year_per_country_4b <- tibble(countries_4b, population_per_year_4b)
+(n_population_per_year_per_country_4b)
+```
+
+
+```{r 2.3 Divide cases by population, and multiply by 10000 for table2 and table4a and table4b}
+# Table 2
+(n_cases_per_year_per_country_tb)
+(n_population_per_year_per_country_tb)
+
+(rate_table2 <- (n_cases_per_year_per_country_tb$n_cases_per_year_per_country / n_population_per_year_per_country_tb$n_population_per_year_per_country) * 10000)
+
+(rate_table4a4b <- (n_counts_per_country_per_year_4a$counts_per_year / n_population_per_year_per_country_4b$population_per_year_4b) * 10000)
+
+```
+```{r Store back in the appropriate place}
+table2
+rate_table2
+
+rate_table2_formatted <- c(rate_table2[[1]], rate_table2[[1]], rate_table2[[1]], rate_table2[[1]],rate_table2[[2]], rate_table2[[2]], rate_table2[[2]], rate_table2[[2]],rate_table2[[3]], rate_table2[[3]], rate_table2[[3]], rate_table2[[3]])
+
+table2[["rate"]] = rate_table2_formatted
+# table2
+
+###
+
+rate_table4a4b
+
+table4a[["rate"]] = rate_table4a4b
+table4a
+
+table4b[["rate"]] = rate_table4a4b
+table4b
+
+
+# It was easier to address table4a & 4b; However working with table2 was more efficient. Containing variables in the cells of table2 proved challenging, and the split tibbles proved inefficient.
+```
+```{r 3 Recreate the plot showing change in cases over time using table2 instead of table1. What do you need to do first?}
+# Compute rate per 10,000
+table1 %>% 
+  mutate(rate = cases / population * 10000)
+#> # A tibble: 6 × 5
+#>   country      year  cases population  rate
+#>   <chr>       <dbl>  <dbl>      <dbl> <dbl>
+#> 1 Afghanistan  1999    745   19987071 0.373
+#> 2 Afghanistan  2000   2666   20595360 1.29 
+#> 3 Brazil       1999  37737  172006362 2.19 
+#> 4 Brazil       2000  80488  174504898 4.61 
+#> 5 China        1999 212258 1272915272 1.67 
+#> 6 China        2000 213766 1280428583 1.67
+
+# Compute cases per year
+table1 %>% 
+  count(year, wt = cases)
+#> # A tibble: 2 × 2
+#>    year      n
+#>   <dbl>  <dbl>
+#> 1  1999 250740
+#> 2  2000 296920
+
+# Visualise changes over time
+library(ggplot2)
+ggplot(table1, aes(year, cases)) + 
+  geom_line(aes(group = country), colour = "grey50") + 
+  geom_point(aes(colour = country))
+
+# table2 %>% group_by(cases_logical = type == "cases") %>% filter(cases_logical) %>% group_by(year, country) %>% summarise() 
+
+(table2_n_cases_per_country_per_year <- table2 %>% group_by(type_cases = type == "cases") %>% filter(type_cases == TRUE) %>% group_by(country))
+
+ggplot(table2_n_cases_per_country_per_year, aes(year, count)) + 
+  geom_line(aes(group = country), color = "grey50") +
+  geom_point(aes(color = country))
+```
+```{r}
+table4a %>% pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "counts")
+```
+
+```{r}
+table2
+tidy_table2 <- table2 %>% pivot_wider(names_from = "year", values_from = "count") %>% pivot_longer(c(`1999`, `2000`), names_to = "year", values_to= "count") %>% pivot_wider(names_from = "type", values_from = "count")
+tidy_table2
+
+```
+
+
+### Section 12.3.3 Exercises:
+```{r}
+# The values in a column become column names after a pivot wider. The outermost column is used as column names for pivot_wider(). pivot_longer() will then place the column names into rows, but will maintain the initial column ordering of the first row. pivot_longer() will not re-order rows.
+
+stocks <- tibble(
+  year = c(2015, 2015, 2016, 2016),
+  half = c(1,2,1,2),
+  return = c(1.88,0.59,0.92, 0.17)
+)
+```
+
+```{r}
+stocks
+```
+
+```{r}
+stocks %>%
+  pivot_wider(names_from = year, values_from = return ) %>%
+   pivot_longer(`2015`:`2016`, names_to = "year", values_to = "return")
+```
+```{r}
+table4a
+```
+
+
+
+```{r}
+table4a
+```
+
+
+```{r}
+table4a
+```
+
+
+```{r eval = FALSE}
+# table4a %>% pivot_longer(c(1999, 2000), names_to = "year", values_to = "cases")
+# The names need to be in backticks because they are numbers. i.e.
+#table4a %>% 
+  # pivot_longer(c(1999, 2000), names_to = "year", values_to = "cases")
+```
+
+```{r}
+# Quesion 3
+# Calling wider on this tribble will allow the values to be placed in a double, a column for personid would allow this data to be transformed appropriately.
+people <- tribble(
+  ~name,             ~names,  ~values, ~pid,
+  #-----------------|--------|---------|----
+  "Phillip Woods",   "age",       45, 1,
+  "Phillip Woods",   "height",   186, 1,
+  "Phillip Woods",   "age",       50, 2,
+  "Jessica Cordero", "age",       37, 3,
+  "Jessica Cordero", "height",   156, 3,
+)
+
+people %>% group_by(name, names,) %>% summarise(values) 
+# %>% summarise
+# %>% summarise() %>% select(everything())
+
+# Answer:
+(people_wider <- people %>% pivot_wider( names_from = names, values_from = values))
+
+# val[["age"]]
+# %>% pivot_wider(names_from = name, values_from = values)
+```
+
+
+```{r}
+# Quesion 4
+preg <- tribble(
+  ~pregnant, ~male, ~female,
+  "yes", NA, 10,
+  "no", 20, 12
+)
+
+
+preg %>% pivot_longer(c("male", "female"), names_to = "gender", values_to = "count") %>% select(count, pregnant, gender)
+```
+
+
+## Section 12.4 Separating and Uniting
+
+#### Section 12.4.1 Separate
+```{r}
+# table3
+table3 %>% separate(rate, into = c("count", "population")) %>% separate(year, into = c("century", "year"), sep=2)
+```
+
+#### Section 12.4.2 Unite
+```{r Unite}
+table5 %>%
+  unite(new, century, year, sep = "")
+```
+#### Section 12.4.3 Exercises
+```{r}
+tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>%
+  separate(x, c("one", "two", "three"), extra = "merge")
+
+tibble(x = c("a,b,c", "d, e", "f, g, i")) %>%
+  separate(x, c("one", "two", "three"), fill = "left")
+
+```
+```{r}
+# Quesion 2
+# Removes input columns from the output dataframe
+```
+```{r}
+# Quesion 3
+# Extract will turn a group into columns. Extract will separate groups into columns as well. Extract has been superceded. 
+```
+
+## Section 12.5 Missing Values:
+```{r}
+stocks <- tibble(
+  year   = c(2015, 2015, 2015, 2015, 2016, 2016, 2016),
+  qtr    = c(   1,    2,    3,    4,    2,    3,    4),
+  return = c(1.88, 0.59, 0.35,   NA, 0.92, 0.17, 2.66)
+)
+
+```
+```{r}
+stocks %>% pivot_wider(names_from = year, values_from = return)
+```
+```{r}
+treatment <- tribble(
+  ~ person,           ~ treatment, ~response,
+  "Derrick Whitmore", 1,           7,
+  NA,                 2,           10,
+  NA,                 3,           9,
+  "Katherine Burke",  1,           4
+)
+```
+
+```{r}
+treatment %>% fill(person)
+```
+
+```{r}
+# Complete 
+df <- tibble(
+  group = c(1:2, 1, 2),
+  item_id = c(1:2, 2, 3),
+  item_name = c("a", "a", "b", "b"),
+  value1 = c(1, NA, 3, 4),
+  value2 = 4:7
+)
+df
+```
+
+
+```{r}
+df %>% complete(group, item_id, item_name)
+```
+#### Section 12.5.1 Exercises
+```{r}
+df %>% complete(group, nesting(item_id, item_name)) 
+# Complete will find all the combinations of elements n a list. 
+# Fill will fill in missing value with the last observation carried forward.
+# 
+```
+```{r}
+# Quesion 1
+# What does the direction argument to fill do?
+treatment %>% fill(person, .direction = "up")
+# Direction in fill will fill NA from a particular direction
+
+```
+
+
+```{r}
+who
+```
+
+```{r}
+who1 <- who %>% pivot_longer(
+  cols = new_sp_m014:newrel_f65, 
+  names_to = "key",
+  values_to = "cases",
+  values_drop_na = TRUE
+)
+who1
+```
+```{r}
+who1 %>% count(key)
+```
+
+
+```{r}
+who2 <- who1 %>%
+  mutate(key = stringr::str_replace(key, "newrel", "new_rel"))
+who2
+```
+```{r}
+who3 <- who2 %>%
+  separate(key, c("new", "type", "sexage"))
+who3
+```
+
+```{r}
+who3 %>% 
+  count(new)
+who4 <- who3 %>%
+  select(-new, -iso2, -iso3)
+```
+```{r}
+who5 <- who4 %>%
+  separate(sexage, c("sex", "age"), sep = 1)
+who5
+```
+```{r}
+who5 <- who4 %>%
+  separate(sexage, c("sex", "age"), sep = 1)
+who5
+```
+```{r}
+# Checking for implicit missing values
+# names()
+n_who5 <- who5 %>% pivot_wider(names_from = year, values_from = cases) 
+n_who5
+n_who5 %>% filter(is.na(`1997`))
+```
+
+
+```{r}
+# Checking for implicit missing values
+# who5 %>% complete(type, sex) %>% filter(is.na(case))
+```
+
+
+```{r}
+# Afghanistan	sn	m	014
+
+# who5 %>% group_by(country, type, sex, age) %>% filter(country == "Afghanistan", type == "sn", sex == "m", age == "014")
+
+
+# %>% group_by(type) %>% summarise()
+# %>% group_by(country) %>% summarise()
+# %>%
+#   complete(country, var, sex, age, cases)
+```
+
+```{r}
+who %>%
+  pivot_longer(
+    cols = new_sp_m014:newrel_f65,
+    names_to = "key",
+    values_to = "cases",
+    values_drop_na = TRUE
+  ) %>%
+    mutate(
+    key = stringr::str_replace(key, "newrel", "new_rel")
+  ) %>%
+
+  separate(key, c("new", "var", "sexage")) %>%
+  # select(-new, -iso2, -iso3) %>%
+  separate(sexage, c("sex", "age"), sep = 1)
+```
+
+
+```{r}
+# Quesion 1
+# Dropping NA values is necessary in order to create a tidy tibble. Otherwise, the values of cases are "NA". Yes, it is reasonable to drop NA values to ensure that the values that are present in the tibble are valid. On the contrary, dropping NA values could be filled rather than dropped. It is possible to show implicit missing values through the presence of NA values. If these values are dropped, then the implicit missing values in the data may be more challenging to detect as explicit missing values are turned implicit. The difference between NA and zero is that NA represents a value that is missing from the dataset and zero defines a numeric value that is present and recorded as having a value of literally zero. Yes, there are years missing between 1997 and 2000. There are many implicit missing values in the dataset. This can be shown by pivoting the dataset wider to bring the years into a column and then listing the values from cases. The year 1997 has many missing values for cases in Afghanistan for example. See the code snippet below:
+
+# n_who5 <- who5 %>% pivot_wider(names_from = year, values_from = cases) 
+# n_who5
+# n_who5 %>% filter(is.na(`1997`))
+```
+
+
+```{r}
+# Quesion 2
+# If you neglect the mutate step, data will be missing from the tibble. It will not separate on "new" because there is only the presence of "newrel" and the separator is "_".
+who %>%
+  pivot_longer(
+    cols = new_sp_m014:newrel_f65,
+    names_to = "key",
+    values_to = "cases",
+    values_drop_na = TRUE
+  ) %>%
+  #   mutate(
+  #   key = stringr::str_replace(key, "newrel", "new_rel")
+  # ) %>%
+
+  separate(key, c("new", "var", "sexage")) %>%
+  # select(-new, -iso2, -iso3) %>%
+  separate(sexage, c("sex", "age"), sep = 1)
+```
+
+
+```{r}
+# 3 iso2 and iso3
+redundant <- who %>%
+  pivot_longer(
+    cols = new_sp_m014:newrel_f65,
+    names_to = "key",
+    values_to = "cases",
+    values_drop_na = TRUE
+  ) %>%
+    mutate(
+    key = stringr::str_replace(key, "newrel", "new_rel")
+  ) %>%
+
+  separate(key, c("new", "var", "sexage")) %>%
+  # select(-new, -iso2, -iso3) %>%
+  separate(sexage, c("sex", "age"), sep = 1)
+
+(redundant) # this tibble has 76,046 observations
+
+redundant_dropped <- who %>%
+  pivot_longer(
+    cols = new_sp_m014:newrel_f65,
+    names_to = "key",
+    values_to = "cases",
+    values_drop_na = TRUE
+  ) %>%
+    mutate(
+    key = stringr::str_replace(key, "newrel", "new_rel")
+  ) %>%
+
+  separate(key, c("new", "var", "sexage")) %>%
+  select(-new, -iso2, -iso3) %>%
+  separate(sexage, c("sex", "age"), sep = 1)
+
+(redundant_dropped) # This contains the same number of observations: 76,046
+
+
+# %>% pivot_wider(names_from = country, values_from = iso2)
+```
+
+
+```{r}
+# 3 iso2 and iso3
+# redundant %>% select(iso3)
+(redundant)
+# redundant %>% group_by(country, new) %>% summarise() %>% count()
+```
+
+
+```{r 3 redundant iso2}
+# There each country contains only one iso2
+
+# There are no countries with more than one iso2 or contain a missing value of iso2
+(redundant %>% group_by(country, iso2) %>% summarise() %>% count() %>% filter(n != 1 | is.na(n)))
+
+country_iso2 <- redundant %>% group_by(country, iso2) %>% summarise()
+n_unique_iso2_per_country <- length(unique(country_iso2$iso2))
+
+# The number of countries are equal to the number of unique iso2
+if (length(country_iso2$country) == n_unique_iso2_per_country){
+  print("The number of countries are equal to the number of unique iso2")
+}
+# If the number of unique were less, there would be repeated values or missing values.
+# Because the number of unique iso is equal to the number of countries and each country only has one value, then these values are redundant.
+```
+
+
+```{r 3 iso3}
+# There each country contains only one iso3
+
+# There are no countries with more than one iso3 or contain a missing value of iso3
+(redundant %>% group_by(country, iso3) %>% summarise() %>% count() %>% filter(n != 1 | is.na(n)))
+
+country_iso3 <- redundant %>% group_by(country, iso3) %>% summarise()
+n_unique_iso3_per_country <- length(unique(country_iso3$iso3))
+
+# The number of countries are equal to the number of unique iso3
+if (length(country_iso3$country) == n_unique_iso3_per_country){
+  print("The number of countries are equal to the number of unique iso3")
+}
+# If the number of unique were less, there would be repeated values or missing values.
+# Because the number of unique iso is equal to the number of countries and each country only has one value, then these values are redundant.
+
+
+```
+
+```{r redundant new example}
+# There each country contains only one iso3
+
+# There are no countries with more than one iso3 or contain a missing value of iso3
+(redundant %>% group_by(country, new) %>% summarise() %>% count() %>% filter(n != 1 | is.na(n)))
+
+country_new <- redundant %>% group_by(country, new) %>% summarise()
+n_unique_new_per_country <- length(unique(country_new$new))
+
+# The number of countries are equal to the number of unique iso3
+if (length(country_new$country) == n_unique_new_per_country){
+  print("The number of countries are equal to the number of unique new")
+} else if(n_unique_new_per_country == 1) {
+  print("There is only 1 unique entry for every country. This variable is redundant because it holds no unique value.")
+} else {
+  print("unique values found")
+  print(length(country_new$country))
+  print(n_unique_new_per_country)
+}
+# If the number of unique were less, there would be repeated values or missing values.
+# There is only 1 unique entry for every country. This variable is redundant because it holds no value.
+
+
+```
+
+```{r redundancy counterexample}
+# There each country contains only one iso3
+
+# There are no countries with more than one iso3 or contain a missing value of iso3
+(redundant %>% group_by(country, year) %>% summarise() %>% count() %>% filter(n != 1 | is.na(n)))
+
+country_year <- redundant %>% group_by(country, year) %>% summarise()
+n_unique_year_per_country <- length(unique(country_year$year))
+
+# The number of countries are equal to the number of unique iso3
+if (length(country_year$country) == n_unique_year_per_country){
+  print("The number of countries are equal to the number of unique new")
+} else if(n_unique_year_per_country == 1) {
+  print("There is only 1 unique entry for every country. This variable is redundant because it holds no unique value.")
+} else {
+  print("unique values found")
+  print(length(country_year$country))
+  print(n_unique_year_per_country)
+}
+# If the number of unique were less, there would be repeated values or missing values.
+
+```
+
+```{r}
+# Quesion 4
+base_who_q4 <- who %>%
+  pivot_longer(
+    cols = new_sp_m014:newrel_f65,
+    names_to = "key",
+    values_to = "cases",
+    values_drop_na = TRUE
+  ) %>%
+    mutate(
+    key = stringr::str_replace(key, "newrel", "new_rel")
+  ) %>%
+  separate(key, c("new", "var", "sexage")) %>%
+  select(-new, -iso2, -iso3) %>%
+  separate(sexage, c("sex", "age"), sep = 1)
+
+
+
+```
+```{r}
+
+head(base_who_q4) 
+
+(number_of_cases_per_country <- base_who_q4 %>% group_by(country, cases) %>% summarise()  %>% summarise(cases_per_country = sum(cases)))
+
+(number_of_cases_per_year <- base_who_q4 %>% group_by(year, cases) %>% summarise() %>% summarise(cases_per_year = sum(cases)))
+
+(number_of_cases_per_sex <- base_who_q4 %>% group_by(sex, cases) %>% summarise() %>% summarise(cases_per_sex = sum(cases)))
+(number_of_cases_per_sex <- base_who_q4 %>% group_by(sex, cases) %>% summarise() %>% summarise(cases_per_sex = sum(cases)))
+```
+```{r}
+# Quesion 1
+# I would need to combine tables airports, flights, and planes. I would need to gather the longitude and lattitude of the origin and destination from airports in order to calculate the trajectory of the plane on a world map. I would need the distance calculated by the distance from the origin to the destination to identify the lenght of the line. I would need to group origin and destination by tailnum in flights to identify which flight tailnum went to which origin and destination.
+```
+
+```{r}
+# Quesion 2
+# The relationship between weather and airports is origin
+```
+
+
+```{r}
+# Quesion 3
+# Weather would need to include a relation to destination from flights.
+```
+
+```{r}
+# Quesion 4
+# I would want the following values in the table: holiday, month, day, year, number_of_people. The primary key would be the year, month, day and the foreign key would be the year, month, day in flights.
+```
+
+#### Section 13.3 Keys
+#### Section 13.3.1 Exercises
+```{r Add a surogate key to flights}
+surogate_key <- nycflights13::flights
+surogate_key %>% mutate(surogate_key = row_number()) %>% select(surogate_key, everything())
+```
+```{r 2. Identify the keys in the following datasets}
+if(!require("Lahman")) install.packages("Lahman")
+if(!require("babynames")) install.packages("babynames")
+if(!require("nasaweather")) install.packages("nasaweather")
+if(!require("fueleconomy")) install.packages("fueleconomy")
+if(!require("ggplot2")) install.packages("ggplot2")
+```
+
+
+```{r 2.1 Identify the keys in the following datasets}
+length(unique(Lahman::Batting$teamID))
+length(Lahman::Batting$teamID)
+Lahman::Batting
+babynames::babynames
+nasaweather::atmos
+fueleconomy::vehicles 
+ggplot2::diamonds 
+
+# I would suggest that playerID is key in the Lahman dataset. There is no primary key in the Lahman dataset.
+# There is no primary key in the babynames dataset. I would use the row_number as a surrogate key. 
+# A combination of lattitude, longitude, year, & month the categories I would use to create a surrogate key. Row number would work as well.
+# id is the key in fueleconomy vehicles.
+# There is no primary key in the ggplot2::diamonds dataset. I would mutate the rows to allow for a rownumber for each observation to be used as a key. 
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+batting <- Lahman::Batting
+pitching <- Lahman::Pitching
+fielding <- Lahman::Fielding
+```
+```{r}
+batting %>% count(playerID)
+```
+```{r}
+pitching %>% count(playerID)
+```
+```{r}
+fielding %>% group_by(playerID) %>% summarise(n())
+```
+```{r}
+# Batting and pitching have a one to one relationship on playerID where one playerID in pitching relates to one playerID in batting. The same is true with respect to batting and fielding. 
+```
+## Section 13.4: Mutating Joins
+
+
+
+```{r Mutating Joins}
+flights2 <- flights %>% 
+  select(year:day, hour, origin, dest, tailnum, carrier)
+flights2
+```
+
+```{r}
+# A mutating join is akin to a left join 
+
+# Left Join
+flights2 %>% 
+  select(-origin, -dest) %>%
+  left_join(airlines, by = "carrier")
+
+# Mutating Join
+flights2 %>%
+  select(-origin, -dest) %>%
+  mutate(name = airlines$name[match(carrier, airlines$carrier)])
+```
+
+```{r}
+flights2 %>%
+  select(-origin, -dest) %>%
+  left_join(airlines, by = "carrier")
+```
+
+#### 13.4.1 Understanding Joins
+```{r Understanding Joins}
+x <- tribble(
+  ~key, ~val_x,
+  1, "x1",
+  2, "x2",
+  3, "x3"
+)
+
+y <- tribble(
+  ~key, ~val_y,
+  1, "y1",
+  2, "y2",
+  4, "y3"
+)
+
+
+
+```
+
+#### Section 13.4.2 Inner Joins
+```{r}
+x %>% inner_join(y, by = "key")
+# Inner joins drop observations that are unmatched.
+```
+#### 13.4.3 Outer Joins
+```{r }
+x %>% left_join(y, by = 'key')
+x %>% right_join(y, by = 'key')
+x %>% full_join(y, by = 'key')
+```
+
+#### 13.4.4 Duplicate keys
+```{r}
+x <- tribble(
+  ~key, ~val_x,
+     1, "x1",
+     2, "x2",
+     2, "x3",
+     1, "x4"
+)
+y <- tribble(
+  ~key, ~val_y,
+     1, "y1",
+     2, "y2"
+)
+
+left_join(x, y, by = 'key')
+```
+
+```{r}
+x <- tribble(
+  ~key, ~val_x,
+     1, "x1",
+     2, "x2",
+     2, "x3",
+     3, "x4"
+)
+y <- tribble(
+  ~key, ~val_y,
+     1, "y1",
+     2, "y2",
+     2, "y3",
+     3, "y4"
+)
+
+left_join(x,y, by = "key")
+```
+#### Defining the key columns
+```{r}
+flights2 %>%
+  left_join(weather)
+```
+```{r}
+flights2 %>%
+  left_join(airports, c("dest" = "faa"))
+```
+
+```{r}
+flights2 %>%
+  left_join(airports, c("origin" = "faa"))
+```
+#### Section 13.4.6 Exercises
+```{r 1. Compute the average delay by destination, then join on the airports data frame so you can show the spatial distribution of delays}
+
+airports %>% 
+  semi_join(flights, c("faa" = "dest")) %>%
+  ggplot(aes(lon, lat)) + 
+  borders("state") +
+  geom_point() +
+  coord_quickmap()
+```
+```{r}
+flights 
+```
+```{r}
+airports
+```
+
+
+```{r}
+airports %>% semi_join(flights, c("faa" = "dest"))
+```
+
+
+
+```{r}
+# pseudo-filter airport destinations in flight destinations
+airports_dest <- airports %>% semi_join(flights, c("faa" = "dest"))
+airports_dest
+```
+
+
+```{r}
+# LGA is in origin; NA in dest.
+flights %>% 
+  filter(!is.na(dep_delay) & !is.na(arr_delay)) %>% 
+  mutate(total_delay = dep_delay + arr_delay) %>% 
+  filter(origin == "LGA")
+# %>% 
+  # group_by(dest) %>% 
+  # summarise(avg_total_delay = mean(total_delay, rm.na = TRUE)) 
+```
+
+
+```{r}
+# LGA is NA in flights here and is filtered
+(avg_delay_per_dest <- flights %>% filter(!is.na(dep_delay) & !is.na(arr_delay)) %>% mutate(total_delay = dep_delay + arr_delay) %>% group_by(dest) %>% summarise(avg_total_delay = mean(total_delay)))
+```
+```{r}
+avg_delay_per_dest %>% filter(dest == "LGA")
+```
+
+```{r}
+airports %>% filter(faa == "LGA")
+```
+```{r}
+# LGA is NA in flights ???
+flights %>% filter(dest == "LGA")
+```
+
+
+```{r}
+airports_in_flight_dest <- airports %>% semi_join(flights, c("faa" = "dest"))
+```
+
+```{r}
+airports_in_flight_dest %>% filter(faa == "LGA")
+```
+```{r}
+avg_delay_per_dest
+```
+
+
+```{r}
+# adding the avg delay to the airport destination tibble; LGA in airports_dest; LGA not in avg_delay_per_dest because it is derived from flights which lists LGA destination as NA or arr_time & dep_time.
+airports_dest_avg_delay <- left_join(airports_dest, avg_delay_per_dest, by = c("faa" = "dest"))
+
+# Dropping LGA; Value is NA because of above.  
+(clean_airports_dest_avg_delay <- airports_dest_avg_delay %>% select(faa, avg_total_delay, everything()) %>% filter(!is.na(avg_total_delay)))
+```
+
+
+
+```{r}
+clean_airports_dest_avg_delay %>% 
+  ggplot(aes(lon, lat, color = avg_total_delay)) + 
+  borders("state") +
+  geom_point() +
+  coord_quickmap()
+```
+
+
+```{r}
+# 2. Add the location of the origin and destination to flights
+# Add the location of the origin and destination (i.e. the lat and lon) to flights.
+
+# There are only 3 origins
+flights %>% filter(!is.na(dep_delay) & !is.na(arr_delay)) %>% mutate(total_delay = dep_delay + arr_delay) %>% group_by(origin) %>% summarise(avg_total_delay = mean(total_delay, rm.na = TRUE))
+
+```
+
+```{r}
+# 2. Add the location of the origin and destination to flights
+(avg_delay_per_origin <- flights %>% filter(!is.na(dep_delay) & !is.na(arr_delay)) %>% mutate(total_delay = dep_delay + arr_delay) %>% group_by(origin) %>% summarise(avg_total_delay = mean(total_delay, rm.na = TRUE)))
+```
+
+
+```{r}
+# 2. Add the location of the origin and destination to flights
+(airports_origin <- airports %>% semi_join(flights, c("faa" = "origin")))
+```
+
+
+
+```{r}
+# 2. Add the location of the origin and destination to flights
+airports_origin_avg_delay <- left_join(airports_origin, avg_delay_per_origin, by = c("faa" = "origin"))
+
+airports_origin_avg_delay %>% select(faa, avg_total_delay, everything())
+```
+
+
+```{r}
+# 2. Add the location of the origin and destination to flights
+(airports_dest_avg_delay) %>% filter(faa == "EWR" | faa == "JFK" | faa == "LGA")
+
+# (ewr <- first(airports_origin_avg_delay))
+# (jfk <- nth(airports_origin_avg_delay, 2))
+
+
+# comment out and run once
+# airports_dest_origin_avg_delay <- airports_dest_avg_delay %>% add_row(ewr)
+# airports_dest_origin_avg_delay %>% add_row(jfk)
+
+# Examine results
+# airports_dest_origin_avg_delay%>% filter(faa == "EWR" | faa == "JFK" | faa == "LGA")
+
+# left_join(airports_dest_avg_delay, airports_origin_avg_delay)
+
+# flights_origin <- left_join(flights, airports, by = c("origin" = "faa")) %>% mutate(lon_origin = lon, lat_origin = lat) %>% mutate(row_number = row_number()) %>% select(row_number, origin, dest, lon_origin, lat_origin, everything())
+# 
+# flights_dest <- left_join(flights, airports, by = c("dest" = "faa")) %>% mutate(lon_dest = lon, lat_dest = lat) %>% mutate(row_number = row_number()) %>% select(row_number, origin, dest, lon_dest, lat_dest, everything())
+# 
+# left_join(flights_origin, flights_dest)
+
+
+# (flights_dest <- left_join(flights, airports_dest_avg_delay, by = c("dest" = "faa")))
+# (flights_origin <- left_join(flights, airports_dest_avg_delay, by = c("origin" = "faa")))
+
+```
+
+```{r}
+avg_delay_per_origin
+```
+
+```{r}
+# Destination
+# avg_delay_per_dest
+# clean_airports_dest_avg_delay %>% select(faa, avg_total_delay, lon, lat, everything()) %>% rename( )
+
+# rename faa to dest
+clean_airports_dest_avg_delay_dest <- clean_airports_dest_avg_delay %>% select(faa, avg_total_delay, lon, lat, everything()) %>% rename(dest = faa )
+
+```
+```{r}
+(clean_airports_dest_avg_delay_dest)
+```
+```{r}
+# origin , avg total delay, lon, lat
+airports_origin_avg_delay_short <- airports_origin_avg_delay %>% select(faa, avg_total_delay, lat, lon)
+
+# creating a single tibble
+clean_airports_dest_avg_delay_dest_short <- clean_airports_dest_avg_delay_dest %>% select(dest, avg_total_delay, lat, lon)
+```
+
+```{r}
+# common name
+airports_origin_avg_delay_short <- airports_origin_avg_delay_short %>% rename(loc = faa)
+clean_airports_dest_avg_delay_dest_short <- clean_airports_dest_avg_delay_dest_short %>% rename( loc = dest)
+```
+
+
+```{r}
+# Full Join
+origin_dest_flights <- clean_airports_dest_avg_delay_dest_short %>% full_join(airports_origin_avg_delay_short)
+```
+
+
+```{r}
+origin_dest_flights %>%
+  ggplot(aes(lon, lat, color = avg_total_delay)) + 
+    borders("state") + 
+    geom_point() +
+    coord_quickmap() + 
+    labs(x = "Longitude", y = "Latitude", title = "Average total Delay of Flights by Location")
+```
+
+
+```{r}
+# Quesion 3
+# Is there a relationship between the age of a plane and its delays?
+flights_total_delay <- flights %>% mutate(total_delay = (dep_delay + arr_delay)) %>% select(total_delay, everything())
+
+# planes_year_manufactured <-
+# planes %>% rename(year_manufactured = "year)
+
+planes_year_manufactured <- planes %>% mutate(year_manufactured = year)
+
+plane_age_vs_delays <- flights_total_delay %>% left_join(planes_year_manufactured, by = "tailnum") %>% select(tailnum, total_delay, year_manufactured, everything())
+
+
+# plane_age_vs_delays <- 
+  # plane_age_vs_delays %>% filter(!is.na(year_manufactured))
+  
+clean_plane_age_vs_delays <- plane_age_vs_delays %>% filter(!is.na(year_manufactured))
+clean_plane_age_vs_delays <- clean_plane_age_vs_delays %>% mutate(year = year.x) %>% select(everything(), -year.x, -year.y) 
+clean_plane_age_vs_delays <- clean_plane_age_vs_delays %>% filter(!is.na(total_delay))
+clean_plane_age_vs_delays <- clean_plane_age_vs_delays %>% arrange(year_manufactured)
+```
+
+```{r}
+# Quesion 3
+# Is there a relationship between the age of a plane and its delays?
+# Newer planes 
+year_manufactured_vs_total_delays <- clean_plane_age_vs_delays %>% group_by(year_manufactured, total_delay) %>% summarise() %>% summarise(total_delays_per_year = n())
+
+```  
+  
+```{r}
+ggplot(year_manufactured_vs_total_delays) +
+  geom_point(aes(year_manufactured, total_delays_per_year, color = total_delays_per_year)) +
+  geom_smooth(aes(year_manufactured, total_delays_per_year), se = FALSE, color = "lightblue") + 
+  labs(x = "Year Manufactured", y = "Total Delays Per Year", title = "Does Plane Age Effect Delays?")
+```
+```{r}
+# Quesion 4
+# What weather conditions make it more likely to see a delay?
+flights
+```
+
+
+```{r}
+# Quesion 4
+# calculate dep delay in minutes since midnight
+# dep_delay_minutes_since_midnight <- ((flights$dep_delay %/% 100) * 60) + (flights$dep_delay %% 100)
+# arr_delay_minutes_since_midnight <- ((flights$arr_delay %/% 100) * 60) + (flights$arr_delay %% 100)
+# 
+# flights$dep_delay_minutes_since_midnight <- dep_delay_minutes_since_midnight
+# flights$arr_delay_minutes_since_midnight <- arr_delay_minutes_since_midnight
+```
+
+
+```{r}
+# Quesion 4
+flights_weather <- flights %>% left_join(weather)
+```
+
+
+```{r}
+# Quesion 4
+names(weather)
+```
+
+
+```{r}
+# Quesion 4
+clean_flights_weather_tb <- flights_weather %>% select(dep_delay, arr_delay, temp, dewp, humid, wind_dir, wind_speed, wind_gust, precip, pressure, visib, time_hour, everything()) %>% filter(!is.na(wind_gust)) %>% arrange(desc(dep_delay))
+
+# (flights_weather)
+
+```
+
+```{r}
+flights_weather
+```
+
+
+```{r}
+clean_flights_weather_tb
+ggplot(clean_flights_weather_tb) + 
+  geom_histogram(aes(clean_flights_weather_tb$dep_delay))
+
+clean_flights_weather_tb
+ggplot(clean_flights_weather_tb) + 
+  geom_histogram(aes(clean_flights_weather_tb$arr_delay))
+```
+```{r}
+# Departure: What weather conditions make it more likely to see a delay?
+  clean_flights_weather_tb <- clean_flights_weather_tb %>% filter(!is.na(pressure))
+  clean_flights_weather_tb %>% select(-arr_delay) %>% arrange(dep_delay)
+```
+
+```{r}
+if(!require("corrr")) install.packages("corrr")
+library(corrr)
+```
+
+```{r}
+names(weather)
+```
+
+
+```{r}
+# correlate(clean_flights_weather_tb) %>% View()
+
+# corrr_clean_flights_weather_tb <- 
+
+clean_flights_weather_dep_delay_tb <- clean_flights_weather_tb %>% select(dep_delay, temp, dewp, humid, wind_dir, wind_speed, wind_gust, precip, pressure, visib)
+
+clean_flights_weather_dep_delay_positive_tb <- clean_flights_weather_dep_delay_tb %>% filter(dep_delay > 0)
+```
+
+
+```{r}
+clean_flights_weather_dep_delay_positive_tb %>% 
+  correlate() %>% 
+  autoplot(method = "Identity") + geom_text(aes(label=round(r, digits=2)), size = 2.5)
+```
+
+
+```{r}
+
+
+# dep_delay as a function of temp, dewp, humidity, wind_speed, wind_gust, precipitation
+
+ggplot(clean_flights_weather_dep_delay_positive_tb) + 
+  geom_point(aes(dep_delay, humid)) +
+  geom_smooth(aes(dep_delay, humid), se = FALSE)
+
+```
+```{r}
+# Arrival: What weather conditions make it more likely to see a delay?
+  clean_flights_weather_tb <- clean_flights_weather_tb %>% filter(!is.na(pressure))
+  clean_flights_weather_tb %>% select(-dep_delay) %>% arrange(arr_delay)
+clean_flights_weather_arr_delay_tb <- clean_flights_weather_tb %>% select(arr_delay, temp, dewp, humid, wind_dir, wind_speed, wind_gust, precip, pressure, visib)
+```
+
+
+```{r}
+clean_flights_weather_arr_delay_positive_tb <- clean_flights_weather_arr_delay_tb %>% filter(arr_delay > 0)
+clean_flights_weather_arr_delay_positive_tb %>% 
+  correlate() %>% 
+  autoplot(method = "Identity") + geom_text(aes(label=round(r, digits=2)), size = 2.5)
+# arr_delay as a function of temp, dewp, humidity, wind_speed, wind_gust, precipitation
+```
+
+
+```{r}
+ggplot(clean_flights_weather_arr_delay_positive_tb) + 
+  geom_point(aes(arr_delay, humid)) +
+  geom_smooth(aes(arr_delay, humid), se = FALSE)
+```
+```{r}
+ggplot(clean_flights_weather_arr_delay_positive_tb) + 
+  geom_point(aes(arr_delay, dewp)) +
+  geom_smooth(aes(arr_delay, dewp), se = FALSE)
+```
+```{r}
+ggplot(clean_flights_weather_arr_delay_positive_tb) + 
+  geom_point(aes(arr_delay, temp)) +
+  geom_smooth(aes(arr_delay, temp), se = FALSE)
+```
+```{r}
+# There is a correlation between arrival and departure delays on days that are more humid, have higher dewpoints, have more rain, and have higher temperatures. 
+```
+
+```{r}
+#  5. What happened on June 13, 2013?
+names(flights)
+```
+
+
+```{r}
+#  5. What happened on June 13, 2013?
+june_13_2013 <- flights %>% filter(year == "2013", month == "6", day == "13") %>% arrange(sched_dep_time)
+```
+
+```{r}
+ggplot(june_13_2013) + 
+  geom_point(aes(sched_dep_time, dep_delay), color = "lightblue") + 
+  geom_smooth(aes(sched_dep_time, dep_delay), color = "darkblue", se = FALSE) + 
+  labs(title = "Departure Delays on June 13th 2013", x = "Scheduled Departure Times", y = "Departure Delay (min)")
+
+ggplot(june_13_2013) + 
+  geom_point(aes(sched_arr_time, arr_delay), color = "lightblue") + 
+  geom_smooth(aes(sched_arr_time, arr_delay), color = "darkblue", se = FALSE) + 
+  labs(title = "Arrival Delays on June 13th 2013", x = "Scheduled Arrival Times", y = "Arrival Delay (min)")
+
+# June 13th 2013 was an overcast, rainy, & foggy day. The rain reduced visibility to 2 miles between the times of 9:57 AM, 10:58 AM  and again at 7:51 PM. This corresponds to the increase in dealys with respect to scheduled arrival and departure times. Reference: https://www.timeanddate.com/weather/usa/new-york/historic?month=6&year=2013
+```
+
+## Section 13.5: Filtering joins
+```{r}
+# semi_join(x, y) keeps all the observations in x that are also present in y 
+# anti_join(x, y) drops all the observationsin x that are alse present in y
+
+# Example:
+top_dest <- flights %>%
+  count(dest, sort = TRUE) %>%
+  head(10)
+top_dest
+
+
+```
+
+```{r}
+# Find each flight that went to one of those destinations:
+flights %>% 
+  filter(dest %in% top_dest$dest)
+
+```
+
+```{r}
+# Only the flights that are in the top destinations
+flights %>% 
+  semi_join(top_dest)
+```
+# 13.5.1 Exercises
+```{r 1. What does it mean for a flight to have a missing tailnum?}
+
+# A missing tailnumber on a flight means that the tailnumber was not recorded. 
+tailnum_not_in_planes <- flights %>%
+  anti_join(planes, by = "tailnum")
+
+```
+
+```{r}
+tailnum_not_in_planes %>% group_by(origin) %>% summarise(n())
+```
+
+```{r}
+# tailnum_not_in_planes %>% group_by(dep_time) %>% summarise(n())
+```
+
+```{r}
+tailnum_not_in_planes
+```
+
+
+```{r}
+# Answer: The carriers MQ and AA are mostly not recorded in the planes tibble. 
+n_planes_not_in_planes_tb_by_carrier_MQ_AA <- tailnum_not_in_planes %>% group_by(carrier) %>% summarise(count = n()) %>% filter(carrier == "MQ" | carrier == "AA") %>% summarise(n_planes_not_in_planes_tb_by_carrier = sum(count))
+
+total_n_planes_not_in_planes_tb <- tailnum_not_in_planes %>% group_by(carrier) %>% summarise(count = n()) %>% summarise(total_n_planes_not_in_planes_tb = sum(count))
+
+percent_of_planes_from_carrier_MQ_and_AA_not_in_planes_tb <- (n_planes_not_in_planes_tb_by_carrier_MQ_AA / total_n_planes_not_in_planes_tb) * 100
+(percent_of_planes_from_carrier_MQ_and_AA_not_in_planes_tb)
+```
+
+
+```{r}
+# tailnum_not_in_planes %>% group_by(dest) %>% summarise(n())
+```
+
+```{r}
+# Quesion 2
+# All Planes in planes tibble with at least 100 flights
+tailnumbers_with_at_least_100_flights <- flights %>% group_by(tailnum) %>% summarise(n_flights = n()) %>% arrange(n_flights) %>% filter(n_flights >= 100)
+
+planes %>%
+  semi_join(tailnumbers_with_at_least_100_flights, by = "tailnum")
+
+```
+
+```{r}
+# Quesion 3
+vehicles <- fueleconomy::vehicles
+common <- fueleconomy::common
+
+# The most common models
+vehicles %>%
+  semi_join(common)
+
+```
+
+```{r}
+# Quesion 4
+# Find the 48 hours over the course of the whole year that have the worst delays. These hours are not contiguous. The hours in flights are contiguous only by 19 hours. 
+
+# Day and number of hours 
+flights %>% group_by(year, month, day, hour) %>% select(year, month, day, hour, dep_delay, everything()) %>% summarise() %>% summarise(n_hours = n()) %>% select(-year, -month, day, n_hours, )
+
+# Groups of hours
+flights %>% filter(year == 2013, month == 1, day == 1) %>% group_by(hour) %>% summarise() %>% arrange(hour)
+
+forty_eight_hours_with_the_worst_delays <- flights %>% mutate(rank = min_rank(desc(dep_delay))) %>% filter(rank <= 48) %>% select(dep_delay, year, month, day, hour) %>% arrange(desc(dep_delay))
+
+(forty_eight_hours_with_the_worst_delays)
+
+weather %>%
+  semi_join(forty_eight_hours_with_the_worst_delays)
+
+```
+
+
+```{r}
+# Quesion 5
+# These are all the flights that are not in airports where the destinations in flights are not located in the faa column in airports.
+anti_join(flights, airports, by = c("dest" = "faa")) 
+
+# These are all the airports that are not in flights where the faa in airports are not located in the dest column in flights
+anti_join(airports, flights, by = c("faa" = "dest"))
+
+```
+```{r}
+# Quesion 6
+# names(planes)
+# 
+# names(flights)
+
+# flights[["carrier"]] %>% filter()
+
+(planes)
+# flights
+ flights_filtered_by_planes_tb <- flights %>%
+  semi_join(planes, by = "tailnum")
+ 
+ (flights_filtered_by_planes_tb)
+ 
+ flights_planes_tb <- flights_filtered_by_planes_tb %>% left_join(planes, by = "tailnum")
+```
+
+
+```{r}
+# Quesion 6
+(flights_planes_tb)
+```
+```{r}
+# Quesion 6
+# flights_planes_tb %>% select(carrier, tailnum) %>% group_by(carrier, tailnum) %>% summarise() %>% summarise(n_planes = n())
+
+# flights_planes_tb %>% select(carrier, tailnum) %>% group_by(carrier, tailnum) 
+
+# There exist planes that are flown by multiple airlines. 
+flights %>% group_by(tailnum, carrier) %>% summarise() %>% summarise(n_carriers = n()) %>% filter(n_carriers > 1)
+
+flights %>% group_by(tailnum, carrier) %>% filter(tailnum == "N146PQ") %>% summarise()
+
+```
+
+#### Section 13.6: Join Problems
+```{r}
+
+```
+
+#### Section 13.7: Set Operations
+```{r}
+df1 <- tribble(
+  ~x, ~y,
+   1,  1,
+   2,  1
+)
+df2 <- tribble(
+  ~x, ~y,
+   1,  1,
+   1,  2
+)
+```
+
+```{r}
+df1
+```
+```{r}
+df2
+```
+
+
+```{r}
+# return only observations in both df1 and df2
+intersect(df1, df2)
+```
+
+```{r}
+# return unique observations in df1 and df2
+union(df1, df2)
+```
+
+```{r}
+# return observations in df1 but not df2
+setdiff(df1, df2)
+```
+
+
+## Section 14: Strings
+```{r}
+if(!require(tidyverse)) install.package("tidyverse")
+library(tidyverse)
+```
+
+
+```{r}
+x <- c("\"", "\\")
+x
+```
+
+
+```{r}
+writeLines(x)
+```
+
+
+#### 14.2.1 String Length
+```{r}
+str_length(c("a", "R for data science", NA))
+```
+
+```{r}
+# Combine two strings 
+str_c("x", "y")
+```
+
+```{r}
+# Control how combined strings are separated
+str_c("x", "y", sep = ",")
+```
+
+```{r}
+# Replacing missing values
+x <- c("abc", NA)
+x
+```
+
+```{r}
+str_c("|-", x, "-|")
+```
+
+```{r}
+# print NA as literal "NA"
+str_c("|-", str_replace_na(x), "-|")
+```
+
+
+```{r}
+str_c(c("x", "y", "z"), collapse = ", ")
+
+```
+
+```{r}
+x <- c("Apple", "Banana", "Pear")
+str_sub(x, 1, 3)
+
+# negative numbers count backwards from end
+str_sub(x, -3, -1)
+
+```
+
+```{r}
+str_sub("a", 1, 5)
+```
+
+```{r}
+x <- c("apple", "eggplant", "banana")
+str_sort(x, locale = "en") # English
+str_sort(x, locale = "haw")
+```
+
+
+#### 14.2.5 Exercises
+```{r}
+# Quesion 1
+# paste0 has no spaces in the separator between strings
+# paste has a default of " " in as the separator between strings that are combined.
+
+# paste0 is similar in function to str_c
+# paste is str_c using a sep = " "
+
+# str_c treats NA as NA and paste0 and paste will treat NA as a string.
+
+```
+
+
+```{r}
+# Quesion 2
+# Where separator adds a space, collapse will remove a space or designated character between string vectors
+```
+
+```{r}
+# Quesion 3
+test_string <- "12345678"
+len <- str_length(test_string)
+ceiling(len/2)
+str_sub(test_string, start = ceiling(len/2), end = ceiling(len/2))
+# The start and end are inclusive. If there are an odd number of characters, then I am using the ceiling to return the middle value. If there are an even number of characters, I will return the lower most of value between the difference.
+```
+
+```{r}
+# Quesion 4
+thanks <- 'R would not be what it is today without the invaluable help of these people
+outside of the (former and current) R Core team, who contributed by donating
+code, bug fixes and documentation: Valerio Aimale, Suharto Anggono, Thomas
+Baier, Gabe Becker, Henrik Bengtsson, Roger Bivand, Ben Bolker, David Brahm,
+G"oran Brostr"om, Patrick Burns, Vince Carey, Saikat DebRoy, Matt Dowle, Brian
+D\'Urso, Lyndon Drake, Dirk Eddelbuettel, Claus Ekstrom, Sebastian Fischmeister,
+John Fox, Paul Gilbert, Yu Gong, Gabor Grothendieck, Frank E Harrell Jr, Peter
+M. Haverty, Torsten Hothorn, Robert King, Kjetil Kjernsmo, Roger Koenker,
+Philippe Lambert, Jan de Leeuw, Jim Lindsey, Patrick Lindsey, Catherine Loader,
+Gordon Maclean, Arni Magnusson, John Maindonald, David Meyer, Ei-ji Nakama,
+Jens Oehlschl\"agel, Steve Oncley, Richard O\'Keefe, Hubert Palme, Roger D. Peng,
+Jose\' C. Pinheiro, Tony Plate, Anthony Rossini, Jonathan Rougier, Petr Savicky,
+Guenther Sawitzki, Marc Schwartz, Arun Srinivasan, Detlef Steuer, Bill Simpson,
+Gordon Smyth, Adrian Trapletti, Terry Therneau, Rolf Turner, Bill Venables,
+Gregory R. Warnes, Andreas Weingessel, Morten Welinder, James Wettenhall, Simon
+Wood, and Achim Zeileis. Others have written code that has been adopted by R and
+is acknowledged in the code files, including '
+
+```
+
+```{r}
+# Question 4.1
+cat(str_wrap(thanks, width = 100), "\n")
+```
+
+```{r}
+# Question 4.2
+# String wrap will wrap the number of characters used before a newline character is inserted. 
+```
+
+```{r}
+# Quesion 5
+# str_trim will remove the whitespace at both ends of a string.
+# str_pad(sample, width = str_length(sample) + 2, side = "both", pad = " ") is the opposite of str_trim
+```
+
+```{r}
+# Quesion 6
+vector <- c("a", "b")
+
+split_string_func <- function(input) {
+  return_val <- c("")
+  for (col in seq_along(input)) {
+    if (length(input) == 0) {
+        return("")
+      break
+      } else if(length(input) == 1 ) {
+        if (input[[col]] == "" ){
+          return("")
+        } else {
+          return_val <- str_c(return_val, input[[col]], ".")  
+        }
+        
+      } else {
+      if (str_length(input[[col]]) == 0) {
+        next
+      }
+      if (col != length(input)){
+        return_val <- str_c(return_val, input[[col]], ", ")
+      } else {
+        return_val <- str_c(return_val, "and ",  input[[col]], ".")
+      }
+    }
+  }
+  return(return_val)
+}
+split_string_func(vector)
+```
+
+#### Section 14.3 Matching Patterns with Regular Expressions
+```{r}
+
+```
+
+#### Section 14.3.1.1 Exercises
+```{r}
+# Quesion 1
+x <- "\\"
+writeLines(x)
+```
+
+
+```{r}
+# Quesion 1
+# "\" as a string representation of a regular expression converts to "". It is converted to a NULL regular expression, and will not match a literal "\".
+# "\\" as a string representation of a regular expression becomes converted to the regular expression "\". The converted regular expression is escaping nothing and will not match a literal "\".
+# "\\\" as a string representation of a regular expression becomes converted to the regular expression "\\". The regular expression will be converted to search for the string "\". To write the string "\" to output, "\\" is needed. "\\" will convert to "\" on console output. The string representation of the a regular expression "\\\" will create a regular expression that is searching for "\" where "\\" is used in the string to print "\" to the console. One needs to find "\\" to find the "\" printed in a console because the string "\\" will convert to "\" on a print. Therefore, "\\\" will search for the string "\". "\" would escape nothing and would not print "\" to the console. "\\" will convert from a string to "\" on console output. Ultimately, the regular expression needs to find "\\" which in turn needs a string representation of a regular expression - each of which require an additional "\" resulting in the string representation of a regular expression that searches for a string "\\" which will output "\" to be "\\\\".
+
+str_view(x, "\\\\")
+
+```
+
+```{r}
+# Quesion 2
+x <- '"\'\\'
+writeLines(x)
+str_view(x,'\\"\\\'\\\\')
+```
+
+
+```{r}
+# Quesion 3
+# "\..\..\.." will match ".a.b.c";
+# '\..\..\..'
+
+x <- '.a.b.c'
+writeLines(x)
+
+str_view(x, '\\..\\..\\..')
+```
+
+## Section 14.3.2: Anchors
+```{r}
+
+```
+
+#### Section 14.3.2.1: Exercises
+```{r}
+x <- '$^$'
+
+str_view(x, '\\$\\^\\$')
+```
+
+```{r}
+# Quesion 1
+x <- 'yes'
+
+str_view(x, '^y.+')
+
+```
+
+```{r}
+# Quesion 2
+x <- 'spacex'
+
+str_view(x, '.+x$')
+```
+
+```{r}
+# Quesion 3
+x <- "Sam"
+
+str_view(x, "^...$")
+```
+
+```{r}
+# Quesion 4
+x <- '1234567'
+
+str_view(x, "^(.......+)$")
+```
+
+
+#### Section 14.3.3: Character classes alternatives
+```{r }
+
+```
+
+#### Section 14.3.3.1 Exercises
+```{r}
+#  1.1
+x <- 'afterlife'
+
+str_view(x, '^[aeiou].[a-z]+')
+
+```
+
+```{r}
+#  1.2
+x <- 'cnstnts'
+x_not <- 'constants'
+
+str_view(x, '^[^aeiou]+$')
+```
+
+
+```{r}
+# Question 1.3
+x <- 'started'
+x_not <- 'seed'
+
+str_view(x, '[a-z]+[^eed]ed$')
+```
+
+```{r}
+# Question 1.4
+x <- 'starting'
+x2 <- 'concise'
+
+str_view(x, '^[a-z]+(ing|ise)$')
+```
+
+
+```{r}
+# Quesion 2
+x <- 'perceive'
+x2 <- 'piece'
+x_not <- 'percieve'
+
+str_view(x, '(cei)')
+```
+
+```{r}
+# Quesion 3
+x <- 'queque'
+
+str_view(x, '(qu)')
+```
+
+```{r}
+# Quesion 4
+american <- 'color'
+british <- 'colour'
+
+str_view(american, '[a-z]*[o][u][r]$')
+```
+
+```{r}
+# Quesion 5
+x <- '800-867-5309'
+
+str_view(x, '[\\d]{3}[-][\\d]{3}[-][\\d]{4}')
+
+```
+
+
+#### Section 14.3.4.1 Exercises
+```{r}
+# Quesion 1
+# ? is {0,1}
+# + is {1,}
+# * is {0,}
+```
+
+```{r}
+# Quesion 2
+# Any character zero or more times
+x <- '{asdf}'
+str_view(x, '\\{.+\\}')
+
+# "{" followed by any character one or more times followed by a "}"
+
+# \d{4}-\d{2}-\d{2} This is four digits followed by a dash followed by two digits followed by a dash followed by two more digits
+
+# \\\\{4} This is searching for a four contiguous "\"
+
+```
+
+
+```{r}
+# Quesion 3
+x <- 'sdf'
+str_view(x, '^[^aeiou]{3}')
+
+x <- 'aeiou'
+str_view(x, '[aeiou]{3,}')
+
+x <- 'dfdfsfdfdf'
+str_view(x, '([^aeiou][^aeiou]){2,}')
+
+```
+
+```{r}
+# Quesion 4
+# https://regexcrossword.com/challenges/beginner.
+```
+
+#### Section 14.3.5: grouping and backreferences
+```{r}
+x <- 'bbbanananan'
+str_view(x, '(.)\\1\\1')
+
+x <- 'aaaa'
+str_view(x, "(.)(.)\\2\\1")
+
+# The expression (.)\1\1 matches any character followed by the same character twice.
+# The string representation of the regular expression "(.)(.)\\2\\1" will match any two characters followed by the second matched character followed by the first matched character. 
+
+# (..)\1 is a regular expression that will match any two characters followed by the same group of characters. 
+
+# "(.).\\1.\\1" will match any character followed by any character followed by the first character that is matched followed by any character followed by the first character that is matched. 
+
+# "(.)(.)(.).*\\3\\2\\1" will match any character followed by any character followed by any character followed by any character zero or more times follwed by the third character that is matched followed by the second character that is matched followed by the first character that is matched. 
+```
+
+```{r}
+# Quesion 2.1 
+x <- 'eve'
+str_view(x, "(.).*\\1")
+```
+
+```{r}
+#  2.2
+x <- 'church'
+str_view(x, '(..).*\\1')
+```
+
+```{r}
+#  2.3
+x <- 'eleven'
+str_view(x, '(.).*\\1.*\\1.*')
+```
+
+
+## Section 14.4: Tools
+```{r}
+
+```
+
+#### Section 14.4.1.1 Exercises
+
+```{r}
+#  1.1
+x <- 'x'
+words <- c("spacex", "x", "not")
+str_detect(words, '.*x$')
+```
+
+```{r}
+#  1.2
+words <- c("alphabet", "evan", "neuralink")
+str_detect(words, '^[aeiou].*[^aeiou]$')
+```
+
+```{r 1.3.1}
+# Are there any words that contain at least one of each different vowel
+# If you were working for neuralink and you needed to parse all detected words of thought... you would need to know these skills... 
+
+# words_example <- c("aa", "neuralinko", "counterexample")
+
+contains_a <- str_count(words, "[a]")
+contains_e <- str_count(words, "[e]")
+contains_i <- str_count(words, "[i]")
+contains_o <- str_count(words, "[o]")
+contains_u <- str_count(words, "[u]")
+
+for (index in seq_along(words)) {
+  if (contains_a[[index]] >= 1 & 
+      contains_e[[index]] >= 1 & 
+      contains_i[[index]] >= 1 & 
+      contains_o[[index]] >= 1 & 
+      contains_u[[index]] >= 1){
+    print(words[[index]])
+  }
+}
+
+
+```
+
+```{r}
+# Quesion 2
+vowels <- str_count(words, '[aeiou]')
+word_count <- str_count(words, '[a-z]')
+
+word_proportion <- vowels / word_count
+
+for (col in seq_along(words)) {
+  if (vowels[[col]] == max(vowels)){
+    print_val <- str_c(words[[col]], "has the most vowels.", sep = " ")
+    print(print_val)
+  }
+  
+  if (word_proportion[[col]] == max(word_proportion)) {
+    print_val <- str_c(words[[col]], "has the greatest ratio of vowels to characters in the word.", sep = " ")
+    print(print_val)
+  }
+  
+}
+```
+
+
+#### Section 14.4.2: Exact Matches
+```{r}
+length(sentences)
+
+head(sentences)
+```
+#### 14.4.2.1 Exercises
+```{r}
+# Quesion 1
+colours <- c("red", "orange", "yellow", "green", "blue", "purple")
+colour_match <- str_c(colours, collapse = "\\b|\\b")
+colour_match <- str_pad(colour_match, str_length(colour_match) + 2, side = "both", pad = " ")
+colour_match <- str_replace_all(colour_match, " ", "\\\\b")
+colour_match
+```
+
+```{r}
+# Sentences that contain a color.
+has_colour <- str_subset(sentences, colour_match) # str_subset will create a list of sentences. 
+head(has_colour)
+```
+
+```{r}
+# The color that was found in the sentences. 
+matches <- str_extract(has_colour, colour_match) # string extract will extract the first color found in the sentences.
+head(matches)
+```
+
+```{r}
+# Sentences with more than one match of color in the sentence. 
+more <- sentences[str_count(sentences, colour_match) > 1]
+str_view_all(more)
+```
+
+
+```{r}
+# Showcasing the fact that str_extract only pulls the first color from each sentence in which a color is found:
+str_extract(more, colour_match) # Notice that the first sentence contains both blue and red which are not present in the returned value from str_extract.
+```
+
+```{r}
+# To get all matches found in strings, use str_extract_all:
+str_extract_all(more, colour_match) # Notice both blue and red appear. 
+```
+
+```{r}
+str_extract_all(more, colour_match, simplify = TRUE)
+
+```
+```{r}
+x <- c("a", "a b", "a b c") 
+str_extract_all(x, "[a-z]", simplify = TRUE)
+```
+
+```{r}
+more
+```
+
+```{r}
+# Quesion 2.1
+# Extract the first word from each sentence in the Harvard dataset.
+# head(sentences)
+
+first_word <- '^[A-Za-z]+'
+str_extract_all(sentences, first_word)
+
+```
+
+```{r}
+#  2.2
+# All words ending in "ing"
+
+ending_ing <- '[A-Za-z]+(ing)'
+
+str_extract_all(sentences, ending_ing, simplify = TRUE)
+```
+
+```{r}
+#  2.3.2 
+# !!! do not split this into smaller parts; do not use for... use regex only...?
+
+# All plurals sometimes
+# n_sentence <- 320
+
+# sentence <- sentences[n_sentence]
+# sentence
+
+plurals <- '(\\w+[^iea][b-h|j-r|t|v-z](s)\\b)'
+
+
+
+remove_non_plurals <- 'sometimes|Always|always|Sometimes|Does|does'
+
+for (col in seq_along(sentences)) {
+  current_sentence <- sentences[[col]]
+  extraction <- str_remove_all(current_sentence,remove_non_plurals)
+  identified_plurals <- str_extract_all(extraction, plurals)
+  if (!(identical(identified_plurals[[1]], character(0)))){
+    print(extraction)
+    print(identified_plurals)
+  }
+}
+
+```
+
+```{r}
+#  2.3.2
+# !!! do not split this into smaller parts; do not use for... use regex only...?
+# Extract all plural words. 
+
+# Answer: This uses a blocking character to define a word, a group of words that are in a negative lookahead group, then any number of one or more word characters followed by a single character that is not a,i,s,u and is alphabetic character followed by a group containing an s.
+
+plurals <- "\\b(?!sometimes|does|Always|always|Sometimes|Does|its\\b)\\w+[b-h|j-r|t|v-z](s)\\b"
+str_extract_all(sentences, plurals, simplify = TRUE)
+```
+
+
+#### Section 14.4.3 Grouped matches
+```{r}
+
+```
+
+
+
+#### 14.4.3.1 Exercises
+```{r}
+# Quesion 1
+# Find all words that come after a "number" like "one", "two", "three", etc. Pull out both the number and the word.
+
+numbers <- c("zero","one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
+test_string <- "one employee"
+regex_numbers <- str_c(numbers, collapse = "\\b|\\b")
+regex_numbers <- str_pad(regex_numbers, width = str_length(regex_numbers) + 2, side = "both", pad = " ")
+regex_numbers <- str_replace_all(regex_numbers, " ", "\\\\b")
+regex_numbers <- str_c("(", regex_numbers)
+regex_numbers <- str_c(regex_numbers, ")")
+regex_numbers <- str_c(regex_numbers, " ([^ ]+)")
+
+regex_numbers
+# test_string %>% str_extract(test_string, regex_numbers, )
+str_extract(test_string, regex_numbers)
+
+```
+
+```{r}
+# Quesion 2
+contraction_exp <- "(\\w+)('s)"
+
+contractions <- tibble(sentence = sentences) %>%
+  tidyr::extract(
+    sentence, c("word", "contraction"), contraction_exp,
+    remove = FALSE
+  )
+
+contractions %>% filter(!is.na(word) & !is.na(contraction))
+```
+
+
+#### Section 14.4.4: Replacing Matches
+```{r}
+sentences %>%
+  str_replace("([^ ]+) ([^ ]+) ([^ ]+) ([^ ]+) ([^ ]+)", "\\1 \\3 \\2") %>%
+  head(5)
+```
+
+
+#### Section 14.4.4.1: Exercises
+```{r}
+# Quesion 1
+# Replace all forward slashes with backslashses.
+
+test_string <- "/"
+
+forward_slash_regex <- '(\\/)'
+replacement_regex <- '\\\\'
+test_string %>% str_view(forward_slash_regex)
+
+
+ans <- test_string %>% str_replace_all(forward_slash_regex, "\\\\")
+print(ans)
+```
+
+```{r}
+# Quesion 2
+
+test_string <- "NEURALINK"
+
+test_string %>% 
+  str_replace_all("[A]", "a") %>% 
+  str_replace_all("[B]", "b") %>%
+  str_replace_all("[C]", "c") %>% 
+  str_replace_all("[D]", "d") %>%
+  str_replace_all("[E]", "e") %>% 
+  str_replace_all("[F]", "f") %>%
+  str_replace_all("[G]", "g") %>% 
+  str_replace_all("[H]", "h") %>%
+  str_replace_all("[I]", "i") %>% 
+  str_replace_all("[J]", "j") %>%
+  str_replace_all("[K]", "k") %>% 
+  str_replace_all("[L]", "l") %>%
+  str_replace_all("[M]", "m") %>% 
+  str_replace_all("[N]", "n") %>%
+  str_replace_all("[O]", "o") %>% 
+  str_replace_all("[P]", "p") %>%
+  str_replace_all("[Q]", "q") %>% 
+  str_replace_all("[R]", "r") %>%
+  str_replace_all("[S]", "s") %>% 
+  str_replace_all("[T]", "t") %>%
+  str_replace_all("[U]", "u") %>% 
+  str_replace_all("[V]", "v") %>%
+  str_replace_all("[W]", "w") %>% 
+  str_replace_all("[X]", "x") %>%
+  str_replace_all("[Y]", "y") %>% 
+  str_replace_all("[Z]", "z")
+
+```
+
+```{r}
+# Quesion 3
+# Switch the first and last letters in words. Which of those strings are still words?
+test_sample <- words[2]
+match_regex <- "\\b(.)([a-z]*)(.)\\b"
+replacement_regex <- "\\3\\2\\1"
+# 
+# test_sample
+# test_sample %>% str_replace(match_regex, replacement_regex)
+
+new_words <- words %>%
+  str_replace(match_regex, replacement_regex)
+
+list_of_sensible_words <- words[str_equal(new_words, words)]
+
+length(list_of_sensible_words) 
+
+# 37 of the words are still words. 
+list_of_sensible_words
+```
+## Section 14.4.5: Splitting
+
+```{r}
+sentences %>%
+  head(5) %>%
+  str_split(" ")
+```
+```{r}
+# Extract the first element of a list
+
+"a|b|c|d" %>%
+  str_split("\\|") %>%
+  .[[1]]
+```
+
+```{r}
+# Otherwise return a matrix with simplify = TRUE
+words %>%
+  head(10) %>%
+  str_split(" ", simplify = TRUE)
+```
+```{r}
+# Request a maximum number of pieces:
+
+fields <- c("Organization: Neuralink", "State: Texas", "City: Austin", "Employee: Hired", "Patient: Cured")
+
+fields %>%
+  head(10) %>%
+  str_split(": ", n = 2, simplify = TRUE)
+```
+
+```{r}
+x <- "This is a sentence. This is another sentence"
+str_view_all(x, boundary("word"))
+
+str_split(x, boundary("word"))
+str_split(x, " ")
+```
+
+#### Section 14.4.5.1: Exercises
+```{r}
+# Quesion 1
+sample_string <- "apples, pears, and bananas"
+
+sample_string %>% str_split(boundary("word"))
+```
+
+```{r}
+# Quesion 2
+# It is better to split by word boundary than by spaces because a boundary will not include punctuation whereas words at the end of a sentence will.
+```
+
+```{r}
+# Quesion 3
+sample_string %>% str_split("")
+# Splitting by "" will split each element in a string into individual characters.
+# "" is equivalent to boundary(character)
+```
+
+
+#### Section 14.4.6: Find Matches
+```{r}
+# str_locate() to find the starting and ending locations of each match.
+# str_locate() to find a matching pattern; str_sub() to extract and/or modify the patterns.
+
+```
+
+## 14.5 Other Types of Patterns
+```{r}
+# A pattern that is a string will automatically make a conversion to regex.
+str_view(fruit, "nana")
+
+str_view(fruit, regex("nana"))
+```
+
+```{r}
+bananas <- c("banana", "Banana", "BANANA")
+str_view(bananas, "banana")
+
+# Ignore case
+str_view(bananas, regex("banana", ignore_case = TRUE))
+```
+
+```{r}
+ # multiline = TRUE allows ^ and $ to match the start of each line rather than the start of each string
+
+x <- "Line 1\nLine 2\nLine 3\n"
+
+# The start of the first string
+str_extract_all(x, "^Line")[[1]]
+
+# The start of the first line
+str_extract_all(x, regex("^Line", multiline = TRUE))[[1]]
+
+```
+
+```{r}
+# Comments: comments = TRUE will allow spaces and # to be ignored
+phone <- regex("
+  \\(?     # optional opening parens
+  (\\d{3}) # area code
+  [) -]?   # optional closing parens, space, or dash
+  (\\d{3}) # another three numbers
+  [ -]?    # optional space or dash
+  (\\d{3}) # three more numbers
+", comments = TRUE)
+
+str_match("888-867-5309", phone)
+```
+
+```{r}
+# Regex options:
+# dotall = TRUE allows . to match one of any type of character including \n
+```
+
+```{r}
+# Other regex options
+# fixed() matches exactly the specified sequence in bytes. It ignores all special regular expressions and operates at a very low level.
+
+if(!require("microbenchmark")) install.packages("microbenchmark")
+library(microbenchmark)
+
+# Fixed is about 3 times as faster than regex. Do not use with non-English data.
+microbenchmark::microbenchmark(
+  fixed = str_detect(sentences, fixed("the")), 
+  regex = str_detect(sentences, "the"),
+  times = 20
+)
+
+```
+
+
+```{r}
+# coll compares strings with standard collation rules. 
+# If a character is represented with two or more ways, coll will repect the human readable equality of the two. 
+# i.e. a with an accent can also be represented as a character "a" that has an accent. i.e.:
+a1 <- "\u00e1"
+a2 <- "a\u0301"
+c(a1, a2)
+
+# False, should be true
+a1 == a2
+
+# Fixed reports false; should be true.
+str_detect(a1, fixed(a2))
+
+# Collate reports True.
+str_detect(a1, coll(a2))
+
+# Collate is the slowest because the rules are complex. However, collate is the only function to return the correct answer.
+microbenchmark(
+  str_detect(a1, regex(a2)),
+  str_detect(a1, fixed(a2)),
+  str_detect(a1, coll(a1)),
+  times = 20
+)
+
+```
+
+```{r}
+# Using boundary with other functions.
+x <- "This is a sentence"
+str_view_all(x, boundary("word"))
+str_extract_all(x, boundary("word"))
+```
+#### Section 14.5.1: Exercises
+```{r}
+# Quesion 1
+# Regex
+str_detect("\\", regex("\\\\"))
+
+# Fixed
+str_detect("\\", fixed("\\"))
+```
+
+```{r}
+# Quesion 2
+# What are the five most common words in sentences?
+head(sentences)
+words_in_sentences <- str_split(sentences, boundary("word"), simplify = TRUE)
+
+wordList <- c("")
+for (word in seq_along(words_in_sentences)) {
+  current_word <- words_in_sentences[word]
+  wordList[word] = str_to_lower(current_word)
+}
+length(wordList)
+unique_word_list <- unique(wordList)
+length(unique_word_list)
+
+count_of_unique_word <- c("")
+for (word in seq_along(unique_word_list)){
+  current_word <- unique_word_list[[word]]
+  regex_word <- str_c("\\b", current_word)
+  regex_word <- str_c(regex_word, "\\b")
+  word_count <- str_count(wordList, regex_word)
+  # word_count
+  
+  # print("sum(word_count)")
+  # print(sum(word_count))
+  # print("word")
+  # print(word)
+  
+  count_of_unique_word[word] <- sum(word_count)
+}
+
+unique_word_list_tb <- tibble(unique_word_list, as.integer(count_of_unique_word))
+(unique_word_list_tb)
+unique_word_list_tb <- unique_word_list_tb %>% rename(count_of_unique_word = `as.integer(count_of_unique_word)`)
+unique_word_list_tb_filtered_arranged <- unique_word_list_tb %>% filter(!(unique_word_list == "")) %>% arrange(desc(count_of_unique_word))
+head(unique_word_list_tb_filtered_arranged, 5)
+```
+
+# Section 14.6: Other uses of regular expressions
+
+```{r}
+# Searches all object available from the global environment. Useful if you forget the name of the function.
+apropos("replace")
+```
+
+
+```{r}
+# List all files in a directory
+head(dir(pattern = "\\."))
+```
+
+## Section 14.7: stringi
+```{r}
+# stringi contains 256 functions. stringr is built on stringi, but only contains 59 functions. 
+```
+
+#### Section 14.7.1: Exercises
+```{r}
+# Quesion 1
+# Stringi functions
+# Count the number of words: stringi::stri_count()
+# Find duplicated strings: stringi::stri_dup()
+# Generates random strings: stringi::stri_rand_strings()
+# Control the language that stri_sort uses for sorting by passing a locale value to the function stri_sort. It is also possible to set the variable "french".
+```
+
+# Section 15: Factors
+## Section 15.1: Creating Factors
+```{r}
+# Creating a factor
+
+# Assigning Data
+x1 <- c("Dec", "Apr", "Jan", "May")
+
+# Manually assigning months
+month_levels <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+# Creating a factor with levels
+factorx <- factor(x1, levels = month_levels)
+factorx
+
+# Sortable factor
+sort(factorx)
+
+# Create factor with data
+factordata <- factor(x1)
+factordata
+
+# Sort
+sort(factordata)
+
+# Create a factor with data where the leves are the unique values in the data
+factor_unique <- factor(x1, levels = unique(x1))
+sort(factor_unique)
+
+# Setting a factor levels as found in hte data
+factor_unique_after <- x1 %>% factor() %>% fct_inorder()
+sort(factor_unique_after)
+
+# Access the levels directly 
+levels(factordata)
+
+```
+## Section 15.3 General Social Survey
+```{r}
+
+```
+
+#### Section 15.3.1: Exercise
+```{r}
+# Quesion 1
+# This bar chart is rotated 90 degrees because the x-axis of rincome was illegible. Removing Refused, Don't Know, No Answer, and Not Applicable from the current chart into a different bar chart and/or creating a new chart that consists of only those variables would make it clear as to the distribution of rincome at first glance. It would be useful to add a legend that described precisely what is meant by the abbreviation: "Lt". It would be useful to know why there are a great number of values in the category "Not Applicable". 
+
+ggplot(gss_cat)+
+  geom_bar(aes(rincome)) + 
+  coord_flip() 
+```
+
+```{r}
+# Quesion 2
+# Protestant is the most common religion in this survey.
+ggplot(gss_cat) + 
+  geom_bar(aes(relig)) + 
+  coord_flip()
+```
+```{r}
+# names(gss_cat)
+
+class(gss_cat$partyid)
+```
+
+
+```{r}
+# Independent is the most common party in this survey.
+# How do you reorder a bar chart using a factor???
+ggplot(gss_cat) + 
+  geom_bar(aes(partyid)) + 
+  coord_flip()
+```
+
+```{r}
+party_id_count <- gss_cat %>% group_by(partyid) %>% summarise(count = n())
+
+
+names(party_id_count)
+
+
+```
+
+
+```{r}
+
+# To reorder the bars of a bar chart, use geom_col, aes(fct_reorder(factor, count_of_factor), count, after_stat = "Identity", fill = count)
+ggplot(party_id_count) + 
+  geom_col(aes(x = fct_reorder(partyid, count), y = count, after_stat = "Identity", fill = count)) +
+  coord_flip()
+
+```
+
+#### Section 15.4: Modifying factor order
+```{r}
+relig_summary <- gss_cat %>%
+  group_by(relig) %>%
+  summarise(
+    age = mean(age, na.rm = TRUE),
+    tvhours = mean(tvhours, na.rm = TRUE),
+    n = n()
+  )
+
+ggplot(relig_summary, aes(tvhours, relig)) + geom_point()
+```
+```{r}
+# class(relig_summary$tvhours)
+
+# reorder a factor: fct_reorder(relig, tvhours): Sort religion using the values of tvhours
+ggplot(relig_summary, aes(tvhours, fct_reorder(relig, tvhours))) + geom_point()
+```
+
+```{r}
+# Reorder individual factors
+
+rincome_summary <- gss_cat %>%
+  group_by(rincome) %>%
+  summarise(
+    age = mean(age, na.rm = TRUE), 
+    tvhours = mean(tvhours, na.rm = TRUE),
+    n = n()
+  )
+
+# ggplot(rincome_summary, aes(age, fct_reorder(rincome, age))) + geom_point() # rincome already has an order; do not do this
+
+# ggplot(rincome_summary, aes(age, fct_relevel(rincome))) + geom_point()
+ggplot(rincome_summary, aes(age, rincome)) + geom_point() # Natural Plot
+ggplot(rincome_summary, aes(age, fct_relevel(rincome, "Not applicable"))) + geom_point() # Moves Not applicable to the front of the list. 
+
+```
+```{r}
+# fct_reorder2 will reorder the factor by the y values associated with the largest x values in the plot.
+
+by_age <- gss_cat %>%
+  filter(!is.na(age)) %>%
+  count(age, marital) %>%
+  group_by(age) %>%
+  mutate(prop = n / sum(n))
+
+ggplot(by_age, aes(age, prop, colour = marital)) +
+  geom_line(na.rm = TRUE)
+
+# reordering the legend using fct_reorder2(data, x, y); fct_reorder 2 reorders the y values by the largest value that corresponds to the values in x. fct_reorder2(data, )... given x, reorder y with the largest corresponding value.
+
+ggplot(by_age, aes(age, prop, colour = fct_reorder2(marital, age, prop))) +
+  geom_line() +
+  labs(colour = "marital")
+```
+```{r}
+# Reordering Bar Charts
+# reorder factor levels by frequency level using fct_infreq (largest value first); 
+# fct_rev() to reverse the ordering of the factors.
+
+# Original
+gss_cat %>%
+  ggplot(aes(marital)) +
+  geom_bar()
+
+# infreq
+gss_cat %>% 
+  mutate(marital = marital %>% fct_infreq()) %>%
+  ggplot(aes(marital)) + 
+  geom_bar()
+
+# infreq & reversed
+gss_cat %>% 
+  mutate(marital = marital %>% fct_infreq() %>% fct_rev()) %>%
+  ggplot(aes(marital)) + 
+  geom_bar()
+
+
+```
+
+#### Section 15.4.1: Exercises
+```{r}
+# Quesion 1
+# The mean may not be a good summary for tvhours if there are outliers. Outliers can effect the mean. The median would be a better choice to represent an average with outliers. 
+```
+
+```{r}
+# Quesion 2
+# head(gss_cat)
+# names(gss_cat)
+# Factors: marital, race, rincome, partyid, relig, denom
+
+# Order of levels:
+
+# levels(gss_cat$marital) # arbitrary order
+# levels(gss_cat$race) # arbitrary order
+levels(gss_cat$rincome) # prinicipled: descending with respect to values
+# levels(gss_cat$partyid) # principled: strength of polarity of party
+# levels(gss_cat$relig) # arbitrary order
+# levels(gss_cat$denom) # arbitrary order
+```
+
+```{r}
+# Quesion 3
+# The factors are decreasing in incremental value as the levels increase within the collection. Column 4 represents the largest value & column 15 represents the least significant numeric value in the penultimate significant position within the collection. The plot plots the values from the value within column of the least significant position  upwards as the position within the collection of levels increases. By moving the value from the column in the most significant position of factor levels to the least significant position, i.e. "the front", the least significant position, 1, was plotted first at the bottom of the plot.  
+```
+
+## Section 15.5: Modifying factor levels
+```{r}
+
+# fct_recode() allows you to rename the values at each level
+
+gss_cat %>% count(partyid)
+
+gss_cat %>%
+  mutate(partyid = fct_recode(partyid,
+                              "Republican, strong" = "Strong republican",
+                              "Republican, weak" = "Not str republican",
+                              "Independent, near rep" = "Ind,near rep",
+                              "Independent, near dem" = "Ind,near dem",
+                              "Democrat, weak" = "Not str democrat",
+                              "Democrat, strong" = "Strong democrat"
+                              )) %>%
+                              count(partyid)
+```
+
+
+
+```{r}
+# Combine groups by assigning multiple levels to the same level.
+gss_cat %>%
+  mutate(partyid = fct_recode(partyid,
+                              "Republican, strong" = "Strong republican",
+                              "Republican, weak" = "Not str republican",
+                              "Independent, near rep" = "Ind,near rep",
+                              "Independent, near dem" = "Ind,near dem",
+                              "Democrat, weak" = "Not str democrat",
+                              "Democrat, strong" = "Strong democrat",
+                              "Other" = "No answer",
+                              "Other" = "Don't know",
+                              "Other" = "Other party"
+                              )) %>%
+                              count(partyid)
+```
+
+
+
+```{r}
+# Collapsing levels:
+gss_cat %>%
+  mutate(partyid = fct_collapse(partyid, 
+                                other = c("No answer", "Don't know", "Other party"), 
+                                rep = c("Strong republican", "Not str republican"),
+                                ind = c("Ind,near rep", "Independent", "Ind,near dem"),
+                                dem = c("Not str democrat", "Strong democrat"))) %>%
+                                count(partyid)
+```
+
+```{r}
+# lumping all the small groups together to make a table simpler
+gss_cat %>%
+  mutate(relig = fct_lump(relig)) %>%
+  count(relig)
+
+# Specify the number of lumps with n
+gss_cat %>%
+  mutate(relig = fct_lump(relig, n = 10)) %>%
+  count(relig)
+```
+
+```{r}
+# gss_cat %>% count(year)
+(gss_cat_party_collapse_year_partyid_count <-gss_cat %>% mutate(partyid = fct_collapse(partyid,
+  other = c("No answer", "Don't know", "Other party"),
+  rep = c("Strong republican", "Not str republican"),
+  ind = c("Ind,near rep", "Independent", "Ind,near dem"),
+  dem = c("Not str democrat", "Strong democrat")
+)) %>% group_by(year, partyid) %>% summarise(count = n()) %>% filter(partyid == "rep" | partyid == "dem" | partyid == "ind"))
+
+```
+
+```{r}
+gss_cat_party_collapse_year_partyid_count %>% count(year)
+```
+
+```{r}
+# Quesion 1
+ggplot(gss_cat_party_collapse_year_partyid_count) +
+  geom_point(aes(year, count, group = partyid, color = partyid)) + 
+  geom_smooth(aes(year, count, group = partyid, color = partyid), se = FALSE) +
+  labs(title = "Number of Members in the Republican, Independent, and Democratic Parties", subtitle = "Years: 2000 - 2014", x = "Year", y = "Population")
+```
+
+```{r}
+# Quesion 2
+# rincome can be regrouped into "$10000 to $24999, "Lt $1000 to $9999", and over 25000. No answer, Don't know, Refused, & Not applicable can all be sorted into a category listed as Other.
+
+gss_cat %>% count(rincome) # original
+gss_cat %>% mutate(rincome = fct_lump(rincome, n = 4)) %>% count(rincome) # unreliable, unknown what comprises "Other", useful for a quick idea of groups.
+
+gss_cat_regrouped <- gss_cat %>% mutate(rincome = fct_recode(rincome,
+  "$25000 or more" = "$25000 or more",
+  
+  "$10000 to $24999" = "$10000 - 14999", 
+  "$10000 to $24999" = "$15000 - 19999", 
+  "$10000 to $24999" = "$20000 - 24999",
+  
+  "Lt $1000 to $9999" = "Lt $1000", 
+  "Lt $1000 to $9999" = "$1000 to 2999", 
+  "Lt $1000 to $9999" = "$3000 to 3999", 
+  "Lt $1000 to $9999" = "$4000 to 4999", 
+  "Lt $1000 to $9999" = "$5000 to 5999", 
+  "Lt $1000 to $9999" = "$6000 to 6999", 
+  "Lt $1000 to $9999" = "$7000 to 7999", 
+  "Lt $1000 to $9999" = "$8000 to 9999", 
+  
+  "Other" = "Don't know", 
+  "Other" = "Refused", 
+  "Other" = "No answer", 
+  "Other" = "Not applicable"
+  ))
+
+gss_cat_regrouped %>% count(rincome)
+```
+
+```{r}
+# Summary of what I learned: 
+# fct_reorder to reorder columns 
+# fct_collapse to collapse columns 
+# fct_recode to recode columns into new groups
+# fct_reorder2 to reorder the y values in a legend to match orders of the lines. 
+```
+
+
+# Section 16: Dates and Times
+```{r}
+# Create date time from input
+flights %>% 
+  select(year, month, day, hour, minute) %>%
+  mutate(departure = make_datetime(year, month, day, hour, minute))
+```
+
+
+```{r}
+make_datetime_100 <- function(year, month, day, time) {
+  make_datetime(year, month, day, time %/% 100, time %% 100)
+}
+
+flights_dt <- flights %>%
+  filter(!is.na(dep_time), !is.na(arr_time)) %>%
+  mutate(
+    dep_time = make_datetime_100(year, month, day, dep_time),
+    arr_time = make_datetime_100(year, month, day, arr_time), 
+    sched_dep_time = make_datetime_100(year, month, day, sched_dep_time),
+    sched_arr_time = make_datetime_100(year, month, day, sched_arr_time)
+  ) %>%
+  select(origin, dest, ends_with("delay"), ends_with("time"), distance, flight)
+
+flights_dt
+```
+
+```{r}
+flights_dt %>%
+  ggplot(aes(dep_time)) +
+  geom_freqpoly(binwidth = 86400) # 86400 seconds = 1 day
+```
+
+```{r}
+flights_dt %>%
+  filter(dep_time < ymd(20130102)) %>%
+  ggplot(aes(dep_time)) +
+  geom_freqpoly(binwidth = 600) # 600 s = 10 minutes
+```
+
+```{r}
+as_datetime(today())
+as_date(now())
+```
+
+#### 16.2.4: Exercises
+```{r}
+# Quesion 1
+# There is a warning that the function failed to parse & the data is NA.
+ymd(c("2010-10-10", "bananas"))
+```
+
+```{r}
+# Quesion 2
+# tzone sets the current time zone of the value today.
+today(tzone = "GMT")
+today(tzone = "EST")
+today(tzone = "UTC")
+```
+
+```{r}
+# Question 3.1
+if(!require("lubridate")) install.packages("lubridate")
+library(lubridate)
+```
+
+
+```{r}
+# Question 3.2
+d1 <- "January 1 2010"
+d2 <- "2015-Mar-07"
+d3 <- "06-Jun-2017"
+d4 <- c("August 19 (2015)", "July 1 (2015)")
+d5 <- "12/30/14" # Dec 30, 2014
+
+```
+
+```{r}
+# Question 3.3
+mdy(d1)
+ymd(d2)
+dmy(d3)
+mdy(d4)
+mdy(d5)
+```
+
+## Section 16.3: Date-time components
+```{r}
+# Return an abbreviated name of the month or day of the week. Set abbr = FALSE to return the full name.
+datetime <- ymd_hms("2016-07-08 12:34:56")
+
+year(datetime)
+month(datetime)
+mday(datetime)
+
+yday(datetime)
+wday(datetime)
+```
+
+```{r}
+# month() & wday() : label = TRUE will return an abbreviated version of the day of the month or the day of the week. 
+# abbr = FALSE will return the full name of the day of the month or day of the week.
+
+month(datetime, label = TRUE)
+weekday <- wday(datetime, label = TRUE, abbr = FALSE)
+class(weekday)
+(weekday)
+```
+
+```{r}
+# wday(flights_dt$dep_time, label = TRUE)
+```
+
+
+```{r}
+flights_dt %>%
+  mutate(wday = wday(dep_time, label = TRUE)) %>%
+  ggplot(aes(x = wday)) +
+  geom_bar()
+```
+
+```{r}
+flights_dt %>%
+  mutate(minute = minute(dep_time)) %>%
+  group_by(minute) %>%
+  summarise(
+    avg_delay = mean(arr_delay, na.rm = TRUE),
+    n = n()) %>%
+  ggplot(aes(minute, avg_delay)) +
+  geom_line()
+```
+
+```{r}
+sched_dep <- flights_dt %>%
+  mutate(minute = minute(sched_dep_time)) %>%
+  group_by(minute) %>%
+  summarise(
+    avg_delay = mean(arr_delay, na.rm = TRUE),
+    n = n())
+
+ggplot(sched_dep, aes(minute, avg_delay)) + 
+  geom_line()
+```
+
+#### Section 16.3.4: Exercises
+```{r}
+# Quesion 1
+# How does the distribution of flight times within a day change over the course of the year?
+flights_dt %>%
+  mutate(day = day(dep_time)) %>% count(day)
+```
+
+
+```{r}
+# Frequency of arrival times for the year 2013
+flights_dt %>% 
+  ggplot(aes(arr_time)) + 
+  geom_freqpoly(binwidth = 86400) # 86400 = Number of seconds within a day
+```
+
+
+```{r}
+# Quesion 2
+# dep_time
+# sched_dep_time
+# dep_delay
+
+flights_dt %>%
+  mutate(minute = minute(dep_time)) %>%
+  group_by(minute) %>%
+  summarise(
+    avg_delay = mean(arr_delay, na.rm = TRUE),
+    n = n()) %>%
+  ggplot(aes(minute, avg_delay)) +
+  geom_line()
+
+####
+```
+
+
+```{r}
+# Quesion 2
+flights_dt %>% select(dep_time, sched_dep_time, dep_delay)
+```
+
+
+```{r}
+# Quesion 2
+# Compare the dep_time, sched_dep_time, & dep_delay. Are they consistent?
+
+flights_dt$dep_time[2] - flights_dt$sched_dep_time[2]
+
+```
+
+
+```{r}
+# Quesion 2
+flights_dt %>% group_by(dep_time, sched_dep_time, dep_delay) 
+
+dep_time_minus_sched_dep_time <- difftime(flights_dt$dep_time, flights_dt$sched_dep_time, units = c("mins"))
+
+class(dep_time_minus_sched_dep_time)
+times1 <- dep_time_minus_sched_dep_time
+times2 <- as.difftime(flights_dt$dep_delay, units = "mins")
+
+# time <- 28
+# times1[time]
+# times2[time]
+
+flights_dt$sched_dep_time[times1 != times2][1]
+flights_dt$dep_time[times1 != times2][1]
+flights_dt$dep_delay[times1 != times2][1]
+
+# Recorded Departure Delay
+hours <- flights_dt$dep_delay[times1 != times2][1] / 60
+minutes <- flights_dt$dep_delay[times1 != times2][1] %% 60
+(hours)
+(minutes)
+
+# Quantity of detected Errors
+length(flights_dt$dep_delay[times1 != times2])
+
+# Calculated difference between dep_time and scheduled departure time
+flights_dt$dep_time[times1 != times2][1] - flights_dt$sched_dep_time[times1 != times2][1]
+
+# Calculated difference between dep_time and scheduled departure time in minutes
+(calculated_difference_min <- 9*60 + (.783333 * 60))
+
+# Numeric discrepancy
+flights_dt$dep_delay[times1 != times2][1]  - calculated_difference_min
+
+# There are 1205 inconsistencies within the data. The dep_delay of a sample of the dataset suggests a recorded delay of 853 minutes whereas the actual departure of the same sample was calculated to be 587 minutes. The difference is 266 minutes. I infer this is an error in recording the dep_delay rather than an error in the difference between the recordings of the scheduled_dep_time and the dep_time.
+
+```
+
+```{r}
+# Quesion 3
+# Compare air_time with the duration between the departure and arrival.
+flights_dt %>% select(air_time)
+
+# flights$air_time
+arr_time_minus_dep_time <- difftime(flights_dt$arr_time, flights_dt$dep_time, units = "mins")
+air_time_as_difftime <- as.difftime(flights_dt$air_time, units = "mins")
+
+length(arr_time_minus_dep_time)
+length(flights_dt$air_time)
+length(flights$distance)
+
+n_time = 3
+
+flights_dt$dep_time[n_time]
+flights_dt$arr_time[n_time]
+
+arr_time_minus_dep_time[n_time]
+air_time_as_difftime[n_time]
+
+equal_arrival_times <- flights_dt$arr_time[arr_time_minus_dep_time == air_time_as_difftime]
+length(equal_arrival_times)
+
+unequal_arrival_times <- flights_dt$arr_time[arr_time_minus_dep_time != air_time_as_difftime]
+length(unequal_arrival_times)
+
+flights_dt$origin[n_time]
+flights_dt$dest[n_time]
+
+flights_dt$distance[n_time]
+
+# There are 327867 flights that contain discrepancies between the time in the air and the difference between the departure time and arrival time. There are 913 flights where the difference between the departure time and arrival times are equal to the time spent in the air.
+```
+
+
+```{r}
+# Quesion 3
+flights_dt_diff <- flights_dt %>% filter(arr_time %in% unequal_arrival_times) %>% mutate(diff_arr_minus_dep = difftime(arr_time, dep_time, units = "mins")) %>% mutate(air_time = as.difftime(air_time, units = "mins")) %>% select(dep_time, arr_time, diff_arr_minus_dep, air_time, distance, dest, origin, everything()) 
+```
+
+
+```{r}
+head(flights_dt_diff)
+```
+
+```{r} 
+# Planes that spent time in the air by destination.
+
+# Planes that spent less time in the air.
+air_time_less_dest_list <- flights_dt_diff %>% filter(diff_arr_minus_dep > air_time) %>% count(dest)
+
+# plans that spent more time in the air. 
+air_time_greater_dest_list <- flights_dt_diff %>% filter(diff_arr_minus_dep < air_time) %>% count(dest)
+```
+
+```{r} 
+# There are 73 destinations in common between these two lists.
+air_time_greater_dest_list %>% filter((dest %in% air_time_less_dest_list$dest))
+
+# There are 21 destinations that are not common between these two lists.
+air_time_greater_dest_list %>% filter(!(dest %in% air_time_less_dest_list$dest))
+```
+
+
+
+```{r}
+# Planes that spent time in the air by origin.
+
+# Planes that spent less time in the air.
+air_time_less_origin_list <- flights_dt_diff %>% filter(diff_arr_minus_dep > air_time) %>% count(origin)
+
+# Planes that spent more time in the air. 
+air_time_greater_origin_list <- flights_dt_diff %>% filter(diff_arr_minus_dep < air_time) %>% count(origin)
+```
+
+
+```{r}
+# No origins not in common between these two lists.
+air_time_greater_origin_list %>% filter(!(origin %in% air_time_less_origin_list$origin))
+```
+
+
+```{r}
+# All origins are common between these two lists.
+air_time_greater_origin_list %>% filter((origin %in% air_time_less_origin_list$origin))
+```
+
+```{r}
+# Planes that spent a greater amount of time in the air. Sorted. 
+air_time_greater_dest_list %>% arrange(desc(n))
+
+# Planes that spent less time in the air. Sorted. 
+air_time_less_dest_list %>% arrange(desc(n))
+```
+
+
+```{r}
+length(air_time_greater_dest_list$dest)
+
+```
+
+
+```{r}
+# Quesion 3
+# Airport destinations where the plane circled during its flight.
+airports %>% 
+  semi_join(air_time_greater_dest_list, c("faa" = "dest")) %>%
+  ggplot(aes(lon, lat)) + 
+  borders("state") +
+  geom_point() +
+  coord_quickmap()
+```
+```{r}
+# Quesion 3
+# Airport destinations where the plane taxied after its flight.
+airports %>% 
+  semi_join(air_time_less_dest_list, c("faa" = "dest")) %>%
+  ggplot(aes(lon, lat)) + 
+  borders("state") +
+  geom_point() +
+  coord_quickmap()
+```
+
+
+```{r}
+# Planes that spent more time in the air. 
+number_of_flights_per_distance <- flights_dt_diff %>% filter(diff_arr_minus_dep < air_time) %>% group_by(distance) %>% summarise(count = n()) %>% arrange(desc(count))
+```
+
+```{r}
+average_flight_distance_air_time_greater_than_arr_dep_diff <- sum(number_of_flights_per_distance$distance) / length(number_of_flights_per_distance$distance)
+```
+
+```{r}
+# Planes that spent less time in the air.
+number_of_flights_per_distance_air_time_less <- flights_dt_diff %>% filter(diff_arr_minus_dep > air_time) %>% group_by(distance) %>% summarise(count = n()) %>% arrange(desc(count))
+```
+
+
+```{r}
+average_flight_distance_air_time_less_than_arr_dep_diff <- sum(number_of_flights_per_distance_air_time_less$distance) / length(number_of_flights_per_distance_air_time_less$distance)
+```
+
+```{r}
+# Comparison of average flights times for planes that spent more time in the air versus less:
+average_flight_distance_air_time_greater_than_arr_dep_diff
+average_flight_distance_air_time_less_than_arr_dep_diff
+```
+
+
+```{r}
+# After viewing the map of fligths that spent longer in the air than the difference between the arrival and departure time and comparing the average amount of flights among distances that spent more time in the air than the difference between the arrival and departure times, I infer that the planes that spent more time in the air were farther to their destination on average. Planes that spent less time in the air were closer to their destinations.
+```
+
+
+```{r}
+# Quesion 4
+# How does the average delay time change over the course of a day? I will use the sched_dep_delay to group the departure delay times. Then I will compute the average amongst the groups. 
+
+flights_dt_diff
+```
+
+```{r}
+# Quesion 4
+flights_dt %>% mutate(day = day(dep_time)) %>%
+  select(day, dep_time, dep_delay) %>% group_by(day) %>% summarise(mean(dep_delay))
+```
+
+
+```{r}
+# Quesion 4
+# how does the average 
+flights_dt %>% mutate(day = day(dep_time)) 
+
+# %>%
+#   select(day, dep_time, dep_delay) %>% group_by(day) %>% summarise(mean(dep_delay))
+
+ggplot(flights_dt) +
+  geom_point(aes(dep_time, dep_delay)) +
+  geom_smooth(aes(dep_time, dep_delay), se = FALSE)
+
+```
+```{r}
+# Quesion 4
+# Change in average departure delay over the course of a day. 
+avg_dep_delay <- flights_dt %>% group_by(sched_dep_time, dep_delay) %>% summarise(n()) %>% summarise(mean(dep_delay))
+
+ggplot(avg_dep_delay) +
+  geom_point(aes(sched_dep_time, `mean(dep_delay)`)) +
+  geom_smooth(aes(sched_dep_time, `mean(dep_delay)`), se = FALSE)
+```
+
+
+```{r}
+# Quesion 5
+avg_dep_delay <- flights_dt %>% group_by(sched_dep_time, dep_delay) %>% summarise(n()) %>% summarise(mean(dep_delay))
+```
+
+
+```{r}
+# Quesion 5
+avg_dep_delay %>% mutate(wday = wday(sched_dep_time, label = TRUE)) %>% arrange(`mean(dep_delay)`) %>% filter(`mean(dep_delay)` >0)
+```
+
+
+```{r}
+# Quesion 5
+# Saturday is the day with the lowest average delay. 
+flights_dt %>% mutate(wday = wday(sched_dep_time, label = TRUE)) %>% group_by(wday, dep_delay) %>% summarise(n()) %>% summarise(mean(dep_delay)) %>% arrange(`mean(dep_delay)`)
+```
+
+```{r}
+# Quesion 6
+
+diamonds_carat <- diamonds %>% count(carat) %>% arrange(desc(`n`))
+flights_sched_dep_time <- flights %>% count(sched_dep_time) %>% arrange(desc(`n`))
+
+ggplot(diamonds_carat) +
+  geom_freqpoly(aes(diamonds_carat$n))
+```
+
+
+```{r}
+# Quesion 6
+min(diamonds$carat)
+max(diamonds$carat)
+mean(diamonds$carat)
+sd(diamonds$carat)
+
+###
+
+min(flights$sched_dep_time)
+max(flights$sched_dep_time)
+mean(flights$sched_dep_time)
+sd(flights$sched_dep_time)
+
+```
+
+
+```{r}
+flights_dt %>%
+  mutate(wday = wday(dep_time, label = TRUE)) %>%
+  ggplot(aes(x = wday)) +
+  geom_bar()
+```
+
+
+```{r}
+flights_dt %>%
+  mutate(day = day(dep_time)) %>%
+  group_by(day) %>%
+  summarise(
+    avg_delay = mean(arr_delay, na.rm = TRUE),
+    n = n()) %>%
+  ggplot(aes(day, avg_delay)) +
+  geom_line()
+```
+```{r}
+diamonds$carat
+```
+
+
+```{r}
+# Distribution of carats in Diamonds
+ggplot() +
+  geom_histogram(aes(diamonds$carat))
+
+# Distribution of scheduled departure times in flights
+ggplot() +
+  geom_histogram(aes(flights$sched_dep_time))
+
+# These two distributions are not similar. 
+```
+
+```{r}
+# Quesion 7
+
+```
+```{r}
+# flights_dt %>% mutate(min = minute(dep_time)) %>% select(min, everything()) %>% group_by(min) %>% summarise(n())
+
+count_of_early_departed_flights_grouped_by_minute <- flights_dt %>% mutate(min = minute(dep_time)) %>% mutate(early = dep_delay < 0) %>% select(early, min, dep_delay, everything()) %>% filter(early == TRUE) %>% group_by(min, dep_delay) %>% summarise() %>% summarise(count = n())
+
+
+(count_of_early_departed_flights_grouped_by_minute)
+
+ggplot(count_of_early_departed_flights_grouped_by_minute) +
+  geom_line(aes(min, count))
+
+```
+
+```{r}
+# flights_dt %>% mutate(min = minute(dep_time)) %>% select(min, everything()) %>% group_by(min) %>% summarise(n()) ???
+
+flights_dt %>% mutate(early = dep_delay < 0) %>% filter(early == TRUE) %>% select(early, sched_dep_time, dep_delay, everything())
+```
+
+
+```{r}
+###
+count_of_early_departed_flights_grouped_by_minute <- flights_dt %>% mutate(min = minute(sched_dep_time)) %>% mutate(early = dep_delay < 0) %>% select(early, min, dep_delay, everything()) %>% filter(early == TRUE) %>% group_by(min, dep_delay) %>% summarise() %>% summarise(count = n())
+
+(count_of_early_departed_flights_grouped_by_minute)
+
+ggplot(count_of_early_departed_flights_grouped_by_minute) +
+  geom_line(aes(min, count))
+
+```
+
+```{r}
+# Causality:
+# Empirical Association
+# Temporal priority of the independent variable
+# Nonspuriousness (There are is not a hidden variable influencing the dependent outcome.)
+#---#
+# Identifying a causal mechanism (how)
+# Specifying the context in which the effect occurs (under which conditions & parameters)
+
+
+
+
+```
+
+```{r}
+#  Question 7
+# Hypothesis: Early Departures of flights in minutes 20-30 and 50-60 are caused by scheduled flights that leave early. 
+
+# flights_dt %>% mutate(min = minute(dep_time), delayed = dep_delay > 0, early = dep_delay < 0) %>% select(early, delayed, dep_delay, dep_time, min, everything()) 
+
+# Early departures of flights in minutes 20-30 
+flights_dt %>% mutate(min = minute(dep_time), delayed = dep_delay > 0, early = dep_delay < 0) %>% select(early, delayed, dep_delay, dep_time, min, everything()) %>% filter(min >= 20, min <= 30, early == TRUE) %>% arrange(min)
+
+# Scheduled Flights that leave early
+
+flights_dt %>% mutate(min = minute(dep_time), delayed = dep_delay > 0, early = dep_delay < 0) %>% select(early, delayed, dep_delay, dep_time, min, sched_dep_time, everything()) 
+
+# flights_dt %>% mutate(min = minute(dep_time), delayed = dep_delay > 0, early = dep_delay < 0) %>% select(early, delayed, dep_delay, dep_time, min, everything())
+
+# Is there a correlation between scheduled flights that leave late and 
+
+# Early departures of flights in minutes 20-30 are caused by scheduled flights that leave early. 
+# Early departures of flights are the same concept as scheduled flights that leave early.
+
+# Examine the early departures.
+# Examine the scheduled departures. 
+# Examine the departure times.
+
+# Plot sched_dep_times in minutes 20 - 30 that are delayed.
+# Is there a correllation between scheduled departure times that are delayed and early departures?
+```
+
+
+```{r}
+#  Question 7
+# scheduled flights that are delayed during minutes 20 to 30.
+
+flights_dt %>% 
+  mutate(delayed = dep_delay > 0, min = minute(sched_dep_time)) %>%
+  select(delayed, min, sched_dep_time, everything()) %>%
+  arrange(min) %>% filter(delayed == TRUE)
+
+
+# %>% 
+  # 
+  # filter(delayed == TRUE, min >=20, min <=30) %>% 
+  # select(min, sched_dep_time) %>% arrange(min) %>% 
+  # group_by(min) %>% 
+  # summarise(count = n())
+
+
+# scheduled_flights_min_20_30_delayed <- flights_dt %>% 
+#   mutate(delayed = dep_delay > 0, min = minute(sched_dep_time)) %>% 
+#   filter(delayed == TRUE, min >=20, min <=30) %>% 
+#   select(min, sched_dep_time) %>% arrange(min) %>% 
+#   group_by(min) %>% 
+#   summarise(count = n())
+# 
+# (scheduled_flights_min_20_30_delayed)
+# ggplot(scheduled_flights_min_20_30_delayed) + 
+#   geom_line(aes(min, count)) + 
+#   labs(title = "Number of flights that are delayed from minutes 20 - 30")
+```
+
+
+```{r}
+#  Question 7
+####
+# scheduled flights that are not delayed (early) during minutes 20 to 30.
+scheduled_flights_min_20_30_not_delayed <- flights_dt %>% 
+  mutate(delayed = dep_delay > 0, min = minute(sched_dep_time)) %>% 
+  filter(delayed == FALSE, min >=20, min <=30) %>% 
+  select(min, sched_dep_time) %>% arrange(min) %>% 
+  group_by(min) %>% 
+  summarise(count = n())
+
+
+(scheduled_flights_min_20_30_not_delayed)
+ggplot(scheduled_flights_min_20_30_not_delayed) + 
+  geom_line(aes(min, count)) + 
+  labs(title = "Number of flights that are delayed from minutes 20 - 30")
+```
+
+
+```{r}
+#  Question 7
+####
+
+# Flights that are early departures in minutes 20 - 30. 
+
+# Early departures of flights in minutes 20-30 
+flights_min_20_30_early <- flights_dt %>% mutate(min = minute(sched_dep_time), delayed = dep_delay > 0, early = dep_delay < 0) %>% select(early, delayed, dep_delay, dep_time, min, everything()) %>% filter(min >= 20, min <= 30, early == TRUE) %>% arrange(min) %>% group_by(min, dep_delay) %>% summarise(count = n()) %>% summarise(count)
+
+(flights_min_20_30_early)
+ggplot(flights_min_20_30_early) +
+  geom_smooth(aes(min, count), se = FALSE) + 
+  labs(title = "Distribution of Early departures during minutes 20 - 30.")
+```
+
+
+```{r}
+#  Question 7
+# Late departures of flights in minutes 20-30
+flights_min_20_30_late <- flights_dt %>% mutate(min = minute(sched_dep_time), delayed = dep_delay > 0, early = dep_delay < 0) %>% select(early, delayed, dep_delay, dep_time, min, everything()) %>% filter(min >= 20, min <= 30, delayed == TRUE) %>% group_by(min, dep_delay) %>% summarise(count = n()) %>% summarise(count)
+
+(flights_min_20_30_late)
+
+ggplot(flights_min_20_30_late) +
+  geom_smooth(aes(min, count), se = FALSE) + 
+  labs(title = "Count of Late delays during minutes 20 - 30")
+
+```
+
+```{r}
+(flights_min_20_30_early)
+ggplot() +
+  geom_smooth(aes(flights_min_20_30_early$min, flights_min_20_30_early$count), color = "lightblue", se = FALSE) + 
+  geom_smooth(aes(flights_min_20_30_late$min, flights_min_20_30_late$count), color = "darkgreen", se = FALSE) + 
+  labs(title = "Distribution of Late Delays & Early departures during minutes 20 - 30.", x = "Flight Minute Group", y = "Quantity of Flights") 
+
+
+```
+
+```{r}
+
+# Early departures of flights in minutes 50-60 
+flights_min_50_60_early <- flights_dt %>% mutate(min = minute(sched_dep_time), delayed = dep_delay > 0, early = dep_delay < 0) %>% select(early, delayed, dep_delay, dep_time, min, everything()) %>% filter(min >= 50, min <= 60, early == TRUE) %>% arrange(min) %>% group_by(min, dep_delay) %>% summarise(count = n()) %>% summarise(count)
+
+(flights_min_50_60_early)
+ggplot(flights_min_50_60_early) +
+  geom_smooth(aes(min, count), se = FALSE) + 
+  labs(title = "Distribution of Early departures during minutes 50 - 60.")
+```
+
+```{r}
+# Late departures of flights in minutes 50-60
+flights_min_50_60_late <- flights_dt %>% mutate(min = minute(sched_dep_time), delayed = dep_delay > 0, early = dep_delay < 0) %>% select(early, delayed, dep_delay, dep_time, min, everything()) %>% filter(min >= 50, min <= 60, delayed == TRUE) %>% group_by(min, dep_delay) %>% summarise(count = n()) %>% summarise(count)
+
+(flights_min_50_60_late)
+
+ggplot(flights_min_50_60_late) +
+  geom_smooth(aes(min, count), se = FALSE) + 
+  labs(title = "Count of Late delays during minutes 50 - 60")
+```
+
+
+```{r}
+
+ggplot() +
+  geom_smooth(aes(flights_min_50_60_early$min, flights_min_50_60_early$count), se = FALSE, color = "lightblue") + 
+  geom_smooth(aes(flights_min_50_60_late$min, flights_min_50_60_late$count), se = FALSE, color = "darkgreen") +
+  labs(title = "Distribution of Late Delays & Early departures during minutes 50 - 60.", x = "Flight Minutes by Grouping of Minute", y = "Number of Flights During the Minute Group")
+```
+```{r}
+# From the graphs above, it is clear that the distributions of scheduled flights departing early between the minutes of 20 - 30 and 50 - 60 are not correlated with the distributions of late departures of scheduled flights within the same groups of minutes. Because scheduled flights can only either arrive late, early, or on-time (and given that on-time is defined as not late) then it is safe to infer that the assumption that there is no causal relationship between early departures of flights and scheduled flights leaving early is not true. Given the two possibilities of late or early scheduled flights, one must infer that early departures of flights are due to scheduled flights leaving early as opposed to the opposite conclusion. 
+```
+
+
+
+## Section 16.4: Time spans
+
+#### Section 16.4.3: Intervals
+```{r}
+years(1) / days(1)
+```
+
+
+```{r}
+# Today plus a year later divided by the duration of days in seconds
+(today() %--% (today() + years(1))) # This is the interval of a year from today. 
+
+next_year <- today() + years(1)
+(today() %--% next_year) / ddays(1) # This will divide the number of days in a year by the duration of one day.
+
+(today() %--% next_year) / days(1) # This will divide the number of days in an interval by the period of one day. 
+
+# How many periods fall into an interval?
+(today() %--% next_year) %/% days(1)
+
+```
+#### 16.4.5 Exercises
+```{r}
+# Quesion 1
+# There are months but no dmonths because the duration of months in seconds is inconsistent. 
+```
+
+```{r}
+# Quesion 2 
+
+flights_dt %>% 
+  mutate(
+    overnight = arr_time < dep_time,
+         ) %>%
+  select(sched_arr_time, arr_time, dep_time, overnight)
+```
+
+
+```{r}
+# Quesion 2
+# Overnight flight arrivals and departures before adding the period of days.
+overnight_flights_dt_b4 <-flights_dt %>% mutate(overnight = arr_time < dep_time) %>% select(flight, overnight, arr_time, dep_time, everything()) %>% filter(overnight == TRUE)
+
+overnight_flights_dt_b4$overnight[1]
+class(overnight_flights_dt_b4$overnight[1])
+days(TRUE)
+days(FALSE)
+days(TRUE *1)
+
+# Overnight flight arrivals and departures after adding the period of days. 
+overnight_flights_dt_after <- flights_dt %>% 
+  mutate(
+    overnight = arr_time < dep_time,
+    arr_time = arr_time + days(overnight),
+    sched_arr_time = sched_arr_time + days(overnight)
+         ) %>%
+  select(flight, overnight, arr_time, dep_time, everything()) %>% filter(overnight == TRUE)
+
+# days(overnight * 1) Uses the logical value of overnight to create a period of one day. This day is added to the arrival times such that the datetime-formatted arrival time's "day" is consistent with the departure time where the departure time is before or less than the arrival time.  
+```
+
+```{r}
+# Quesion 3
+days()
+init_year <- ymd(20150101)
+class(init_year)
+```
+
+
+```{r}
+# Question 3.1
+years(1)
+class(init_year %--% (init_year + years(1)))
+init_year + months(0:11)
+
+
+```
+```{r}
+# Question 3.2
+year(today())
+init_current_year <- make_datetime(year(today()), month(1), day(1))
+init_current_year <- ymd(init_current_year)
+(init_current_year + months(0:11))
+
+```
+
+
+```{r}
+# Quesion 4
+age <- function(b_day){
+  return (year(today()) - year(b_day))
+}
+bday <- make_date(year = 1990, month = 5, day = 29)
+age(bday)
+```
+
+```{r}
+# Quesion 5
+# months(1) returns a factor: January
+
+years(1) # period
+year(1) # one year
+
+
+
+months(1) # period
+class(months(1))
+class(month(1)) # Value of one month 
+
+# (today() %--% (today() + years(1))) / months(1) returns the number of months during this period; this can work.
+# (today() %--% (today() + years(1))) %/% months(1) returns the number of groups of months during this period; 
+# (today() %--% (today() + years(1))) %/% month(1) You cannot perform modular arithmetic of an interval by an integer. 
+
+# The numerator and denominator of integer division (%/%) must be of the same type to return the integer quotient. 
+# If the numerator is an interval and the denominator is an interval (if the numerator and denominator are the same type) in modular arithmetic, then the numeric integer quotient can be returned from modular arithmetic.
+
+# In arithmetic division, an interval arithmetically divided by an integer will return the interval divided by integer and will result in the first interval from the start of the interval to the length of the interval divided by the integer denominator. For example, an interval of one year arithmetically divided by an integer of 2 will return an interval of six months (a year divided by 2) starting from the start of the interval and ending 6 months later. 
+
+# arithmetic division of an interval divided by a period will return the numeric value of the interval divided by the period. If the period of one year is divided by a period of 1 months, then 12 (the number of months in the interval) will be returned.
+
+
+# Modular division and arithmetic division of intervals by periods will always return the number of periods within the interval.
+# An interval divided by a period will indicate the number of periods within the interval. 
+
+# The interval arithmetically divided by an integer will return a period.
+# The interval modularly divided by an integer will not return an integer quotient because there is no integer in the numerator. 
+
+# An interval and a period are the same type. Hence, modular and arithmetic division will both return the number of times a period fits into an interval.
+
+# An interval and an integer are different types. Arithmetic division of an interval will return an interval with a new length. Modular aritmetic of an interval and an integer will not return a value because there is no integer in the numerator with which to divide and return an integer quotient.
+
+# What will alwyas work is arithmetic division of an interval by an integer or dividing by the same type. 
+
+(today() %--% (today() + years(1))) %/% months(1)
+
+(today() %--% (today() + years(1))) / month(1)
+
+(today() %--% (today() + years(2)))
+
+```
+
+## Section 16.5 Time zones
+```{r}
+# c() will drop the timezone and use the default in R. 
+# with_tz will keep the instant of time the same but will alter the timezone
+# force_tz will change the instant of time but keep the timezone the same. Fixing an underlying time with an incorrect timezone.
+# Coordinated Universal Time (UTC) is the scientific standard and is roughly equivalent to Greenwhich Mean Time (GMT)
+
+# A list of all timezones
+head(OlsonNames())
+```
+
+# Section 17: Program: Introduction
+```{r}
+# Advanced R: http://adv-r.had.co.nz/
+```
+
+# Section 18: Pipes
+```{r}
+# T pipe: T pipe will return the left hand side of the pipe rather than the right hand side of the pipe.
+```
+
+```{r}
+# Pipe
+ rnorm(100) %>% matrix(ncol = 2) %>% plot() %>% str()
+```
+
+```{r}
+# T Pipe
+rnorm(100) %>% matrix(ncol = 2) %T>% plot() %>% str()
+```
+
+
+```{r}
+if(!require("magrittr")) install.packages("magrittr")
+library(magrittr)
+```
+
+```{r}
+# %$% will expand variables in a dataframe so that you can refer to them explicitly. 
+mtcars %$% cor(disp, mpg)
+```
+
+```{r}
+# Assignment
+# original
+mtcars <- mtcars %>% transform(cyl = cyl * 2)
+
+# magrittr assignment syntax
+mtcars %<>% transform(cyl = cyl * 2)
+
+```
+
+
+## Section 19: Functions
+```{r}
+
+```
+
+#### Section 19.2: Writing Functions
+```{r}
+df <- tibble::tibble(
+  a = rnorm(10),
+  b = rnorm(10),
+  c = rnorm(10),
+  d = rnorm(10)
+)
+```
+
+```{r}
+df$a <- (df$a - min(df$a, na.rm = TRUE)) /
+  (max(df$a, na.rm = TRUE) - min(df$a, na.rm = TRUE))
+df$b <- (df$b - min(df$b, na.rm = TRUE)) /
+  (max(df$b, na.rm = TRUE) - min(df$b, na.rm = TRUE))
+df$c <- (df$c - min(df$c, na.rm = TRUE)) /
+  (max(df$c, na.rm = TRUE) - min(df$c, na.rm = TRUE))
+df$d <- (df$d - min(df$d, na.rm = TRUE)) /
+  (max(df$d, na.rm = TRUE) - min(df$d, na.rm = TRUE))
+```
+
+```{r}
+x <- df$a
+(x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
+
+rng <- range(x , na.rm = TRUE)
+(x - rng[1]) / (rng[2] - rng[1])
+
+```
+
+
+```{r}
+rescale01 <- function(x) {
+  rng <- range(x, na.rm = TRUE)
+  (x - rng[1]) / (rng[2] - rng[1])
+}
+
+rescale01(c(0, 5, 10))
+
+```
+
+
+```{r}
+rescale01
+```
+
+```{r}
+df$a <- rescale01(df$a)
+df$b <- rescale01(df$b)
+df$c <- rescale01(df$c)
+df$d <- rescale01(df$d)
+```
+
+```{r}
+```
+
+
+
+
+#### Section 19.2.1: Exercises
+```{r}
+# Quesion 1
+# TRUE is not a parameter to rescale01() because it is a constant setting that does not change.
+# If x contained a single missing value and na.rm was false, then the missing value would percolate throughout the function. 
+```
+
+```{r}
+# Quesion 2
+x <- c(1:10, Inf)
+
+rescale01 <- function(x) {
+  rng <- range(x, na.rm = TRUE, finite = TRUE)
+  return_val <- (x - rng[1]) / (rng[2] - rng[1])
+  for (value in seq_along(return_val)){
+    if(return_val[value] == Inf){
+      return_val[value] <- 1
+    }
+    if(return_val[value] == -Inf){
+      return_val[value] <- 0
+      # print(return_val[value])
+    }
+  }
+  return(return_val)
+}
+(rescale01(x))
+```
+
+```{r}
+# Quesion 3
+avg_na <- function(x) {
+  return(mean(is.na(x)))  
+}
+```
+
+
+```{r}
+# Quesion 3
+proportion_x <- function(x) {
+  x / sum(x, na.rm = TRUE)  
+}
+```
+
+
+```{r}
+# Quesion 3
+sd_divided_by_mean_x <- function(x) {
+  sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE)  
+}
+```
+
+```{r}
+# Quesion 4
+var_x <- function(x) {
+  n <- length(x)
+  x_mean <- mean(x)
+  intermediate_sum <- 0
+  for (x_i in seq_along(x)){
+    intermediate_sum <- intermediate_sum + (x[x_i] - mean(x))^2
+  }
+  return_val <- intermediate_sum * (1/(n-1))
+  return(return_val)
+}
+
+skew_x <- function(x){
+  n <- length(x)
+  x_mean <- mean(x)
+  intermediate_sum <- 0
+  for (x_i in seq_along(x)) {
+    intermediate_sum <- intermediate_sum + (x[x_i] - mean(x))^3
+  }
+  numerator <- intermediate_sum * (1/(n-2))
+  denominator <- var_x(x)^(3/2)
+  skew_val <- numerator / denominator
+  return(skew_val)
+}
+
+x <- c(1,2,3,4)
+var_x(x)
+```
+
+
+```{r}
+# Quesion 5
+both_na <- function(x, y) {
+  num_positions = 0
+  for (index in seq_along(x)){
+    if(is.na(x[index]) & is.na(y[index])){
+      num_positions <- num_positions + 1
+    }
+  }
+  return(num_positions)
+}
+```
+
+```{r}
+# Quesion 6
+# This function will indicate if a given path is a directory.
+is_directory <- function(x) file.info(x)$isdir
+
+getwd()
+is_directory("/Users/evanwoods/Github/lpa/r-for-data-science")
+
+# This function verifies if access if available to the file at that file path.
+is_readable <- function(x) file.access(x, 4) == 0
+path <- "/Users/evanwoods/Github/lpa/r-for-data-science"
+is_readable(path)
+
+```
+
+```{r eval = FALSE}
+# Quesion 7
+# Little Bunny Foo Foo,
+# Hopping through the forest,
+# Scooping up the field mice,
+# And bopping them on the head.
+
+# Down came the Good Fairy, and she said,
+
+# "Little Bunny Foo Foo,
+# I don't want to see you,
+# Scooping up the field mice
+# And bopping them on the head."
+
+# "I'll give you three chances,
+# And if you don't behave,
+# I'm gonna turn you into a goon!"
+
+# The next day...
+
+# Little Bunny Foo Foo,
+# Hopping through the forest,
+# Scooping up the field mice,
+# And bopping them on the head.
+
+# Down came the Good Fairy, and she said,
+
+# "Little Bunny Foo Foo,
+# I don't want to see you,
+# Scooping up the field mice
+# And bopping them on the head."
+
+# "I'll give you three chances,
+# And if you don't behave,
+# I'm gonna turn you into a goon!"
+
+# That evening...
+
+# Little Bunny Foo Foo,
+# Hopping through the forest,
+# Scooping up the field mice,
+# And bopping them on the head.
+
+# Down came the Good Fairy, and she said,
+
+# "Little Bunny Foo Foo,
+# I don't want to see you,
+# Scooping up the field mice
+# And bopping them on the head."
+
+# "I'll give you three chances,
+# And if you don't behave,
+# I'm gonna turn you into a goon!"
+
+# Later that night...
+
+# Little Bunny Foo Foo,
+# Hopping through the forest,
+# Scooping up the field mice,
+# And bopping them on the head.
+
+# Down came the Good Fairy, and she said,
+
+# "Little Bunny Foo Foo,
+# I don't want to see you,
+# Scooping up the field mice
+# And bopping them on the head."
+
+# "I'll give you three chances,
+# And if you don't behave,
+# I'm gonna turn you into a goon!"
+
+# A few moments later...
+
+# "I gave you three chances,
+# And you didn't behave,
+# And now I'm gonna turn you into a goon. POOF!"
+
+# foo_foo <- little_bunny()
+# fairy <- good_fairy()
+# 
+# foo_foo %>%
+#   hop(through = forest) %>%
+#   scoop(up = field_mice) %>%
+#   bop(on = head)
+# 
+# fairy %>%
+#   came(direction = down) %>%
+#   said(to = foo_foo) %>%
+#   dontWant(to_see = foo_foo) %>%
+#   scoop(up = field_mice) %>%
+#   bop(on = head) %>%
+#   give(chances = three) %>%
+#   dontBehave(you = foo_foo) %>%
+#   turn(you = goon) %>%
+#   time(when = next_day)
+# 
+# verses <- c(1:3)
+# current_time <- c("that_evening", "later_that_night", "a_few_moments_later")
+# 
+# for (verse in verses) {
+#   foo_foo %>%
+#     hop(through = forest) %>%
+#     scoop(up = field_mice) %>%
+#     bop(on = head)
+# 
+#   fairy %>%
+#     came(direction = down) %>%
+#     said(to = foo_foo) %>%
+#     dontWant(to_see = foo_foo) %>%
+#     scoop(up = field_mice) %>%
+#     bop(on = head) %>%
+#     give(chances = (three - verse)) %>%
+#     dontBehave(you = foo_foo) %>%
+#     turn(you = goon) %>%
+#     time(when = current_time[verse])
+# }
+# 
+# fairy %>%
+#   gave(chances = three) %>%
+#   didntBehave(you = foo_foo) %>%
+#   turn(you = goon) %>%
+#   poof()
+```
+
+
+```{r eval = FALSE}
+# animal_sounds <- function(animal) {
+#   switch(animal, 
+#          cat = "Meow", 
+#          cow = "Moo",
+#          dog = "Bark",
+#          "No Sound Found"
+#          )
+# }
+# animal_sounds(animal)
+
+```
+
+
+## Seciton 19.3 Functions are for humans and computers
+```{r}
+
+```
+
+
+#### Section 19.3.1: Exercises
+```{r}
+# Question 1
+verify_prefix <- function(string, prefix) {
+  substr(string, 1, nchar(prefix)) == prefix
+}
+
+return_values_to_penultimate <- function(x) {
+  if(length(x) <= 1) return(NULL)
+  x[-length(x)]
+}
+
+replicate_y_x_times <- function(x, y) {
+  rep(y, length.out = length(x))
+}
+
+```
+
+
+```{r}
+# Quesion 2
+count_shared_na_position <- function(vector_one, vector_two) {
+  num_positions = 0
+  for (index in seq_along(vector_one)){
+    if(is.na(vector_one[index]) & is.na(vector_two[index])){
+      num_positions <- num_positions + 1
+    }
+  }
+  return(num_positions)
+}
+
+```
+
+
+```{r}
+# Quesion 3
+# rnorm 
+# Arguments: 
+# n = number of observations
+# mean = vector of mean averages
+# sd = vector of standard deviations
+
+# MASS::mvrnorm()
+# n = number of samples required
+# mu = vector of the means of the variables
+# Sigma = covariance matrix of the variables
+# tol = tolerance relative to largest variance for lack of positive-definiteness in Sigma
+# empirical = When true, mu & Sigma specify the empirical mean and covariance matrix rather than the population mean and covariance matrix
+# EISPACK = Logical values other than FALSE are an error.
+
+# rnorm and MASS::mvrnorm can be more consistent by changing "sd" to "Sigma" in rnorm & "mean" to "mu" in rnorm
+```
+
+```{r}
+# Quesion 4
+# norm_r and norm_d would be better than rnorm() and dnorm() because they have the same prefix which makes the two simpler to look up.
+# rnorm() and dnorm() would be better than norm_r() and norm_d() because the type of normal distribution is identified from the beginning of function name meaning that one may circumvent human error when autocompleting to the wrong norm_ function.
+```
+
+#### Section 19.4: Conditional Execution
+
+#### Section 19.4.1: Conditions
+```{r}
+# if conditions: vectors create warning messages
+# NA creates errors
+
+# || is a logical or
+# && is a logical and
+
+# | is vectorized operation (do not use in `if` condition); applies to multiple values; their use is in filter
+# & is a vectorized operation (do not use in `if` condition); applies to multiple values; their use is in filter
+
+# any() or all() can be mapped to a single vector. 
+
+# use `identical` for a single output
+# == is a vectorised operation meaning that it will return more than one output
+# use dplyr::near() for comparisons to overcome errors in precision when comparing numnerical values
+
+```
+
+#### Section 19.4.2 Multiple conditions
+```{r}
+# if() {}
+# else if() {}
+# else {}
+
+```
+
+```{r}
+# switch case
+# function(x, y, op) {
+# switch(op, # variable to switch on 
+# plus = x + y, # case 1
+# minus = x - y, # case 2
+# times = x * y, # case 3
+# divide = x / y, # case 4
+# stop("Unknown op!") # default case
+# )
+# }
+```
+
+```{r}
+# cut is used to break a numeric variable into factors
+```
+
+#### Section 19.4.3: Code style
+```{r}
+
+```
+
+#### Section 19.4.4: Exercises
+```{r}
+# Question 1
+# The difference between if and ifelse(); if else accepts NA; if will not accept NA values. if else accepts a to verify the truthiness of, the value when the verified value is true, and the value when the verified value is false. 
+```
+
+```{r}
+# Quesion 2
+greet <- function(){
+  instant <- lubridate::now()
+  today = today()
+  
+  midnight <- as_datetime(str_c(today, "00:00:00"), tz = "EST")
+  noon <- as_datetime(str_c(today, "12:00:00"), tz = "EST")
+  evening <- as_datetime(str_c(today, "06:00:00"), tz = "EST")
+  
+  if(instant >= midnight && instant < noon){
+    print("good morning")
+  } else if(instant >= noon && instant < evening) {
+    print("good afternoon")
+  } else if(instant >= evening && instant < midnight) {
+    print("good evening")
+  }
+}
+greet()
+```
+
+```{r}
+# Quesion 3
+fizzbuzz <- function(n) {
+  if(identical((n %% 3), 0) && identical((n %% 5), 0)) {
+    return("fizzbuzz")
+  } else if(identical((n %% 3), 0)) {
+    return("fizz")
+  } else if(identical((n %% 5), 0)) {
+    return("buzz")
+  } else {
+    return(n)
+  }
+}
+
+fizzbuzz(5)
+fizzbuzz(3)
+fizzbuzz(15)
+fizzbuzz(13)
+```
+
+```{r}
+# Quesion 4
+temp <- 100
+if (temp <= 0) {
+  "freezing"
+} else if (temp <= 10) {
+  "cold"
+} else if (temp <= 20) {
+  "cool"
+} else if(temp <= 30) {
+  "warm"
+} else {
+  "hot"
+}
+
+
+# Cut can be used to identify factor levels. 
+# 1. Create the levels with a vector: x <- c(0, 30)
+# 2. Cut the levels using cut: cut(x, breaks = 3)
+# This will create three levels: a level between 0 and 10, a level between 10 and 20, and a level between 20 and 30.
+
+# If cut were to use < instead of <=, right would be set to FALSE in the call to cut(); This will create a closed bracket on the left and use a parenthesis on the right.
+
+# Cut is useful for this problem because it allows for the expedient and programmatic creation of levels using only a range and a constant. Rather than manually hardcoding & specifying the ranges, the ranges of levels can be dynamically defined which is efficient as the number of ranges required reaches toward the limit of infinity.
+
+```
+
+```{r}
+# Quesion 5
+n <- 3
+switch(n,
+       "cat" = 1, 
+       "dog" = "dog",
+       "none")
+
+# Using numeric values on a switch case will allow the case to be selected where 1 is the first case and every case descending afterwards corresponds to the next integer in a sequence following 1.
+```
+
+```{r}
+# Quesion 6
+# This expression will match on "a" or "b" and return "ab" in both cases; This Expression will also match on "c" or "d" and will return "cd" in both cases. "e" does not match in this switch case expression. 
+
+x <- "e"
+
+switch(x, 
+  a = ,
+  f = "ab",
+  c = ,
+  d = "cd"
+)
+```
+
+
+## Section 19.5: Function Arguments
+#### Section 19.5.3: Ellipses
+```{r}
+# Ellipses are a catch all; It is a special argument that captures any number of arguments that aren't otherwise matched.
+# Useful for wrapping str_c() in a helper function
+```
+
+```{r}
+commas <- function(...) stringr::str_c(..., collapse = ", ")
+commas(letters[1:10])
+```
+
+```{r}
+rule <- function(..., pad = "-"){
+  title <- paste0(...)
+  width <- (getOption("width") - nchar(title) - 5)
+  cat(title, " ", stringr::str_dup(pad, width), "\n", sep = "")
+}
+rule("Important output")
+```
+
+```{r}
+# Printing the values of ... by using list(...)
+list_ellipses <- function(...){
+  # stringr::str_c(..., collapse = ", ")
+  list(...)
+} 
+list_ellipses(letters[1:10])
+```
+
+
+#### Section 19.5.4: Lazy Evaluation
+```{r}
+
+```
+
+#### Section 19.5.5: Exercises
+```{r}
+# Question 1
+# commas(letters, collapse = "-")
+# This function call will throw an error. The error states 'formal argument "collapse" matched by multiple actual arguments'.
+# This is because the code piece 'collapse = "-"' is being passed into the function as below after being captured from the ellipses:
+# stringr::str_c(collapse = "-", collapse = ", ")
+# Calling the function above will throw the same error.
+```
+```{r}
+# Quesion 2
+# This currently doesn't work because the output line is duplicating pad 'width' number of times and presuming pad is a single character. By including nchar(pad), the number of characters used in padding can be known, and a division of the width by the number of characters in the pad can be used to set the appropriate width respective of the number of characters used in the pad. 
+
+rule <- function(..., pad = "-"){
+  title <- paste0(...)
+  pad_char <- nchar(pad)
+  width <- (getOption("width") - nchar(title) - 5) / pad_char
+  cat(title, " ", stringr::str_dup(pad, width), "\n", sep = "")
+}
+rule("Important output")
+```
+
+```{r}
+# Quesion 3
+# The trim argument of mean takes a fraction of the observations to be trimmed from x before the mean is computed. The values outside the range are taken to the nearest endpoint. 
+```
+
+```{r}
+# Quesion 4
+# The default value for the `method` argument to cor() is c("pearson", "kendall", "spearman"). These are three different individuals each of which are associated with a correlation coefficient. The Pearson correlation coefficient is a rank correlation coefficient that measures linear correlation between two sets of data. The Kendall correlation coefficient is a rank coefficient used to measure ordinal association between two quantities. Spearman's rank correlation coefficient results when two variables are monotomically related even if their relationship is non-linear. Pearson is the default method.
+```
+
+
+#### Section 19.6: Return Values
+```{r}
+# use early returns to return simple conditionals before complex conditionals
+```
+
+
+#### Section 19.6.2: Writing pipeable functions
+```{r}
+# Two types of pipeable functions:
+# Transformations: when a function modifies the object that is returned. 
+# Side-effects: When a function performs an action using the object but does not modify the object. Plots or saving the object to disk are examples. The object is returned silently.
+# Call `invisible` on the input object to prevent the object from being printed out.
+
+```
+
+```{r}
+show_missings <- function(df) {
+  n <- sum(is.na(df))
+  cat("Missing values: ", n, "\n", sep = "")
+  invisible(df)
+}
+
+class(show_missings(mtcars))
+dim(show_missings(mtcars))
+```
+## Section 19.7: Environment
+```{r}
+# Lexical scoping: when a variable is not declared in a function but is found elsewhere in the environment. This is similar to global variables in other languages. 
+```
+
+# Section 20: Vectors
+```{r}
+# Atomic vectors contain: logical, character and numeric; numeric subtypes are integer and double vectors; 
+# List vectors are not atomic. Lists are heterogeneous while atomic vectors are homogeneous.
+# NULL represents the absence of a vector.
+```
+
+```{r}
+# Vector properties:
+# Type: typeof() indicates the type of vector.
+# Length: length() indicates the length of the vector.
+
+```
+
+#### Section 20.3.1: Logical
+```{r}
+# Possible Values: FALSE, TRUE, NA
+
+```
+
+
+#### Section 20.3.2: Numeric
+```{r}
+# numbers are doubles by default. Using an "L" will allow the number to be an integer. 
+typeof(1)
+typeof(1L)
+```
+
+```{r}
+# Double Special values: NA, NaN, Inf, -Inf
+# Integer Special values: NA
+```
+
+
+#### Section 20.3.3: Character
+```{r}
+if(!require("pryr")) install.packages("pryr")
+library(pryr)
+```
+
+
+```{r}
+# y uses pointers to the same object, x. Each pointer is 8 bytes. 
+pryr::object_size(x)
+
+y <- rep(x, 1000)
+pryr::object_size(y)
+```
+
+
+#### Section 20.3.4: Missing Values
+```{r}
+# Each type of atomic vector contains its own missing value:
+NA # logical
+NA_integer_ # integer
+NA_real_ # double
+NA_character_ # character
+```
+
+
+#### Section 20.3.5: Exercises
+```{r}
+# Question 1
+# The difference between is.finite(x) and !is.infinite(x) is that is.finite(NA) and is.finite(NaN) will present FALSE; is.infinite(NA) and is.infinite(NaN) will also present false; Therefore !is.infinite(NA) & !is.infinite(NaN) will both produce TRUE even though they are not finite. 
+```
+
+```{r}
+# Quesion 2
+# dplyr::near
+# dplyr::near() will take the absolute value of the difference between two values and compare the values as if to be less than a tolerance. 
+```
+
+```{r}
+# Quesion 3
+# According to https://stat.ethz.ch/R-manual/R-devel/library/base/html/integer.html, 
+# R uses 32-bit integer vectors. This means that R can take integers within the range of +- 2 x 10^9.
+# R uses IEEE 754 standard with a precision of 53 bits for doubles. 
+# This means the range of doubles is the absolute value of 2 x 10^+-308. Doubles also except NaN, NA, +- Infinity, +-0 (which are treated as the same). The range of values accepted by a double vector include the absolute value of 2 x 10^+-308 plus five more values: NaN, NA, Inf, -Inf, and 0.
+```
+
+```{r}
+# Quesion 4
+# as.integer() may be applied to a function to convert a double to an integer. This function will accept a double and return the return value from `as.integer`.
+# as.numeric() may be applied to a function to convert a double to an integer. This function will accept a double and return the return value from `as.numeric`.
+# floor() may be applied to a function to convert a double to an integer. This function will accept a double as an argument into floor before performing modular arithmetic on the result. This result will then be used as an input value into either as.integer or as.numeric to return an integer type. 
+# ceil() may be applied to a function to convert a double to an integer. This function will accept a double as an argument into ceil before performing modular arithmetic on the result. This result will then be used as an input value into either as.integer or as.numeric to return an ingeter type. 
+```
+
+```{r}
+# Quesion 5
+# The `readr` package includes the parse_double, parse_integer, & parse_logical functions which enable the conversion of character strings to doubles, integers, and logicals.
+```
+
+
+## Section 20.4: Using Atomic Vectors
+```{r}
+
+```
+
+#### Section 20.4.4: Naming Vectors
+```{r}
+c(x = 1, y = 2, z = 4)
+set_names(1:3, c("a", "b", "c"))
+```
+#### Section 20.4.5: Subsetting
+```{r}
+# Subsetting a named vector with a character vector:
+x <- c(abc = 1, def = 2, xyz = 5)
+x[c("abc", "def")]
+
+```
+
+```{r}
+# Return all of x: x[]
+# x[1,] selects the first row and all columns of a matrix.
+# x[,1] selects all rows and the first column of a matrix.
+# x[, -1] selecta all rows and all columns except the first column of a matrix.
+```
+
+```{r}
+# "[[" only ever extracts a single element and will always drop names. 
+```
+
+
+#### Section 20.4.6 Exercises
+```{r}
+# Question 1
+# mean(is.na(x)) Will tell you if there are NA values in vector x. It will then attempt to calculate the mean of the result. If there is an NA value, then is.na will be 1 which indicates the mean of that value is 1 which indicates that there is an NA value in the integer vector x. If there is no missing value in x, then is.na will return 0. The mean of zero will be 0 which will indicate that there is no missing value in x.
+```
+
+```{r}
+# Quesion 2
+# is.vector() returns TRUE if x is a vector of the specified mode having no attributes other than names. It tests to see if x is a vector with no other attributes other than names within the vector. 
+```
+
+```{r}
+# Quesion 3
+# Atomic types are not atomic vectors in the sense that individual objects are accepted as 'atomic' without being vectors. NULL is not an atomic vector, but it is atomic, for example. 
+```
+
+```{r}
+# Question 4.1
+# Either "[[" or "[" will work to return the last value. "[[" is explicitly defining a singular return value.
+return_last_vector_value <- function(input_vector) {
+  return (input_vector[[length(input_vector)]])
+}
+```
+
+```{r}
+# Question 4.2
+return_even_numbered_positioned_elements <- function(input_vector) {
+  return(input_vector[seq(2, (length(input_vector) - length(input_vector) %% 2), by = 2)])
+}
+```
+
+```{r}
+# Question 4.3
+return_elements_first_to_penultimate <- function(input_vector) {
+  return(input_vector[-length(input_vector)])
+}
+```
+
+```{r 4.4}
+return_only_even_values <- function(input_vector) {
+  return(input_vector[!(x %% 2) & !is.na(x)])
+}
+```
+
+```{r}
+# Quesion 5
+# -which(x>0) returns the negative of all values of x that are greater than zero. x<=0 returns a logical. These two have different return types which is why they are not the same. 
+```
+
+```{r}
+# Quesion 6
+# Subsetting with a value that is out of the length of a vector or a name that doesn't exist will return NA when using "[" notation. When using "[[" notation, the error 'subscript out of bounds' will be thrown.
+```
+
+## Section 20.5: Recursive vectors (lists)
+
+#### Section 20.5.2: Subsetting
+```{r}
+# Three ways to subset a list:
+a <- list(a = 1:3, b = "a string", c = pi, d = list(-1, -5))
+```
+
+
+```{r}
+# extract a sub-list; the results will always be a list.
+str(a[1:2])
+
+str(a[4])
+```
+
+
+```{r}
+# Extracts a single component from a list. Removes a level of hierarchy.
+str(a[[1]])
+
+```
+
+```{r}
+# $ is shorthand for extracting named elements of a list. $ functions the same as [[]].
+str(a$b)
+str(a[["b"]])
+```
+
+```{r}
+# "[" returns a new smaller list. ("View the list")
+# "[[" drills down into the list. ("Access the element in the list")
+str(a)
+
+```
+
+```{r}
+str(a[1:2])
+```
+```{r}
+str(a[4])
+```
+
+```{r}
+str(a[[4]])
+```
+
+```{r}
+str(a[[4]][1])
+```
+```{r}
+str(a[[2]])
+```
+
+```{r}
+str(a[[4]][[2]])
+```
+
+```{r}
+str(a[[4]][[2]])
+```
+
+#### Section 20.5.4: Exercises
+```{r}
+# Question 1
+# The means of addressing elements of a list are identical to the means of addressing elements of a tibble. A tibble allows one to pipe elements into functions such as filter whereas a list does not allow such functionality. 
+```
+
+
+## Section 20.6: Attributes
+```{r}
+x <- 1:10
+```
+
+```{r}
+attr(x, "greeting")
+```
+
+```{r}
+attr(x, "greeting") <- "Hi!"
+```
+
+```{r}
+attributes(x)
+```
+
+```{r}
+# Three important attributes that are used to implement fundamental parts of R:
+# Names: used to name the elements of a vector
+# Dimensions: make a vector behave like a matrix or array
+# Classes: used to implement the S3 object oriented system. 
+```
+
+```{r}
+# "UseMethod" indicates that a function is generic: it will perform differently depending on the input.
+# '[', '[[', & '$' are all generic functions
+# List all the functions for a generic with 'methods()'
+```
+
+## Section 20.7: Augmented Vectors
+```{r}
+# Augmented vectors have attributes
+# Four augmented vectors:
+# Factors
+# Dates
+# Date-Times
+# Tibbles
+```
+
+```{r}
+# POSIXct stands for 'Portable Operating System Interface', calendar time. 
+# Convert POSIXlt (built on top of named lists) to POSIXct with lubridate::as_date_time()
+```
+
+
+#### Section 20.7.4: Exercises
+```{r}
+# Question 1
+attributes(hms::hms(3600))
+# This returns 01:00:00. This is 1 hour. It is built on top of a difftime class. It has attributes of units and class.
+```
+```{r}
+# Quesion 2
+# tb <- tibble(c(1,2,3), c(1,2,3,4))
+# The error "Tibble columns must have compatible sizes" appears when attempting to build a tibble containing columns of differing lengths.
+```
+```{r eval = FALSE}
+# Quesion 3
+tb <- tibble(list(1,2,3), list(1,2,3,4))
+# Lists are acceptable within a tibble so long as the lists are of the same length. 
+```

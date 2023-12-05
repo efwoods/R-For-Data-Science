@@ -7702,7 +7702,7 @@ while (index <= length(files)){
 }
 ```
 
-```{r}
+```{r eval = FALSE}
 # Quesion 2
 # When 'for (nm in names(y))' is used and y is an unnamed vector, nothing is returned by the for loop and there are no errors or warnings. 
 # When there is an inconsistency in the number of named items in a vector, the names of the named items are accessible to be printed whereas the names of the unnamed items print "". If the unnamed name is used to address inside y, then NA is returned. If the names are not unique, the first instance of the name will be used as the index.

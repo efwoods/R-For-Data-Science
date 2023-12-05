@@ -1,0 +1,4414 @@
+---
+title: "R-For-Data-Science-§21:§29"
+author: "Evan-Woods"
+date: "2023-11-10"
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+
+```{r}
+if (!require(dplyr)) install.packages("dplyr")
+# if (!require(stargazer)) install.packages("stargazer")
+if (!require(tidyverse)) install.packages("tidyverse")
+if(!require(nycflights13)) install.packages("nycflights13")
+# if (!require(shiny)) install.packages("shiny")
+# if(!require(Lahman)) install.packages("Lahman")
+if(!require(ggplot2)) install.packages("ggplot2")
+# if(!require(EnvStats)) install.packages("EnvStats")
+# library(EnvStats)
+library(tidyverse)
+```
+
+# Section 21: Iteration
+```{r}
+
+```
+
+#### Section 21.2.1: Exercises
+```{r}
+#  1.1
+# Compute the mean of every column in mtcars
+for (col in seq_along(mtcars)) {
+  print(mean(mtcars[[col]]))
+}
+```
+
+
+```{r}
+#  1.2
+# Determine the type of each column in nycflights13::flights
+for(col in seq_along(nycflights13::flights)){
+  print(typeof(nycflights13::flights[[col]]))
+}
+```
+```{r}
+# Question 1.3
+# Compute the number of unique values in each column of iris
+for (col in seq_along(iris)){
+  print(length(unique(iris[[col]])))
+}
+
+```
+
+```{r}
+# Question 1.4
+# Generate 10 random normals from distributions with means of -10, 0, 10, 100
+n = 10
+means_vector <- c(-10, 0, 10, 100)
+for(i in seq(1,10)){
+  dist <- rnorm(n, means_vector[[((i %% length(means_vector)) + 1)]])
+  print(dist)
+  print(mean(dist))
+}
+```
+
+```{r}
+# Quesion 2
+# out <- ""
+# for(x in letters) {
+#   out <- stringr::str_c(out, x)
+# }
+
+out <- str_c(letters, collapse = "")
+```
+
+```{r}
+# Quesion 2.1
+x <- sample(100)
+# sd <- 0
+# for (i in seq_along(x)) {
+#   sd <- sd + (x[i] - mean(x)) ^2
+# }
+# sd <- sqrt(sd / (length(x) - 1))
+# (sd)
+sd(x)
+
+```
+
+```{r}
+#  2.2
+# x <- runif(100)
+# out <- vector("numeric", length(x))
+# out[1] <- x[1]
+# for (i in 2:length(x)) {
+#   out[i] <- out[i - 1] + x[i]
+# }
+# (out)
+# cat("\n")
+
+cumsum(x)
+```
+
+
+```{r}
+# Question 3.1
+# Alice the camel has five humps
+# Alice the camel has five humps
+# Alice the camel has five humps
+# So go Alice go, boom, boom, boom!
+# Alice the camel has four humps
+# Alice the camel has four humps
+# Alice the camel has four humps
+# So go Alice go, boom, boom, boom!
+# Alice the camel has three humps
+# Alice the camel has three humps
+# Alice the camel has three humps
+# So go Alice go, boom, boom, boom!
+# Alice the camel has two humps
+# Alice the camel has two humps
+# Alice the camel has two humps
+# So go Alice go, boom, boom, boom!
+# Alice the camel has one hump
+# Alice the camel has one hump
+# Alice the camel has one hump
+# So go Alice go, boom, boom, boom!
+# Alice the camel has no humps
+# Alice the camel has no humps
+# Alice the camel has no humps
+# Because Alice is a horse of course!
+```
+
+
+```{r}
+# Question 3.1
+# Alice the camel variables
+
+# n_repetitions_counting_lyric <- 3
+# pre_counting_lyric_string_concatonation_plural <- "Alice the camel has "
+# numeric_counts_vector <- c("five", "four", "three", "two", "one", "no")
+# post_counting_lyric_string_concatonation_plural <- " humps\n"
+# 
+# counting_lyric_singular_conditional_string <- "one"
+# pre_counting_lyric_string_concatonation_singular <- "Alice the camel has "
+# post_counting_lyric_string_concatonation_singular <- " hump\n"
+# 
+# print_static_string <- "So go Alice go, boom, boom, boom!\n"
+# 
+# final_count_condition_string <- "no"
+# final_result_static_string <- "Because Alice is a horse of course!\n"
+
+print_child_song <- function(
+    n_repetitions_counting_lyric = 3,
+    
+    pre_counting_lyric_string_concatonation_plural = "Alice the camel has ",
+    numeric_counts_vector = c("five", "four", "three", "two", "one", "no"),
+    post_counting_lyric_string_concatonation_plural = " humps\n",
+    
+    unique_additional_verse = FALSE,
+    unique_additional_verse_pre_counting_lyric_string_concatonation_plural = "Alice the camel has ",
+    unique_additional_verse_post_counting_lyric_string_concatonation_plural = " humps\n",
+    
+    counting_lyric_singular_conditional_string = "one",
+    pre_counting_lyric_string_concatonation_singular = "Alice the camel has ",
+    post_counting_lyric_string_concatonation_singular = " hump\n",
+    
+    print_static_string = "So go Alice go, boom, boom, boom!\n",
+    
+    final_count_condition_string = "no",
+    final_result_static_string = "Because Alice is a horse of course!\n"
+    
+    ){
+    for (i in seq_along(numeric_counts_vector)){
+      if(!(unique_additional_verse)){
+        
+      }
+      if (!(identical(numeric_counts_vector[[i]], counting_lyric_singular_conditional_string))){
+        print_count_lyric <- str_c(pre_counting_lyric_string_concatonation_plural, numeric_counts_vector[[i]], post_counting_lyric_string_concatonation_plural)
+      } else {
+        print_count_lyric <- str_c(pre_counting_lyric_string_concatonation_singular, numeric_counts_vector[[i]], post_counting_lyric_string_concatonation_singular)
+      }
+    
+      if (identical(numeric_counts_vector[[i]], final_count_condition_string)){
+        print_static_string <- final_result_static_string
+      } 
+
+      for (j in seq(1,n_repetitions_counting_lyric)){
+        cat(print_count_lyric)
+      }
+      cat(print_static_string)
+    }
+}
+```
+
+```{r}
+# Question 3.1
+# n_repetitions_counting_lyric <- 3
+# pre_counting_lyric_string_concatonation_plural <- "Alice the camel has "
+# numeric_counts_vector <- c("five", "four", "three", "two", "one", "no")
+# post_counting_lyric_string_concatonation_plural <- " humps\n"
+# 
+# counting_lyric_singular_conditional_string <- "one"
+# pre_counting_lyric_string_concatonation_singular <- "Alice the camel has "
+# post_counting_lyric_string_concatonation_singular <- " hump\n"
+# 
+# print_static_string <- "So go Alice go, boom, boom, boom!\n"
+# 
+# final_count_condition_string <- "no"
+# final_result_static_string <- "Because Alice is a horse of course!\n"
+
+print_child_song()
+
+```
+
+```{r}
+# Question 3.2
+# There were ten in the bed
+# And the little one said, "Roll over, roll over"
+# So they all rolled over and one fell out
+# There were nine in the bed
+# And the little one said, "Roll over, roll over"
+# So they all rolled over and one fell out
+# There were eight in the bed
+# And the little one said, "Roll over, roll over"
+# So they all rolled over and one fell out
+# There were seven in the bed
+# And the little one said, "Roll over, roll over"
+# So they all rolled over and one fell out
+# There were six in the bed
+# And the little one said, "Roll over, roll over"
+# So they all rolled over and one fell out
+# There were five in the bed
+# And the little one said, "Roll over, roll over"
+# So they all rolled over and one fell out
+# There were four in the bed
+# And the little one said, "Roll over, roll over"
+# So they all rolled over and one fell out
+# There were three in the bed
+# And the little one said, "Roll over, roll over"
+# So they all rolled over and one fell out
+# There were two in the bed
+# And the little one said, "Roll over, roll over"
+# So they all rolled over and one fell out
+# There was one in the bed
+# And the little one said, "Goodnight"
+# Bravo
+```
+
+
+```{r}
+# Question 3.2
+n_repetitions_counting_lyric <- 1
+pre_counting_lyric_string_concatonation_plural <- "There were "
+numeric_counts_vector <- c('ten', 'nine', 'eight', 'seven', 'six', 'five', 'four', 'three', 'two', 'one')
+post_counting_lyric_string_concatonation_plural <- " in the bed\n"
+
+counting_lyric_singular_conditional_string <- "one"
+pre_counting_lyric_string_concatonation_singular <- "There was "
+post_counting_lyric_string_concatonation_singular <- " in the bed\n"
+
+print_static_string <- 'And the little one said, "Roll over, roll over"\nSo they all rolled over and one fell out\n\n'
+
+final_count_condition_string <- "one"
+final_result_static_string <- 'And the little one said, "Goodnight"\n\nBravo'
+
+print_child_song(n_repetitions_counting_lyric = n_repetitions_counting_lyric,
+                 pre_counting_lyric_string_concatonation_plural = pre_counting_lyric_string_concatonation_plural,
+                 numeric_counts_vector = numeric_counts_vector,
+                 post_counting_lyric_string_concatonation_plural = post_counting_lyric_string_concatonation_plural,
+                 counting_lyric_singular_conditional_string = counting_lyric_singular_conditional_string,
+                 pre_counting_lyric_string_concatonation_singular = pre_counting_lyric_string_concatonation_singular,
+                 post_counting_lyric_string_concatonation_singular = post_counting_lyric_string_concatonation_singular,
+                 print_static_string = print_static_string,
+                 final_count_condition_string = final_count_condition_string, 
+                 final_result_static_string = final_result_static_string)
+
+print_child_song()
+
+```
+```{r}
+create_str_vector_from_int <- function(
+        least_significant_integer_to_convert = -1,
+        most_significant_integer_to_convert = 100,
+        reverse_sequence = TRUE,
+        zero_synonym = "zero"
+    ){
+        
+        int_to_string_vector_one_to_nine = c('one', 'two', 'three', 'four', 'five','six', 'seven', 'eight', 'nine')
+        int_to_string_vector_unique_under_twenty = c('eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen')
+        int_to_string_vector_unique_tens = c('ten','twenty', 'thirty', 'fourty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety')
+
+        integer_vector_of_numbers_to_convert = seq(least_significant_integer_to_convert, most_significant_integer_to_convert)
+
+        if(reverse_sequence) {
+          integer_vector_of_numbers_to_convert <- rev(integer_vector_of_numbers_to_convert)
+        }
+
+        return_char_vector <- character()
+
+        for (i in integer_vector_of_numbers_to_convert){
+          if (i > 99 || i < 0) {
+            next
+          }
+          if (near(i, 0)){
+            return_char_vector <- c(return_char_vector, zero_synonym)
+            # cat(zero_synonym)
+            # cat('\n')
+          } else if (i < 10){
+            return_char_vector <- c(return_char_vector, int_to_string_vector_one_to_nine[[i]])
+            # cat(int_to_string_vector_one_to_nine[[i]])
+            # cat('\n')
+          } else if (i > 10 && i < 20) {
+            return_char_vector <- c(return_char_vector, int_to_string_vector_unique_under_twenty[[(i %% 10)]])
+            # cat(int_to_string_vector_unique_under_twenty[[(i %% 10)]])
+            # cat('\n')
+          } else if (near((i %% 10), 0)){
+            return_char_vector <- c(return_char_vector, int_to_string_vector_unique_tens[[(i %/% 10)]])
+            # cat(int_to_string_vector_unique_tens[[(i %/% 10)]])
+            # cat('\n')
+          } else {
+            combined_int_to_str_greater_than_ten <- str_c(int_to_string_vector_unique_tens[[((i %/% 10))]], int_to_string_vector_one_to_nine[[(i %% 10)]], sep = "-")
+            return_char_vector <- c(return_char_vector, combined_int_to_str_greater_than_ten)
+            # cat(combined_int_to_str_greater_than_ten)
+            # cat('\n')
+          }
+        }
+        return(return_char_vector)
+}
+```
+
+```{r}
+vect <- create_str_vector_from_int(        
+  least_significant_integer_to_convert = 0,
+  most_significant_integer_to_convert = 5,
+  reverse_sequence = TRUE,
+  zero_synonym = "no"
+)
+(vect)
+```
+
+```{r}
+print_child_song(numeric_counts_vector = create_str_vector_from_int(        
+  least_significant_integer_to_convert = 0,
+  most_significant_integer_to_convert = 5,
+  reverse_sequence = TRUE,
+  zero_synonym = "no"
+))
+```
+```{r}
+n_repetitions_counting_lyric <- 1
+pre_counting_lyric_string_concatonation_plural <- "There were "
+
+numeric_counts_vector <- create_str_vector_from_int(        
+  least_significant_integer_to_convert = 1,
+  most_significant_integer_to_convert = 10,
+  reverse_sequence = TRUE,
+  zero_synonym = "no"
+)
+
+post_counting_lyric_string_concatonation_plural <- " in the bed\n"
+
+counting_lyric_singular_conditional_string <- "one"
+pre_counting_lyric_string_concatonation_singular <- "There was "
+post_counting_lyric_string_concatonation_singular <- " in the bed\n"
+
+print_static_string <- 'And the little one said, "Roll over, roll over"\nSo they all rolled over and one fell out\n\n'
+
+final_count_condition_string <- "one"
+final_result_static_string <- 'And the little one said, "Goodnight"\n\nBravo'
+
+print_child_song(n_repetitions_counting_lyric = n_repetitions_counting_lyric,
+                 pre_counting_lyric_string_concatonation_plural = pre_counting_lyric_string_concatonation_plural,
+                 numeric_counts_vector = numeric_counts_vector,
+                 post_counting_lyric_string_concatonation_plural = post_counting_lyric_string_concatonation_plural,
+                 counting_lyric_singular_conditional_string = counting_lyric_singular_conditional_string,
+                 pre_counting_lyric_string_concatonation_singular = pre_counting_lyric_string_concatonation_singular,
+                 post_counting_lyric_string_concatonation_singular = post_counting_lyric_string_concatonation_singular,
+                 print_static_string = print_static_string,
+                 final_count_condition_string = final_count_condition_string, 
+                 final_result_static_string = final_result_static_string)
+```
+
+```{r}
+n_repetitions_counting_lyric <- 1
+pre_counting_lyric_string_concatonation_plural <- "There were "
+
+numeric_counts_vector <- create_str_vector_from_int(        
+  least_significant_integer_to_convert = 0,
+  most_significant_integer_to_convert = 99,
+  reverse_sequence = TRUE,
+  zero_synonym = "no"
+)
+
+post_counting_lyric_string_concatonation_plural <- " in the bed\n"
+
+counting_lyric_singular_conditional_string <- "one"
+pre_counting_lyric_string_concatonation_singular <- "There was "
+post_counting_lyric_string_concatonation_singular <- " in the bed\n"
+
+print_static_string <- 'And the little one said, "Roll over, roll over"\nSo they all rolled over and one fell out\n\n'
+
+final_count_condition_string <- "one"
+final_result_static_string <- 'And the little one said, "Goodnight"\n\nBravo'
+
+print_child_song(n_repetitions_counting_lyric = n_repetitions_counting_lyric,
+                 pre_counting_lyric_string_concatonation_plural = pre_counting_lyric_string_concatonation_plural,
+                 numeric_counts_vector = numeric_counts_vector,
+                 post_counting_lyric_string_concatonation_plural = post_counting_lyric_string_concatonation_plural,
+                 counting_lyric_singular_conditional_string = counting_lyric_singular_conditional_string,
+                 pre_counting_lyric_string_concatonation_singular = pre_counting_lyric_string_concatonation_singular,
+                 post_counting_lyric_string_concatonation_singular = post_counting_lyric_string_concatonation_singular,
+                 print_static_string = print_static_string,
+                 final_count_condition_string = final_count_condition_string, 
+                 final_result_static_string = final_result_static_string)
+```
+
+
+```{r}
+capitalize_first_letter_in_string <- function(initial_string){
+  characters <- str_split_1(initial_string, pattern = "")
+  characters[1] <- str_to_upper(characters[1])
+  capitalized_string <- str_flatten(characters)
+  return(capitalized_string)
+}
+capitalize_first_letter_in_string("string")
+```
+
+
+```{r}
+# Question 3.3
+
+capitalize_first_letter_in_string <- function(initial_string){
+  characters <- str_split_1(initial_string, pattern = "")
+  characters[1] <- str_to_upper(characters[1])
+  capitalized_string <- str_flatten(characters)
+  return(capitalized_string)
+}
+
+modify_punctuation_in_string <- function(initial_string, replacement_punctuation){
+  characters <- str_split_1(initial_string, pattern = "")
+  if(identical(characters[length(characters)], "\n")) {
+    characters[length(characters) - 1] <- replacement_punctuation  
+  } else {
+    characters[length(characters)] <- replacement_punctuation
+  }
+  modified_string <- str_flatten(characters)
+  return(modified_string)
+}
+
+print_child_song <- function(
+ n_repetitions_counting_lyric = 1,
+        
+    pre_counting_lyric_string_concatonation_plural = "Alice the camel has",
+    numeric_counts_vector =  create_str_vector_from_int(
+        least_significant_integer_to_convert = 0,
+        most_significant_integer_to_convert = 5,
+        reverse_sequence = TRUE,
+        zero_synonym = "no"
+    ),
+    post_counting_lyric_string_concatonation_plural = " humps\n",
+    
+    counting_lyric_singular_conditional_string = "one",
+    pre_counting_lyric_string_concatonation_singular = "Alice the camel has ",
+    post_counting_lyric_string_concatonation_singular = " hump\n",
+    
+    print_static_string = "So go Alice go, boom, boom, boom!\n",
+    
+    final_count_condition_string = "no",
+    final_result_static_string = "Because Alice is a horse of course!\n",
+
+    unique_additional_verse = FALSE,
+    unique_additional_verse_pre_counting_lyric_string_concatonation_plural = "",
+    unique_additional_verse_post_counting_lyric_string_concatonation_plural = "",
+    unique_additional_verse_pre_counting_lyric_string_concatonation_singular = "",
+    unique_additional_verse_post_counting_lyric_string_concatonation_singular = "",
+    
+    song = "custom"
+    
+    ){
+    if (str_like(song, "Alice the camel", ignore_case = TRUE)){
+        # Parameters for Alice the camel.
+        n_repetitions_counting_lyric = 3
+        
+        pre_counting_lyric_string_concatonation_plural = "Alice the camel has"
+        numeric_counts_vector =  create_str_vector_from_int(
+            least_significant_integer_to_convert = 0,
+            most_significant_integer_to_convert = 5,
+            reverse_sequence = TRUE,
+            zero_synonym = "no"
+        )
+        post_counting_lyric_string_concatonation_plural = " humps\n"
+        
+        counting_lyric_singular_conditional_string = "one"
+        pre_counting_lyric_string_concatonation_singular = "Alice the camel has "
+        post_counting_lyric_string_concatonation_singular = " hump\n"
+        
+        print_static_string = "So go Alice go, boom, boom, boom!\n"
+        
+        final_count_condition_string = "no"
+        final_result_static_string = "Because Alice is a horse of course!\n"
+    
+        unique_additional_verse = FALSE
+        unique_additional_verse_pre_counting_lyric_string_concatonation_plural = ""
+        unique_additional_verse_post_counting_lyric_string_concatonation_plural = ""
+        unique_additional_verse_pre_counting_lyric_string_concatonation_singular = ""
+        unique_additional_verse_post_counting_lyric_string_concatonation_singular = ""
+
+    } else if(str_like(song, "Ten in the bed", ignore_case = TRUE)) {
+        # Parameters for Ten in the bed.
+        n_repetitions_counting_lyric <- 1
+        pre_counting_lyric_string_concatonation_plural <- "There were "
+        numeric_counts_vector <- create_str_vector_from_int(
+                    least_significant_integer_to_convert = 1,
+                    most_significant_integer_to_convert = 10,
+                    reverse_sequence = TRUE,
+                    zero_synonym = "no"
+                )
+        post_counting_lyric_string_concatonation_plural <- " in the bed\n"
+
+        counting_lyric_singular_conditional_string <- "one"
+        pre_counting_lyric_string_concatonation_singular <- "There was "
+        post_counting_lyric_string_concatonation_singular <- " in the bed\n"
+
+        print_static_string <- 'And the little one said, "Roll over, roll over"\nSo they all rolled over and one fell out\n\n'
+
+        final_count_condition_string <- "one"
+        final_result_static_string <- 'And the little one said, "Goodnight"\n\nBravo'
+
+        unique_additional_verse = FALSE
+        unique_additional_verse_pre_counting_lyric_string_concatonation_plural = ""
+        unique_additional_verse_post_counting_lyric_string_concatonation_plural = ""
+        unique_additional_verse_pre_counting_lyric_string_concatonation_singular = ""
+        unique_additional_verse_post_counting_lyric_string_concatonation_singular = ""
+      
+    } else if(str_like(song, "99 bottles of beer", ignore_case = TRUE)) {
+        # Parameters for 99 bottles of beer
+        n_repetitions_counting_lyric = 1
+    
+        pre_counting_lyric_string_concatonation_plural = ""
+        numeric_counts_vector =  create_str_vector_from_int(
+            least_significant_integer_to_convert = 1,
+            most_significant_integer_to_convert = 100,
+            reverse_sequence = TRUE,
+            zero_synonym = "no"
+        )
+        post_counting_lyric_string_concatonation_plural = " bottles of beer on the wall,\n"
+    
+        counting_lyric_singular_conditional_string = "one"
+        pre_counting_lyric_string_concatonation_singular = ""
+        post_counting_lyric_string_concatonation_singular = " bottle of beer on the wall,\n"
+    
+        print_static_string = "Take one down,\nPass it around,\n"
+    
+        final_count_condition_string = "one"
+        final_result_static_string = "Take it down,\nPass it around,\nNo more bottles of beer on the wall!\n"
+
+        unique_additional_verse = TRUE
+        unique_additional_verse_pre_counting_lyric_string_concatonation_plural = ""
+        unique_additional_verse_post_counting_lyric_string_concatonation_plural = " bottles of beer!\n"
+        unique_additional_verse_pre_counting_lyric_string_concatonation_singular = ""
+        unique_additional_verse_post_counting_lyric_string_concatonation_singular = " bottle of beer!\n"
+    } else {
+      # custom song; Alice the horse if not set;
+      # cat(song)
+    }
+  
+    for (i in seq_along(numeric_counts_vector)){
+      if(!(unique_additional_verse)){
+          if (!(identical(numeric_counts_vector[[i]], counting_lyric_singular_conditional_string))){
+            print_count_lyric <- str_c(pre_counting_lyric_string_concatonation_plural, numeric_counts_vector[[i]], post_counting_lyric_string_concatonation_plural)
+          } else {
+            print_count_lyric <- str_c(pre_counting_lyric_string_concatonation_singular, numeric_counts_vector[[i]], post_counting_lyric_string_concatonation_singular)
+          }
+
+          if (identical(numeric_counts_vector[[i]], final_count_condition_string)){
+            print_static_string <- final_result_static_string
+          } 
+
+          for (j in seq(1,n_repetitions_counting_lyric)){
+            cat(print_count_lyric)
+          }
+          cat(print_static_string)
+        } else {
+        if (!(identical(numeric_counts_vector[[i]], counting_lyric_singular_conditional_string))){
+            capitalized_numeric_counts_vector <- capitalize_first_letter_in_string(numeric_counts_vector[[i]])
+            print_count_lyric <- str_c(pre_counting_lyric_string_concatonation_plural, capitalized_numeric_counts_vector, post_counting_lyric_string_concatonation_plural)
+            unique_print_count_lyric <- str_c(unique_additional_verse_pre_counting_lyric_string_concatonation_plural, capitalized_numeric_counts_vector, unique_additional_verse_post_counting_lyric_string_concatonation_plural)
+          } else {
+            capitalized_numeric_counts_vector <- capitalize_first_letter_in_string(numeric_counts_vector[[i]])
+            print_count_lyric <- str_c(pre_counting_lyric_string_concatonation_singular, capitalized_numeric_counts_vector, post_counting_lyric_string_concatonation_singular)
+            unique_print_count_lyric <- str_c(unique_additional_verse_pre_counting_lyric_string_concatonation_singular, capitalized_numeric_counts_vector, unique_additional_verse_post_counting_lyric_string_concatonation_singular)
+          }
+
+          if (identical(numeric_counts_vector[[i]], final_count_condition_string)){
+            print_static_string <- final_result_static_string
+          } 
+
+
+          for (j in seq(1,n_repetitions_counting_lyric)){
+           if(unique_additional_verse && !near(i, 1)) {
+              print_count_lyrics_modified_punctuation <- modify_punctuation_in_string(print_count_lyric, "!")
+              cat(print_count_lyrics_modified_punctuation)
+              cat('\n')
+              cat(print_count_lyric)
+           } else {
+              cat(print_count_lyric)  
+            }
+          }
+          cat(unique_print_count_lyric)
+
+          cat(print_static_string)
+        }
+    }
+}
+
+songs <- c("Alice the camel", "99 bottles of beer", "Ten in the bed")
+
+attr(print_child_song, which = "songs") <- songs
+
+attributes(print_child_song)
+
+print_child_song(song = "ten in the bed")
+```
+```{r 3.4}
+capitalize_first_letter_in_string <- function(initial_string){
+  characters <- str_split_1(initial_string, pattern = "")
+  characters[1] <- str_to_upper(characters[1])
+  capitalized_string <- str_flatten(characters)
+  return(capitalized_string)
+}
+
+modify_punctuation_in_string <- function(initial_string, replacement_punctuation){
+  characters <- str_split_1(initial_string, pattern = "")
+  if(identical(characters[length(characters)], "\n")) {
+    characters[length(characters) - 1] <- replacement_punctuation  
+  } else {
+    characters[length(characters)] <- replacement_punctuation
+  }
+  modified_string <- str_flatten(characters)
+  return(modified_string)
+}
+
+print_child_song <- function(
+ n_repetitions_counting_lyric = 1,
+        
+    pre_counting_lyric_string_concatonation_plural = "Alice the camel has",
+    numeric_counts_vector =  create_str_vector_from_int(
+        least_significant_integer_to_convert = 0,
+        most_significant_integer_to_convert = 5,
+        reverse_sequence = TRUE,
+        zero_synonym = "no"
+    ),
+    post_counting_lyric_string_concatonation_plural = " humps\n",
+    
+    counting_lyric_singular_conditional_string = "one",
+    pre_counting_lyric_string_concatonation_singular = "Alice the camel has ",
+    post_counting_lyric_string_concatonation_singular = " hump\n",
+    
+    print_static_string = "So go Alice go, boom, boom, boom!\n",
+    
+    final_count_condition_string = "no",
+    final_result_static_string = "Because Alice is a horse of course!\n",
+
+    unique_additional_verse = FALSE,
+    unique_additional_verse_pre_counting_lyric_string_concatonation_plural = "",
+    unique_additional_verse_post_counting_lyric_string_concatonation_plural = "",
+    unique_additional_verse_pre_counting_lyric_string_concatonation_singular = "",
+    unique_additional_verse_post_counting_lyric_string_concatonation_singular = "",
+    
+    vessel = "",
+    vessel_plural = "",
+    liquid = "",
+
+    song = "custom"
+    
+    ){
+    if (str_like(song, "Alice the camel", ignore_case = TRUE)){
+        # Parameters for Alice the camel.
+        n_repetitions_counting_lyric = 3
+        
+        pre_counting_lyric_string_concatonation_plural = "Alice the camel has"
+        numeric_counts_vector =  create_str_vector_from_int(
+            least_significant_integer_to_convert = 0,
+            most_significant_integer_to_convert = 5,
+            reverse_sequence = TRUE,
+            zero_synonym = "no"
+        )
+        post_counting_lyric_string_concatonation_plural = " humps\n"
+        
+        counting_lyric_singular_conditional_string = "one"
+        pre_counting_lyric_string_concatonation_singular = "Alice the camel has "
+        post_counting_lyric_string_concatonation_singular = " hump\n"
+        
+        print_static_string = "So go Alice go, boom, boom, boom!\n"
+        
+        final_count_condition_string = "no"
+        final_result_static_string = "Because Alice is a horse of course!\n"
+    
+        unique_additional_verse = FALSE
+        unique_additional_verse_pre_counting_lyric_string_concatonation_plural = ""
+        unique_additional_verse_post_counting_lyric_string_concatonation_plural = ""
+        unique_additional_verse_pre_counting_lyric_string_concatonation_singular = ""
+        unique_additional_verse_post_counting_lyric_string_concatonation_singular = ""
+
+    } else if(str_like(song, "Ten in the bed", ignore_case = TRUE)) {
+        # Parameters for Ten in the bed.
+        n_repetitions_counting_lyric <- 1
+        pre_counting_lyric_string_concatonation_plural <- "There were "
+        numeric_counts_vector <- create_str_vector_from_int(
+                    least_significant_integer_to_convert = 1,
+                    most_significant_integer_to_convert = 10,
+                    reverse_sequence = TRUE,
+                    zero_synonym = "no"
+                )
+        post_counting_lyric_string_concatonation_plural <- " in the bed\n"
+
+        counting_lyric_singular_conditional_string <- "one"
+        pre_counting_lyric_string_concatonation_singular <- "There was "
+        post_counting_lyric_string_concatonation_singular <- " in the bed\n"
+
+        print_static_string <- 'And the little one said, "Roll over, roll over"\nSo they all rolled over and one fell out\n\n'
+
+        final_count_condition_string <- "one"
+        final_result_static_string <- 'And the little one said, "Goodnight"\n\nBravo'
+
+        unique_additional_verse = FALSE
+        unique_additional_verse_pre_counting_lyric_string_concatonation_plural = ""
+        unique_additional_verse_post_counting_lyric_string_concatonation_plural = ""
+        unique_additional_verse_pre_counting_lyric_string_concatonation_singular = ""
+        unique_additional_verse_post_counting_lyric_string_concatonation_singular = ""
+      
+    } else if(str_like(song, "99 bottles of beer", ignore_case = TRUE)) {
+        # Parameters for 99 bottles of beer
+        n_repetitions_counting_lyric = 1
+    
+        pre_counting_lyric_string_concatonation_plural = ""
+        numeric_counts_vector =  create_str_vector_from_int(
+            least_significant_integer_to_convert = 1,
+            most_significant_integer_to_convert = 100,
+            reverse_sequence = TRUE,
+            zero_synonym = "no"
+        )
+        post_counting_lyric_string_concatonation_plural = " bottles of beer on the wall,\n"
+    
+        counting_lyric_singular_conditional_string = "one"
+        pre_counting_lyric_string_concatonation_singular = ""
+        post_counting_lyric_string_concatonation_singular = " bottle of beer on the wall,\n"
+    
+        print_static_string = "Take one down,\nPass it around,\n"
+    
+        final_count_condition_string = "one"
+        final_result_static_string = "Take it down,\nPass it around,\nNo more bottles of beer on the wall!\n"
+
+        unique_additional_verse = TRUE
+        unique_additional_verse_pre_counting_lyric_string_concatonation_plural = ""
+        unique_additional_verse_post_counting_lyric_string_concatonation_plural = " bottles of beer!\n"
+        unique_additional_verse_pre_counting_lyric_string_concatonation_singular = ""
+        unique_additional_verse_post_counting_lyric_string_concatonation_singular = " bottle of beer!\n"
+
+        vessel = ""
+        vessel_plural = ""
+        liquid = ""
+
+    } else {
+      # custom song; Alice the horse if not set;
+      # cat(song)
+    }
+  
+    for (i in seq_along(numeric_counts_vector)){
+      if(!(unique_additional_verse)){
+          if (!(identical(numeric_counts_vector[[i]], counting_lyric_singular_conditional_string))){
+            print_count_lyric <- str_c(pre_counting_lyric_string_concatonation_plural, numeric_counts_vector[[i]], post_counting_lyric_string_concatonation_plural)
+          } else {
+            print_count_lyric <- str_c(pre_counting_lyric_string_concatonation_singular, numeric_counts_vector[[i]], post_counting_lyric_string_concatonation_singular)
+          }
+
+          if (identical(numeric_counts_vector[[i]], final_count_condition_string)){
+            print_static_string <- final_result_static_string
+          } 
+
+          for (j in seq(1,n_repetitions_counting_lyric)){
+            cat(print_count_lyric)
+          }
+          cat(print_static_string)
+        } else {
+        if (!(identical(numeric_counts_vector[[i]], counting_lyric_singular_conditional_string))){
+            capitalized_numeric_counts_vector <- capitalize_first_letter_in_string(numeric_counts_vector[[i]])
+            print_count_lyric <- str_c(pre_counting_lyric_string_concatonation_plural, capitalized_numeric_counts_vector, post_counting_lyric_string_concatonation_plural)
+            unique_print_count_lyric <- str_c(unique_additional_verse_pre_counting_lyric_string_concatonation_plural, capitalized_numeric_counts_vector, unique_additional_verse_post_counting_lyric_string_concatonation_plural)
+            
+            if (!(identical(vessel, "")) && !(identical(vessel_plural, ""))){
+                # alter vessel
+                print_count_lyric <- str_replace_all(print_count_lyric, "bottles", vessel_plural)
+                unique_print_count_lyric <- str_replace_all(unique_print_count_lyric, "bottles", vessel_plural)
+            } 
+
+
+            if (!(identical(liquid, ""))){
+                # alter bottle
+                print_count_lyric <- str_replace_all(print_count_lyric, "beer", liquid)
+                unique_print_count_lyric <- str_replace_all(unique_print_count_lyric, "beer", liquid)
+            } 
+            
+          } else {
+            capitalized_numeric_counts_vector <- capitalize_first_letter_in_string(numeric_counts_vector[[i]])
+            print_count_lyric <- str_c(pre_counting_lyric_string_concatonation_singular, capitalized_numeric_counts_vector, post_counting_lyric_string_concatonation_singular)
+            unique_print_count_lyric <- str_c(unique_additional_verse_pre_counting_lyric_string_concatonation_singular, capitalized_numeric_counts_vector, unique_additional_verse_post_counting_lyric_string_concatonation_singular)
+            
+            if (!(identical(vessel, "")) && !(identical(vessel_plural, ""))){
+                # alter vessel
+                print_count_lyric <- str_replace_all(print_count_lyric, "bottles", vessel_plural)
+                unique_print_count_lyric <- str_replace_all(unique_print_count_lyric, "bottles", vessel_plural)
+            } 
+            
+            if (!(identical(liquid, ""))){
+                # alter bottle
+                print_count_lyric <- str_replace_all(print_count_lyric, "beer", liquid)
+                unique_print_count_lyric <- str_replace_all(unique_print_count_lyric, "beer", liquid)
+            } 
+          }
+
+          # One bottle of beer lyric
+          if (identical(numeric_counts_vector[[i]], final_count_condition_string)){
+            if (!(identical(vessel, "")) && !(identical(vessel_plural, ""))){
+                  # alter vessel
+                  final_result_static_string <- str_replace_all(final_result_static_string, "bottles", vessel_plural)
+                  
+                  print_count_lyric <- str_replace_all(print_count_lyric, "bottles", vessel_plural)
+                  unique_print_count_lyric <- str_replace_all(unique_print_count_lyric, "bottles", vessel_plural)
+             } 
+                
+             if (!(identical(liquid, ""))){
+                # alter bottle
+                final_result_static_string <- str_replace_all(final_result_static_string, "beer", liquid)
+                
+                print_count_lyric <- str_replace_all(print_count_lyric, "beer", liquid)
+                unique_print_count_lyric <- str_replace_all(unique_print_count_lyric, "beer", liquid)
+             } 
+            
+            print_static_string <- final_result_static_string
+          }
+          
+
+
+          for (j in seq(1,n_repetitions_counting_lyric)){
+           if(unique_additional_verse && !near(i, 1)) {
+              print_count_lyrics_modified_punctuation <- modify_punctuation_in_string(print_count_lyric, "!")
+              
+              cat(print_count_lyrics_modified_punctuation)
+              
+              cat('\n')
+              cat(print_count_lyric)
+           } else {
+              cat(print_count_lyric)  
+            }
+          }
+          cat(unique_print_count_lyric)
+
+          cat(print_static_string)
+        }
+    }
+}
+
+songs <- c("Alice the camel", "99 bottles of beer", "Ten in the bed")
+
+attr(print_child_song, which = "songs") <- songs
+
+# attributes(print_child_song)
+
+# print_child_song(song = "ten in the bed")
+```
+
+
+```{r 3.4 Final}
+print_child_song(
+        n_repetitions_counting_lyric = 1,
+    
+        pre_counting_lyric_string_concatonation_plural = "",
+        numeric_counts_vector =  create_str_vector_from_int(
+            least_significant_integer_to_convert = 1,
+            most_significant_integer_to_convert = 100,
+            reverse_sequence = TRUE,
+            zero_synonym = "no"
+        ),
+        post_counting_lyric_string_concatonation_plural = " bottles of beer on the wall,\n",
+    
+        counting_lyric_singular_conditional_string = "one",
+        pre_counting_lyric_string_concatonation_singular = "",
+        post_counting_lyric_string_concatonation_singular = " bottle of beer on the wall,\n",
+    
+        print_static_string = "Take one down,\nPass it around,\n",
+    
+        final_count_condition_string = "one",
+        final_result_static_string = "Take it down,\nPass it around,\nNo more bottles of beer on the wall!\n",
+
+        unique_additional_verse = TRUE,
+        unique_additional_verse_pre_counting_lyric_string_concatonation_plural = "",
+        unique_additional_verse_post_counting_lyric_string_concatonation_plural = " bottles of beer!\n",
+        unique_additional_verse_pre_counting_lyric_string_concatonation_singular = "",
+        unique_additional_verse_post_counting_lyric_string_concatonation_singular = " bottle of beer!\n",
+
+        vessel = "jug",
+        vessel_plural = "jugs",
+        liquid = "water"
+)
+
+```
+
+```{r}
+# Quesion 4
+x <- seq(1, 100)
+growing_vector <- function(x){
+  output <- vector("integer", 0)
+  for (i in seq_along(x)) {
+    output <- c(output, lengths(x[[i]]))
+  }
+  # print(length(output))
+  output
+}
+growing_vector(x)
+```
+
+```{r}
+preallocate_vector <- function(x){
+  output <- vector("integer", length(x))
+  for (i in seq_along(x)) {
+    output[i] <- lengths(x[[i]])
+  }
+  # print(length(output))
+  output
+}
+preallocate_vector(x)
+```
+
+
+```{r}
+if(!require("microbenchmark")) install.packages("microbenchmark")
+library(microbenchmark)
+```
+
+
+```{r}
+# Growing Vector Times Vs. Preallocated Vector Times:
+
+# Growing Vector Vs. Preallocated is Faster on Average under these conditions
+# set.seed(42)
+# set_unit = "nanoseconds"
+# trials  = 1000
+# microbenchmark(growing_vector(100), unit = set_unit, times = trials )
+# microbenchmark(preallocate_vector(100), unit = set_unit, times = trials )
+
+# set.seed(42)
+# set_unit = "nanoseconds"
+# trials  = 100000
+# microbenchmark(growing_vector(1), unit = set_unit, times = trials )
+# microbenchmark(preallocate_vector(1), unit = set_unit, times = trials )
+
+
+set.seed(42)
+set_unit = "nanoseconds"
+trials  = 100000
+
+microbenchmark(growing_vector(1), unit = set_unit, times = trials )
+microbenchmark(preallocate_vector(1), unit = set_unit, times = trials )
+
+microbenchmark(growing_vector(100), unit = set_unit, times = trials )
+microbenchmark(preallocate_vector(100), unit = set_unit, times = trials )
+
+microbenchmark(growing_vector(10000), unit = set_unit, times = trials )
+microbenchmark(preallocate_vector(10000), unit = set_unit, times = trials )
+
+microbenchmark(growing_vector(1000000), unit = set_unit, times = trials )
+microbenchmark(preallocate_vector(1000000), unit = set_unit, times = trials )
+
+# Comparing a vector that grows versus a vector that preallocates results in average microbenchmark times in which the function which preallocated a vector was faster on average than the function which grew a vector during operation. There were two instances in which this was found to be untrue. In the case that both functions are run 1000 times and the final sizes of the vectors are of length 100, the mean time to complete the function to grow a vector versus preallocate a vector was faster. Likewise, in the case that both functions are run 100000 times and the final sizes of the vectors are of length 1, the mean time to complete the function to grow a vector versus preallocate a vector was faster as well. The mechanics of this behaviour are unexplained, as varying the length of the times a function was computed while holding the final length to 1 persisted the pattern of faster execution times for preallocated vectors versus growing vectors. Furthermore, preallocated vectors versus growing vectors continued the trend of faster execution times when the length of the final vector increased from 1 or varied from 100000 while keeping the numer of times the functions were executed constant. 
+```
+
+
+## Section 21.3 For Loop Variations
+```{r}
+flip <- function() sample(c("T", "H"), 1)
+```
+
+#### Section 21.3.5: Exercises
+```{r}
+# Question 1
+file_path <- str_c(getwd(), "/data/")
+files <- dir(file_path, pattern = "\\.csv$", full.names = TRUE)
+index <- 1
+
+tbs <- vector(mode = "list", length = length(files))
+while (index <= length(files)){
+  tbs[index] <- read_csv(files[index])
+  index <- index + 1
+}
+```
+
+```{r eval = FALSE}
+# Question 2
+# When 'for (nm in names(y))' is used and y is an unnamed vector, nothing is returned by the for loop and there are no errors or warnings. 
+# When there is an inconsistency in the number of named items in a vector, the names of the named items are accessible to be printed whereas the names of the unnamed items print "". If the unnamed name is used to address inside y, then NA is returned. If the names are not unique, the first instance of the name will be used as the index.
+
+for (nm in names(y)) {
+  print(y[nm])
+}
+```
+```{r}
+if(!require("DescTools")) install.packages("DescTools")
+library(DescTools)
+```
+
+
+```{r}
+# Quesion 3
+x
+show_mean <- function(data) {
+  y <- character()
+  for (nm in names(data)) {
+    if(is.numeric(data[[nm]])){
+      
+      y <- c(y, sprintf("%s: %f", nm, mean(data[[nm]])))
+      # print(typeof(y))
+      # str(y)
+      
+      # y <- str_pad(y, 20, "right")
+      # print(y)
+      # formatC('print')
+      # print(mean(iris[[nm]]))
+    }
+  }
+  cbind(StrAlign(y, sep = "\\r"))
+}
+show_mean(iris)
+```
+
+```{r}
+# Quesion 4
+# This function will create a list that: 
+# 1. scales an input value "x"
+# 2. creates a factor of "x" with labels of "auto" and "manual"
+# For each name in trans, "disp" & "am", the same name will be used to assign mtcars at the location of each name the value of mtcars at the specified index once transformed by each respective function "disp" & "am" in trans. "am" transforms from values of 0 and 1 into factored levels of "auto" and "manual". This is a list of functions where each function in the list is indexed and the indexes match to the column in mtcars that is desired to be transformed. This function transforms the columns of mtcars with operations that are unique to each column defined in the transformation list names "trans".
+trans <- list( 
+  disp = function(x) x * 0.0163871,
+  am = function(x) {
+    factor(x, labels = c("auto", "manual"))
+  }
+)
+for (var in names(trans)) {
+  print(var)
+  print(trans[[var]])
+  mtcars[[var]] <- trans[[var]](mtcars[[var]])
+}
+```
+
+
+```{r}
+mtcars <- datasets::mtcars
+```
+
+
+## Section 21.4 For loops vs. functionals
+```{r}
+# It is possible to pass functions into functions.
+```
+
+#### Section 21.4.1: Exercises
+```{r}
+# Question 1
+# lappy will return an array of dimension c(n, dim(X) [MARGIN]) if n > 1.
+```
+
+```{r}
+df <- tibble(0.585731553977938, "string")
+```
+
+```{r eval = FALSE}
+# Quesion 2
+# Adapt col_summary() so that it only applies to numeric columns
+
+# col_summary <- function(df, fun) {
+#   out <- vector("double", length(df))
+#   for (i in seq_along(df)) {
+#     out[i] <- fun(df[[i]])
+#   }
+#   out
+# }
+# 
+# col_summary(mtcars, summary)
+
+col_summary <- function(df, fun) {
+  out <- vector("double", length(df))
+
+  for (i in seq_along(df)) {
+    if(is.numeric(df[[i]])) {
+      out[i] <- fun(df[[i]])
+    }
+  }
+  out
+}
+col_summary(mtcars, median)
+#> [1] -0.51850298  0.02779864  0.17295591 -0.61163819
+col_summary(mtcars, mean)
+#> [1] -0.3260369  0.1356639  0.4291403 -0.2498034
+```
+
+## Section 21.5: The map functions
+
+```{r}
+# purrr functions
+# map() makes a list
+# map_lgl() makes a logical vector.
+# map_int() makes an integer vector.
+# map_dbl() makes a double vector.
+# map_chr() makes a character vector.
+```
+
+
+```{r}
+x<-list(list(1,2,3), list(4,5,6), list(7,8,9))
+x %>% map_dbl(2)
+```
+
+```{r}
+models <- mtcars %>%
+  split(.$cyl) %>% # splits mtcars into groups by cylinders; 
+  map(~lm(mpg ~ wt, data = .)) 
+# After creating groups, the observations in each group will be used to create
+# linear models of mpg with respect to weight.
+  
+```
+
+
+```{r}
+models %>%
+  map(summary) %>% # This will create a list of summaries of each model that is created.
+  map_dbl("r.squared")
+```
+
+#### Section 21.5.3: Exercises
+```{r}
+#  1.1
+mtcars %>% map_dbl(mean)
+```
+
+```{r}
+#  1.2
+# Determine the type of each column in nycflights13::flights
+flights <- nycflights13::flights
+flights %>% map(typeof)
+```
+
+```{r}
+# Question 1.3
+# Compute the number of unique values in each column of iris
+iris %>% map(unique) %>% map(length)
+```
+```{r}
+# Question 1.4 
+# Generate 10 random normals from distributions with means of -10, 0, 10, and 100
+mu <- list(-10, 0, 10, 100)
+mu %>% map(rnorm, n = 10) %>% str()
+```
+
+```{r}
+# Quesion 2
+# This will determine if each column in a dataframe is a factor.
+
+tb <- tibble(c(1,2,3,4))
+tb %>% map(is.factor)
+```
+
+```{r}
+# Quesion 3
+# What happens when you use the map functions on vectors that aren't lists?
+# What does map(1:5, runif) do? Why?
+# When functions are mapped to vectors that are not lists, the values are passed to the function as if the function was called using the values directly. This is becuase the values are being mapped to the function where map uses an ellipses as a catch all to pass values to the function. 
+```
+
+```{r}
+# Quesion 4
+
+# map(-2:2, rnorm, n = 5) in the previous mapping, n is the number of observations that are created and -2:2 are used to calculate the mean from within that range of values and the number of times the function rnorm is run.
+
+# map_dbl(-2:2, rnorm, n = 5) Will throw an error that the result length must be 1 not 5. This is because will create 5 rnorm distributions with means from -2:2
+
+map_dbl(-1:1, rnorm, n = 1) # This function will create a number of random samples equal to the max of the spread of integers provided minus the min of the spread of the integers provided plus one. R in this case is the number of times a distrubution is created. "Map_dbl" uses -1:1 as the double argument, rnorm as the function, and n as the side effect. In this case, the resultant length is determined by "n" in the mapped double where the resultant length must be 1 rather than 5.
+
+```
+
+```{r}
+# Quesion 5
+# Rewrite map(x, function(df) lm(mpg ~ wt, data = df))
+# df %>% map(~lm(mpg ~ wt, data = df))
+```
+
+
+## Section 21.6 Dealing with failure
+```{r}
+# possibly always succeeds; uses a default value to return when there is an error.
+# safely works with map; safely will return only mappings that are successful.
+# quietly works with errors, printed output, messages, and warnings.
+```
+
+## Section 21.7 Mapping over multiple arguments
+```{r}
+# mapping random normals with different means
+mu <- list(5, 10, -3)
+mu %>% map(rnorm, n = 5) %>% str()
+```
+
+```{r}
+# creating multiple functions with different paramters using a tribble
+sim <- tribble (
+  ~f,   ~params,
+  "runif", list(min = -1, max = 1),
+  "rnorm", list(sd = 5),
+  "rpois", list(lambda = 10)
+)
+
+sim %>% mutate(sim = invoke_map(f, params, n = 10))
+```
+
+## Section 21.8: Walk
+```{r}
+# Walk is a side effect of print that is used to call a function for its side-effects rather than for its return value.
+x <- list(1, "a", 3)
+x %>% walk(print)
+# There are also walk2 & pwalk functions used to walk multiple arguments.
+```
+
+#### Section 21.9.2: Predicate Functions
+```{r}
+# keep() & discard() keep elements of the input where the predicate is TRUE and FALSE respectively.
+# Example: keep only the elements in iris that are factors
+iris %>%
+  keep(is.factor) %>%
+  str() 
+```
+
+
+
+```{r}
+# Example: discard elements of iris that are not factors.
+iris %>%
+  discard(is.factor) %>%
+  str()
+```
+
+```{r}
+iris %>% map(is.factor)
+
+```
+
+```{r}
+# some() & every() determine if the predicate is true for some or all of the elements. For example:
+x <- list(1:5, letters, list(10))
+
+x %>% some(is_character)
+
+x %>% every(is_vector)
+```
+
+```{r}
+x <- sample(10)
+x
+
+# detect finds the first element where the predicate is true
+x %>% detect(~ . > 5)
+
+# detect_index returns the position of the first element where the predicate is true
+x %>% detect_index(~ . > 5)
+
+```
+
+```{r}
+# head_while takes elements from the start or end of a vector while a predicate is true. 
+x %>% head_while(~ . > 5)
+x %>% tail_while(~ . > 5)
+```
+
+#### Section 21.9.2: Reduce and accumulate
+```{r}
+# Reduce will reduce a complex list to a simple list by reducing a pair to a singleton.
+# Example:
+
+dfs <- list(
+  age = tibble(name = "John", age = 30),
+  sex = tibble(name = c("John", "Mary"), sex = c("M", "F")),
+  trt = tibble(name = "Mary", treatment = "A")
+)
+
+dfs %>% reduce(full_join)
+```
+
+
+```{r}
+# finding the intersection among a list of vectors
+vect <- list(
+  c(1,3,5,6,10),
+  c(1,2,3,7,8,10),
+  c(1,2,3,4,8,9,10)
+)
+
+vect %>% reduce(intersect)
+
+# Reduce takes a binary function (a function with two primary inputs) and repeatedly applies it until there is only a single element left.
+```
+
+```{r}
+# Accumulate takes a binary function and repeatedly applies it until there is only a single element left while keeping the intermediate results.
+# For Example:
+x <- sample(10)
+(x)
+x %>% accumulate(`+`)
+x %>% accumulate(`-`)
+```
+
+#### Section 21.9.3: Exercises
+```{r}
+# Question 1
+# Implementing every(): This version of every will map an input to a function, and verify that "FALSE" is not in the list of returned values from the mappings. Like every, custom_every will accept both lists and vectors.
+x <- seq(1:10)
+custom_every <- function(x, func) {
+  map_vector <- map(x, func)
+  if (FALSE %in% map_vector){
+    return(FALSE)
+  } else {
+    return(TRUE)
+  }
+} 
+custom_every(x, is.factor)
+```
+
+```{r}
+# Quesion 2
+# Create an advanced col_summary that applies a summary function to every column in a data frame.
+col_summary <- function(df, fun) {
+  out <- vector("double", length(df))
+  for (i in seq_along(df)) {
+    out[i] <- fun(df[[i]])
+  }
+  out
+}
+
+col_summary(mtcars, summary)
+```
+
+```{r}
+# Quesion 2
+adv_col_summary <- function(df, fun) {
+  out <- vector("double", length(df))
+  for (i in seq_along(df)) {
+    out[i] <- map(df[i], fun)
+  }
+  out
+}
+adv_col_summary(mtcars, summary)
+```
+
+```{r}
+# Quesion 3
+col_sum3 <- function(df, f) {
+  is_num <- sapply(df, is.numeric)
+  df_num <- df[, is_num]
+
+  sapply(df_num, f)
+}
+```
+
+```{r eval = FALSE}
+# Quesion 3
+df <- tibble(
+  x = 1:3, 
+  y = 3:1,
+  z = c("a", "b", "c")
+)
+# OK
+col_sum3(df, mean)
+# Has problems: don't always return numeric vector
+col_sum3(df[1:2], mean)
+col_sum3(df[1], mean)
+# col_sum3(df[0], mean)
+```
+
+```{r}
+# Quesion 3
+df[0]
+is_num_error <- sapply(df[0], is.numeric) # df[0] is an empty tibble containing 3 rows and zero columns. Sapply returns a named list when this tibble is computed using the function "is.numeric" (rather than returning the expected values of either TRUE or FALSE. The "named list()" is next used to index all rows where the columns match "named list()" which results in an error because the subset must be subset with a logical, numeric, or character rather than an empty list. 
+is_num_1 <- sapply(df[1], is.numeric)
+
+is_num_error
+is_num_1
+```
+## Section 23: Model Basics
+#### Section 23.2 A Simple Model
+```{r}
+library(tidyverse)
+library(modelr)
+options(na.action = na.warn)
+```
+
+```{r}
+# modelr::sim1
+```
+
+```{r}
+ggplot(sim1, aes(x, y)) +
+  geom_point()
+```
+
+```{r}
+# Creating random intercepst and slopes
+models <- tibble(
+  a1 = runif(250, -20, 40),
+  a2 = runif(250, -5, 5)
+)
+```
+
+```{r}
+ggplot(sim1, aes(x, y)) + 
+  geom_abline(aes(intercept = a1, slope = a2), data = models, alpha = 1/4) + 
+  geom_point()
+```
+
+```{r}
+# R function of a model family (predicted values)
+model1 <- function(a, data) {
+  a[1] + data$x * a[2]
+}
+model1(c(7, 1.5), sim1)
+```
+
+```{r}
+# Compute the difference between actual and predicted values
+measure_distance <- function(mod, data) {
+  diff <- data$y - model1(mod, data)
+  sqrt(mean(diff ^ 2))
+}
+measure_distance(c(7, 1.5), sim1)
+```
+
+
+```{r}
+# Compute the distance for all models defined above. 
+# Create a helper function to map BOTH a1 intercept and a2 slope into the measure distance function with map2_dbl; passing c(a1, a2) into measure_distance will not map both variables into the measure_distance function.
+
+sim1_dist <- function(a1, a2) {
+  measure_distance(c(a1, a2), sim1)
+}
+
+# This will map both a1 & a2 into sim1_dist which will then create a vector of both a1 and a2 pairs to calculate a predicted y value before taking the difference from the actual y value in sim1 and returning the square root of the mean of the square of the difference as the distance "dist".
+models <- models %>%
+  mutate(dist = purrr::map2_dbl(a1, a2, sim1_dist))
+models
+
+```
+
+```{r}
+# Overlaying the best 10 models on the data
+ggplot(sim1, aes(x, y)) +
+  geom_point(size = 2, color = "grey30") +
+  geom_abline(aes(intercept = a1, slope = a2, color = -dist), data = filter(models, rank(dist) <= 10))
+```
+
+
+```{r}
+# Plotting the random intercept and slopes a1 & a2 (which represent models) as points
+ggplot(models, aes(a1, a2)) +
+  geom_point(data = filter(models, rank(dist) <= 10), size = 4, color = "red") +
+  geom_point(aes(color = -dist))
+```
+
+
+```{r}
+# Grid Search: Generating evenly spaced points rather than random models based on the 10 best randomly generated points in the plot above.
+grid <- expand.grid(
+  a1 = seq(-5, 20, length = 25),
+  a2 = seq(1, 3, length = 25)
+) %>% 
+  mutate(dist = purrr::map2_dbl(a1, a2, sim1_dist))
+
+grid %>%
+  ggplot(aes(a1, a2)) +
+  geom_point(data = filter(grid, rank(dist) <= 10), size = 4, color = "red") + 
+  geom_point(aes(color =))
+
+```
+
+```{r}
+# Overlaying the 10 best models back on the original data using evenly spaced points.
+ggplot(sim1, aes(x, y)) +
+  geom_point(size = 2, color = "grey30") +
+  geom_abline(
+    aes(intercept = a1, slope = a2, color = -dist),
+    data = filter(grid, rank(dist) <= 10)
+  )
+```
+
+```{r}
+# Iteratively making the grid finer
+# Grid Search: Generating evenly spaced points rather than random models based on the 10 best randomly generated points in the plot above.
+grid <- expand.grid(
+  a1 = seq(0, 10, length = 25),
+  a2 = seq(1.5, 2.5, length = 25)
+) %>% 
+  mutate(dist = purrr::map2_dbl(a1, a2, sim1_dist))
+
+grid %>%
+  ggplot(aes(a1, a2)) +
+  geom_point(data = filter(grid, rank(dist) <= 10), size = 4, color = "red") + 
+  geom_point(aes(color = -dist))
+
+ggplot(sim1, aes(x, y)) +
+  geom_point(size = 2, color = "grey30") +
+  geom_abline(
+    aes(intercept = a1, slope = a2, color = -dist),
+    data = filter(grid, rank(dist) <= 10)
+  )
+```
+
+```{r}
+# Newton-Raphson search
+# Select a point, find the steepest slope (tangent to a curve). Search for another point and repeat this process.
+# optim() represents this mathematical minimization search
+best <- optim(c(0,0), measure_distance, data = sim1)
+best$par
+
+ggplot(sim1, aes(x, y)) + 
+  geom_point(size = 2, color = "grey30") +
+  geom_abline(intercept = best$par[1], slope= best$par[2])
+```
+
+
+#### Section 23.2.1: Exercises
+```{r}
+# Question 1
+# Fit a linear model to the simulated data below, and visualise the results. Rerun a few times to generate different simulated datasets. What do you notice about the model?
+
+sim1a <- tibble(
+  x = rep(1:10, each = 3),
+  y = x * 1.5 + 6 + rt(length(x), df = 2)
+)
+
+# model1 <- lm(y ~ x, data = sim1a)
+ggplot(sim1a, aes(x, y)) + 
+  geom_point()
+
+```
+
+
+
+```{r}
+# Process to fit a linear model
+# Generate random points
+# Compute models from random points
+
+# Generating random points
+models <- tibble(
+  a1 = runif(250, -20, 40),
+  a2 = runif(250, -5, 5)
+)
+
+# Compute the difference between actual and predicted values
+measure_distance <- function(mod, data) {
+  diff <- data$y - model1(mod, data)
+  sqrt(mean(diff ^ 2))
+}
+
+# Overlaying the best 10 models on the data
+sim1a_dist <- function(a1, a2) {
+  measure_distance(c(a1, a2), sim1a)
+}
+# This will map both a1 & a2 into sim1a_dist which will then create a vector of both a1 and a2 pairs to calculate a predicted y value before taking the difference from the actual y value in sim1a and returning the square root of the mean of the square of the difference as the distance "dist".
+models <- models %>%
+  mutate(dist = purrr::map2_dbl(a1, a2, sim1a_dist))
+models
+ggplot(sim1a, aes(x, y)) +
+  geom_point(size = 2, color = "grey30") +
+  geom_abline(aes(intercept = a1, slope = a2, color = -dist), data = filter(models, rank(dist) <= 10))
+```
+
+```{r}
+# Process to fit a linear model
+# Generate random points
+# Compute models from random points
+
+# Generating new random points
+models <- tibble(
+  a1 = runif(250, -20, 40),
+  a2 = runif(250, -5, 5)
+)
+
+# Compute the difference between actual and predicted values
+measure_distance <- function(mod, data) {
+  diff <- data$y - model1(mod, data)
+  sqrt(mean(diff ^ 2))
+}
+
+# Overlaying the best 10 models on the data
+sim1a_dist <- function(a1, a2) {
+  measure_distance(c(a1, a2), sim1a)
+}
+# This will map both a1 & a2 into sim1a_dist which will then create a vector of both a1 and a2 pairs to calculate a predicted y value before taking the difference from the actual y value in sim1a and returning the square root of the mean of the square of the difference as the distance "dist".
+models <- models %>%
+  mutate(dist = purrr::map2_dbl(a1, a2, sim1a_dist))
+models
+ggplot(sim1a, aes(x, y)) +
+  geom_point(size = 2, color = "grey30") +
+  geom_abline(aes(intercept = a1, slope = a2, color = -dist), data = filter(models, rank(dist) <= 10))
+```
+
+
+```{r}
+# Process to fit a linear model
+# Generate random points
+# Compute models from random points
+
+# Generating a third set of random points
+models <- tibble(
+  a1 = runif(250, -20, 40),
+  a2 = runif(250, -5, 5)
+)
+
+# Compute the difference between actual and predicted values
+measure_distance <- function(mod, data) {
+  diff <- data$y - model1(mod, data)
+  sqrt(mean(diff ^ 2))
+}
+
+# Overlaying the best 10 models on the data
+sim1a_dist <- function(a1, a2) {
+  measure_distance(c(a1, a2), sim1a)
+}
+# This will map both a1 & a2 into sim1a_dist which will then create a vector of both a1 and a2 pairs to calculate a predicted y value before taking the difference from the actual y value in sim1a and returning the square root of the mean of the square of the difference as the distance "dist".
+models <- models %>%
+  mutate(dist = purrr::map2_dbl(a1, a2, sim1a_dist))
+models
+ggplot(sim1a, aes(x, y)) +
+  geom_point(size = 2, color = "grey30") +
+  geom_abline(aes(intercept = a1, slope = a2, color = -dist), data = filter(models, rank(dist) <= 10))
+```
+
+
+
+```{r}
+# Question 1
+# The models will map linearly to outliers. There is not a general trend between the three sets of lines that are visualized with respect to slope. 
+```
+
+
+```{r}
+# Quesion 2
+# Newton-Raphson search
+# Select a point, find the steepest slope (tangent to a curve). Search for another point and repeat this process.
+# optim() represents this mathematical minimization search
+
+measure_distance_mean_absolute <- function(mod, data) {
+  diff <- data$y - model1(mod, data)
+  mean(abs(diff))
+}
+
+# Root-Mean-Squared-Distance
+best <- optim(c(0,0), measure_distance, data = sim1)
+best$par
+
+ggplot(sim1, aes(x, y)) + 
+  geom_point(size = 2, color = "grey30") +
+  geom_abline(intercept = best$par[1], slope= best$par[2]) +
+  labs(title = "Root-Mean-Squared-Distance")
+
+# Mean-Absolute Distance 
+best <- optim(c(0,0), measure_distance_mean_absolute, data = sim1)
+best$par
+
+ggplot(sim1, aes(x, y)) + 
+  geom_point(size = 2, color = "grey30") +
+  geom_abline(intercept = best$par[1], slope= best$par[2]) +
+  labs(title = "Mean-Absolute-Distance")
+
+# The mean-absolute-distance is a slightly better fit to the sample data than the root-mean-squared-distance. The mean-absolute-distance travels directly through points in the sample that are indirectly traversed by the line fit by the root-mean-squared-distance.
+```
+
+
+```{r}
+# Quesion 3
+
+# The problem with optimising a three parameter model is that the global optimal value may never be found. A local optimal value may be identified as the maximum or minimum optimal value, but the true global maximum or minimum is established elsewhere. 
+model1 <- function(a, data) {
+  a[1] + data$x * a[2] + a[3]
+}
+```
+
+
+## Section 23.3: Visualising Models
+```{r}
+# https://r4ds.had.co.nz/model-basics.html
+```
+
+
+#### Section 23.3.1: Predictions 
+```{r}
+# Data grid: an evenly spaced grid of values that covers the region where the data lies.
+sim1
+grid <- sim1 %>% data_grid(x)
+grid
+```
+
+```{r}
+sim1_mod <- lm(y ~ x, data = sim1) 
+grid <- grid %>% add_predictions(sim1_mod)
+grid
+```
+
+```{r}
+ggplot(sim1, aes(x)) +
+  geom_point(aes(y = y)) +
+  geom_line(aes(y = pred), data = grid, color = "red", size = 1)
+```
+
+#### Section 23.3.2: Residuals
+```{r}
+# Predictions indicate the pattern captured by the model, residuals indicate what the model failed to capture.
+# Residuals are the differences between the observed and predicted values shown above.
+sim1 <- sim1 %>% add_residuals(sim1_mod)
+sim1
+```
+
+```{r}
+# Understanding the spread of the residuals
+ggplot(sim1, aes(resid)) +
+  geom_freqpoly(binwidth = 0.5)
+```
+
+
+```{r}
+# The residuals appear to be random noise. This inidcates that the model appropriately captured the patterns in the dataset.
+ggplot(sim1, aes(x, resid)) +
+  geom_ref_line(h = 0) + 
+  geom_point()
+```
+
+
+#### Section 23.3.3: Exercises
+```{r}
+# Question 1
+# Repeat the process of model fitting, grid generation, predictions, and visualisation on sim1 using loess() instead of lm(). How does the result compare to geom_smooth()?
+# Create an evenly spaced grid of values
+# fit a model to data using loess
+
+# Create an evenly spaced grid of values (grid generation)
+grid_loess <- sim1 %>% data_grid(x)
+grid_loess
+
+# Create a model that captures the patterns of the data (model fitting)
+sim_loess_mod <- loess(y ~ x , data = sim1)
+sim_loess_mod
+
+# Add the predictions of the model (create predictions)
+grid_loess <- grid_loess %>% add_predictions(sim_loess_mod)
+grid_loess
+
+# Add the residuals of the model 
+sim1_loess_residuals <- sim1 %>% add_residuals(sim_loess_mod)
+sim1_loess_residuals
+```
+
+```{r}
+# Question 1
+ggplot(sim1, aes(x)) +
+  geom_point(aes(y = y)) + 
+  geom_line(aes(y = pred), size = 2, color = "red", data = grid_loess)
+```
+
+```{r}
+# Question 1
+ggplot(sim1_loess_residuals) +
+  geom_freqpoly(aes(resid))
+```
+
+```{r}
+# Question 1
+# The residuals from the loess model are similar but not identical to the random noise that was shown in the plot of the residuals stemming from the linear model.
+ggplot(sim1_loess_residuals, aes(x)) + 
+  geom_ref_line(h = 0) + 
+  geom_point(aes(y = resid))
+```
+
+```{r}
+# Question 1
+# How do the results compare to geom_smooth?
+ggplot(sim1, aes(x)) +
+  geom_point(aes(y = y)) + 
+  geom_line(aes(y = pred), size = 2, color = "red", data = grid_loess) +
+  geom_smooth(aes(y = pred), data = grid_loess, se = FALSE) + 
+  labs(title = "Smooth vs. Line Plot of Residuals of Loess model")
+  
+# These two lines look nearly identical. The "smoothed" line does not have as sharp a change in slope as the geom_line does.
+```
+
+```{r}
+# Quesion 2
+# add_predictions: adds a new single column to the dataframe (default name "pred") to the data.
+# gather_predictions: gather_predictions adds two columns (model and pred); repeats the input rows for each model. Adds each prediction as a row.
+# spread_predictions: spread predictions adds one column for each model.
+
+
+```
+
+
+```{r}
+# Quesion 3
+# What does geom_ref_line() do? What package does it come from? Why is displaying a reference line in plots showing residuals useful and important?
+
+# geom_ref_line creates a horizontal reference line. This is a space by default. This comes from the "modelr" package. Displaying a reference line in plots showing residuals is usefule because it allows one to identify a common difference between all points with respect to the reference. It is important because with out a reference line, there is no common means with which to compare points at a glance. 
+
+```
+
+```{r}
+# Quesion 4
+# Why might you want to look at a frequency polygon of absolute residuals? What are the pros and cons compared to looking at the raw residuals?
+
+# A frequency polygon of absolute residuals indicates the number of times the absolute value of a residual occurs. The line of best fit will have the greatest count of residuals at zero. By examining the absolute value of the residuals, the frequency of their occurences are comparable with respect to zero regardless of sign.
+
+```
+
+
+## Section 23.4: Formulas and model families
+
+#### Section 23.4.4: Transformations
+```{r}
+sim5 <- tibble(
+  x = seq(0, 3.5 * pi, length = 50),
+  y = 4 * sin(x) + rnorm(length(x))
+)
+sim5
+```
+
+```{r}
+rnorm(50) # 50 random numbers with a mean of zero, a standard deviation of 1 and a normal distribution
+```
+
+```{r}
+ggplot(sim5, aes(x, y)) +
+  geom_point()
+```
+
+```{r}
+# Approximating a non-linear function:
+df <- tribble(
+  ~x, ~y,
+  1, 1, 
+  2, 2, 
+  3, 3
+)
+
+library(splines)
+model_matrix(df, y ~ ns(x, 2)) # polynomial to x^2
+```
+
+```{r}
+sim5 <- tibble(
+  x = seq(0, 3.5 * pi, length = 50),
+  y = 4 * sin(x) + rnorm(length(x))
+)
+
+# Random normal distribution of 50 points with values from zero to 3.5 * pi added to 4 times the sine of the same values.
+ggplot(sim5, aes(x, y))+
+  geom_point() 
+```
+
+
+
+```{r}
+# Fitting 5 models to this data
+mod1 <- lm(y ~ ns(x, 1), data = sim5)
+mod2 <- lm(y ~ ns(x, 2), data = sim5)
+mod3 <- lm(y ~ ns(x, 3), data = sim5)
+mod4 <- lm(y ~ ns(x, 4), data = sim5)
+mod5 <- lm(y ~ ns(x, 5), data = sim5)
+
+grid <- sim5 %>%
+  data_grid(x = seq_range(x, n = 50, expand = 0.1)) %>%
+  gather_predictions(mod1, mod2, mod3, mod4, mod5, .pred = "y")
+```
+
+```{r}
+grid
+```
+
+
+```{r}
+ggplot(sim5, aes(x, y)) +
+  geom_point() +
+  geom_line(data = grid, color = "red") +
+  facet_wrap(~model)
+```
+
+
+```{r}
+seq2 <- tibble(
+  x = seq(0, 5 * pi, length = 50),
+  y = 4*cos(x) + rnorm(length(x))
+)
+
+ggplot(seq2, aes(x, y)) + 
+  geom_point()
+```
+
+
+```{r}
+mod1 <- lm(y ~ ns(x, 1), data = seq2)
+mod2 <- lm(y ~ ns(x, 2), data = seq2)
+mod3 <- lm(y ~ ns(x, 3), data = seq2)
+mod4 <- lm(y ~ ns(x, 4), data = seq2)
+mod5 <- lm(y ~ ns(x, 5), data = seq2)
+
+# grid <- sim5 %>% data_grid(x, range(x, n = 50, expand(0.1))
+                           
+                           
+# grid <- sim5 %>% data_grid(x = seq_range(x, n = 50, expand = 0.1))
+# grid <- sim3 %>% data_grid(x = seq_range(x, n = 50, expand = 0.1))
+# grid <- sim4 %>% data_grid(x = seq_range(x, n = 50, expand = 0.1)) 
+# a sequence of 50 points using sim2 as input. expanded by 0.1 to emphasize the effect of a Taylor polynomial beyond the bounds of the data.
+
+# grid <- sim1 %>% data_grid(x = seq_range(x, n = 50, expand = 0.1)) %>% gather_predictions(mod1, mod2, mod3, mod4, mod5, .pred = "y")
+
+grid <- seq2 %>% data_grid(x = seq_range(x, n = 50, expand = 0.1)) %>% gather_predictions(mod1, mod2, mod3, mod4, mod5, .pred = "y")
+(grid)
+```
+
+
+```{r}
+ggplot(seq2, aes(x,y)) +
+  geom_point() +
+  geom_line(data = grid, color = "red") +
+  facet_wrap(~model)
+
+```
+
+
+#### Section 23.4.5: Exercises
+```{r}
+# Question 1
+# What happens if you repeat the analysis of sim2 using a model without an intercept. 
+
+# What happens to the model equation? What happens to the predictions?
+
+# Removing the intercept will force the model to add a variable. All variables in the new model will be considered significant. The estimates of each model differ. However, the residuals between both models remain identical. The Adjusted R-squared value increases when the Intercept is removed. However, this is a superficial means of inflating the adjusted r-squared.
+# The model equation changes to for variables: xa, xb, xc, and xd. The predictions remain unchanged. 
+
+# Plot of sim2
+ggplot(sim2) + 
+  geom_point(aes(x, y))
+
+# Model & plot of sim2
+mod2 <- lm(y ~ x, data = sim2)
+
+summary(mod2)
+
+model_matrix(sim2, y~x)
+
+grid <- sim2 %>% 
+  data_grid(x) %>% 
+  add_predictions(mod2)
+grid
+
+ggplot(sim2, aes(x)) + 
+  geom_point(aes(y = y)) +
+  geom_point(data = grid, aes(y = pred), colour = "red", size = 4)
+```
+
+
+```{r}
+# Question 1
+# Model & Plot of sim2 without Intercept
+mod2_no_intercept <- lm(y ~ x - 1, data = sim2)
+summary(mod2_no_intercept)
+model_matrix(sim2, y~x-1)
+grid_no_intercept <- sim2 %>% data_grid(x) %>% add_predictions(mod2_no_intercept)
+
+ggplot(sim2, aes(x)) + 
+  geom_point(aes(y = y)) +
+  geom_point(data = grid_no_intercept, aes(y = pred), color = "red", size = 4)
+```
+
+
+```{r}
+# Question 1
+# Predictions: Intercept vs. No intercept.
+grid_no_intercept$pred
+grid$pred
+```
+
+```{r}
+# Quesion 2
+# Use model_matrix() to explore the equations generated for the models I fit to sim3 and sim4. Why is * a good shorthand for interaction?
+# * is a good shorthand for interaction because + indicates the inclusion of another variable in a given equation. * indicates the interaction between the two variables.
+
+
+# Sim3 models
+# sim3_mod1 <- lm(y ~ x1 + x2, data = sim3)
+# sim3_mod2 <- lm(y ~ x1 * x2, data = sim3)
+
+model_matrix(sim3, y ~ x1 + x2)
+model_matrix(sim3, y ~ x1 * x2)
+
+# Sim4 models
+# sim4_mod1 <- lm(y ~ x1 + x2, data = sim4)
+# sim4_mod2 <- lm(y ~ x1 * x2, data = sim4)
+
+model_matrix(sim4, y ~ x1 + x2)
+model_matrix(sim4, y ~ x1 * x2)
+```
+
+```{r}
+# Using basic principles, convert the formulas in the following two functions into models. (Hint: start by converting the categorical variables into 0-1 variables)
+sim3 %>% mutate(x2 = as.numeric(x2)) %>% count(x2)
+
+mod1 <- lm(y ~ x1 + x2, data = sim3)
+
+model_matrix(sim3, y ~ x1 + x2)
+
+# mod1 is expressed as y = a_0 + a_1 * x1 + a_2 * x2b + a_3 * x2c + a_4 * x2d
+```
+
+
+```{r}
+# Quesion 3
+mod2 <- lm(y ~ x1 * x2, data = sim3)
+model_matrix(sim3, y ~ x1 * x2)
+sim3 %>% mutate(x2 = as.numeric(x2)) %>% count(x2)
+
+# y = a_0 + a_1 * x1 + a_2 * x2b + a_3 * x2c + a_4 * x2d + a_5 * x1 * x2b + a_6 * x1 * x2c + a_7 * x1 * x2d
+```
+
+```{r}
+# Quesion 4
+# For sim4, which of mod1 and mod2 is better? I think mod2 does a slightly better job at removing patterns, but it’s pretty subtle. Can you come up with a plot to support my claim?
+
+# Gathering predictions:
+mod1 <- lm(y ~ x1 + x2, data = sim4)
+mod2 <- lm(y ~ x1 * x2, data = sim4)
+
+grid <- sim4 %>% 
+  data_grid(
+    x1 = seq_range(x1, 5), 
+    x2 = seq_range(x2, 5) 
+  ) %>% 
+  gather_predictions(mod1, mod2)
+grid
+
+# Gathering Residuals
+sim3
+sim4
+
+grid_residuals <- sim4 %>% gather_residuals(mod1, mod2)
+grid_residuals
+```
+
+```{r 4 Answer}
+# Plot residuals
+# The residuals are dependent upon two continuous variables (x1, x2). Each observation is coordinated with a third variable "rep" and each observation contains a unique value for y. Semi-joining the rows to reduce the number of x1 and x2 variables to a finite grid of 25 combinations would force either a selection or combination of the values of y. To prevent loss of data, the observations were retained. This, however, creates a plot with a facet-wrap that is not clear with respect to the pattern of residuals when comparing model1 and model2. 
+
+# Mathematically, how does one precisely tell which of two models are better based on their residuals?
+ggplot(grid_residuals, aes(x1, resid, color = x2)) +
+  geom_point() +
+  facet_grid(model ~ x2) +
+  coord_flip()
+
+# grid_residuals_model1
+grid_residuals_mod1 <- grid_residuals %>% filter(model == 'mod1')
+grid_residuals_mod2 <- grid_residuals %>% filter(model == 'mod2')
+
+ggplot(grid_residuals_mod1) +
+  geom_freqpoly(aes(resid)) +
+  labs(title = "Freqpoly of Model 1 Residuals")
+
+ggplot(grid_residuals_mod2) +
+  geom_freqpoly(aes(resid)) +
+  labs(title = "Freqpoly of Model 2 Residuals")
+
+# Sum of the squares of the residuals (RSS)
+grid_residuals_mod1_rss <- sum((grid_residuals_mod1$resid ^ 2))
+grid_residuals_mod2_rss <- sum((grid_residuals_mod2$resid ^ 2))
+
+# The smaller the residual sum of squares, the better the model fits the data.
+cat("RSS Model 1: ")
+(grid_residuals_mod1_rss)
+cat("\nRSS Model 2: ")
+(grid_residuals_mod2_rss)
+
+# The frequency poly of the residuals of model 2 holds the greatest maximum count about 0 when compared to the frequency poly of the model 1 residuals. Furthermore, model 2 has a lower residual-sum-of-squares which indicates less variance and a better fit of the model to the data. Therefore, between the two models, model 2 is the model that best fits the data.
+```
+
+
+## Section 23.5: Missing Values
+```{r }
+df <- tribble(
+  ~x, ~y,
+  1, 2.2,
+  2, NA,
+  3, 3.5,
+  4, 8.3,
+  NA, 10
+)
+
+mod <- lm(y ~ x, data = df)
+```
+
+
+```{r }
+# Exclude warning of dropping missing values
+mod <- lm(y ~ x, data = df, na.action = na.exclude)
+
+```
+
+```{r}
+# nobs(): How many observations were used in the model.
+nobs(mod)
+```
+
+
+## Section 23.6: Other model families
+```{r}
+# Generalised linear models: stats::glm()
+# Generalised additive models: mgcv::gam()
+# Penalised linear models: glmnet::glmnet()
+# Robust linear models: MASS::rlm()
+# Trees: rpart::rpart()
+# Random forests: randomForest::randomForest()
+# Gradient Boosting Machines: xgboost::xgboost()
+```
+
+
+# Section 24: Model Building
+## Section 24.1: Introduction
+#### Section 24.1.1: Prerequisites
+```{r}
+if(!require("tidyverse")) install.packages("tidyverse")
+if(!require("modelr")) install.packages("modelr")
+if(!require("nycflights13")) install.packages("nycflights13")
+if(!require("lubridate")) install.packages("lubridate")
+
+library(tidyverse)
+library(modelr)
+options(na.action = na.warn)
+
+library(nycflights13)
+library(lubridate)
+```
+
+
+## Section 24.2: Why are low quality diamonds more expensive?
+```{r}
+# By looking at the prediction (price with respect to the weight) the residual reflects the differrence in price solely. Plotting against the color presents the adjusted price removing the bias of the price vs the weight.
+
+ggplot(diamonds, aes(cut, price)) +
+         geom_boxplot()
+ggplot(diamonds, aes(color, price)) +
+         geom_boxplot()
+ggplot(diamonds, aes(clarity, price)) + 
+         geom_boxplot()
+```
+
+```{r}
+ggplot(diamonds, aes(carat, price)) +
+  geom_hex(bins = 50)
+```
+
+```{r}
+diamonds2 <- diamonds %>% filter(carat <= 2.5) %>% mutate(lprice = log2(price), lcarat = log2(carat))
+diamonds2
+```
+```{r}
+ggplot(diamonds2, aes(lcarat, lprice)) + 
+  geom_hex(bins = 50)
+```
+
+```{r}
+# create a linear model of the data. 
+mod_diamond <- lm(lprice ~ lcarat, data = diamonds2)
+```
+
+```{r}
+grid <- diamonds2 %>% 
+  data_grid(carat = seq_range(carat,20)) %>%
+  mutate(lcarat = log2(carat)) %>%
+  add_predictions(mod_diamond, "lprice") %>%
+  mutate(price = 2 ^ lprice)
+ggplot(diamonds2, aes(carat, price)) + 
+  geom_hex(bins = 50) + 
+  geom_line(data = grid, aes(carat, price), color = "red")
+```
+
+
+```{r}
+ggplot(diamonds2, aes(carat, price)) + 
+  geom_hex(bins = 50) + 
+  geom_line(data = grid, aes(carat, price), color = "red")
+```
+
+```{r}
+# The pattern of the price with respect to the weight has been removed 
+diamonds2 <- diamonds2 %>%
+  add_residuals(mod_diamond, "lresid")
+
+ggplot(diamonds2, aes(lcarat, lresid)) +
+  geom_hex(bins = 50)
+```
+```{r}
+# What are the residuals of the carat and price alone? This requires a model to create residuals. The model would not be linear based on the data. 
+mod_diamond_no_log <- lm(price ~ carat, data = diamonds2)
+diamonds2 <- diamonds2 %>% add_residuals(mod_diamond_no_log, "resid")
+
+ggplot(diamonds2, aes(carat, resid)) +
+  geom_hex(bins = 50)
+# Notice that the residuals are heteroscedastic. The model is a poor fit to the data. Take the transformation of the data. 
+```
+
+```{r}
+library(EnvStats)
+
+# This is the boxcox analysis of the model created without log transformations. The optimal value of lambda is 1.127617 which indicates the data should be squared.
+boxcox.list <- boxcox(mod_diamond_no_log, optimize = TRUE)
+boxcox.list
+plot(boxcox.list, plot.type = "Q-Q Plot", same.window = FALSE)
+```
+
+
+```{r}
+mod_diamond_transformed <- lm(((price) ^2 ~ ((carat) ^2)), data = diamonds2)
+boxcox.list <- boxcox(mod_diamond_transformed, optimize = TRUE) # Lambda is much closer to zero. 
+boxcox.list
+plot(boxcox.list, plot.type = "Q-Q Plot", same.window = FALSE) # The residuals show a better fit of the model to the data.
+```
+
+```{r}
+mod_diamonds_log_transformation <- lm(log2(price) ~ log2(carat), data = diamonds)
+(mod_diamonds_log_transformation)
+```
+
+
+```{r}
+# This is the boxcox plot of the ideal transformation.
+# boxcox.list <- boxcox(mod_diamond, optimize = TRUE)
+boxcox.list <- boxcox(mod_diamonds_log_transformation, optimize = TRUE)
+boxcox.list
+plot(boxcox.list, plot.type = "Q-Q Plot", same.window = FALSE)
+```
+```{r}
+# Transformation with an optimal value of lambda. This is not the ideal transformation in reality. 
+lambda <- 1.127617
+diamonds_optimal <- diamonds %>% filter(carat == 2.5) %>% mutate(pprice = (price ^ lambda), pcarat = (price ^ lambda))
+```
+
+
+```{r}
+mod_diamond_optimal_lamda_transformation <- lm(pprice ~ pcarat, data = diamonds_optimal)
+boxcox.list <- boxcox(mod_diamond_optimal_lamda_transformation, optimize = TRUE)
+boxcox.list
+plot(boxcox.list, plot.type = "Q-Q Plot", same.window = FALSE)
+```
+```{r}
+# After creating four different models and examining the plot of the residuals with a critical eye, the model with the plot of the best residuals is the model comprising the log transformed price with respect to the log transformed carat. 
+```
+
+
+```{r}
+ggplot(diamonds2, aes(lcarat, lprice)) + 
+  geom_hex(bins = 50)
+```
+
+```{r}
+# After transforming the carat and price variables in alignment with the suggested transformation, This is clearly the incorrect graph. The distribution is still exponential, not linear. 
+# names(diamonds3)
+# ggplot(diamonds3, aes((carat^2), (price^2))) +
+#   geom_hex(bins = 50)
+```
+
+```{r}
+# This is the ideal transformation of the variables "carat" & "price. The relationship is linear. This linear relationship is now suitable for use with a linear model. As shown above. 
+names(diamonds2)
+ggplot(diamonds2, aes(log2(carat), log(price))) +
+  geom_hex(bins = 50)
+```
+```{r}
+# Returning lresid back to its original log transformation.
+diamonds2 <- diamonds2 %>%
+  add_residuals(mod_diamond, "lresid")
+```
+
+
+```{r}
+
+# Recreating the motivating plots of the cut, color, and clarity with respect to the residual of the price with respect to the predicted price with respect to the carat
+
+ggplot(diamonds2, aes(cut, lresid))+
+  geom_boxplot()
+
+ggplot(diamonds2, aes(color, lresid)) + 
+  geom_boxplot()
+
+ggplot(diamonds2, aes(clarity, lresid)) + 
+  geom_boxplot()
+
+# The confounding variable of carat has been removed. The plots below allow the diamonds to be compared by price without considering the factor of the weight of the diamond. Ideal cuts have the highest price. "G" color diamonds have the highest price. "IF" clarity have the highest price. 
+```
+```{r}
+mod_diamond2 <- lm(lprice ~ lcarat + color + cut + clarity, data = diamonds2)
+summary(mod_diamond2)
+```
+
+```{r}
+diamonds2
+```
+
+
+```{r}
+# Data grid includes variables from .model such that predictions can be created implementing all variables of the model. The most common values are chosen if the variables are categorical and the median is chosen if the variables are continuous.
+grid <- diamonds2 %>%
+  data_grid(cut, .model = mod_diamond2) %>%
+  add_predictions(mod_diamond2)
+```
+
+```{r}
+grid
+```
+
+
+```{r}
+grid <- diamonds2 %>%
+  data_grid(cut, .model = mod_diamond2) %>%
+  add_predictions(mod_diamond2)
+
+ggplot(grid, aes(cut, pred)) + 
+  geom_point()
+```
+```{r}
+diamonds2 <- diamonds2 %>% add_residuals(mod_diamond2, "lresid2")
+
+ggplot(diamonds2, aes(lcarat, lresid2)) + 
+  geom_hex(bins = 50)
+```
+
+
+```{r}
+# Examining unique values
+diamonds2 %>% filter(abs(lresid2) > 1) %>%
+  add_predictions(mod_diamond2) %>%
+  mutate(pred = round(2 ^ pred)) %>%
+  select(price, pred, carat:table, x:z) %>%
+  arrange(price)
+```
+#### Section 24.2.3: Exercises
+```{r}
+# Question 1
+# In plot of lcarat vs. lprice, the bright vertical strips represent a greater number of diamonds present at that combination of lcarat and lprice.
+```
+
+```{r}
+# Quesion 2
+# log(price) = a_0 + a_1 * log(carat) is a linear relationship.
+```
+
+```{r}
+filtered_diamonds2 <- diamonds2 %>% filter((lresid2 > 1) | (lresid2 < -1)) %>% select(lresid2, everything())
+(filtered_diamonds2)
+```
+
+```{r}
+# Comparison of Cuts
+count_filtered_diamonds2 <- filtered_diamonds2 %>% count(cut)
+grouped_filtered_diamonds2 <- filtered_diamonds2 %>% group_by(cut) %>% summarise(median(price))
+
+# diamonds2
+
+diamonds2_without_extreme_lresid2 <- anti_join(diamonds2, filtered_diamonds2, by = "lresid2")
+# (diamonds2_without_extreme_lresid2)
+
+grouped_diamonds2_without_extreme_lresid2 <- diamonds2_without_extreme_lresid2 %>% group_by(cut) %>% summarise(median(price))
+grouped_diamonds2_without_extreme_lresid2 <- semi_join(grouped_diamonds2_without_extreme_lresid2, filtered_diamonds2)
+
+count_filtered_diamonds2 <- count_filtered_diamonds2 %>% rename(count_n = 'n')
+grouped_filtered_diamonds2 <- grouped_filtered_diamonds2 %>% rename(outlier_median_price = `median(price)`)
+grouped_diamonds2_without_extreme_lresid2 <- grouped_diamonds2_without_extreme_lresid2 %>% rename(original_median_price = `median(price)`)
+
+cut_comparison <- left_join(count_filtered_diamonds2, grouped_filtered_diamonds2, by = 'cut')
+cut_comparison <- left_join(cut_comparison, grouped_diamonds2_without_extreme_lresid2, by = 'cut')
+(cut_comparison)
+
+# (count_filtered_diamonds2)
+# (grouped_filtered_diamonds2)
+# (grouped_diamonds2_without_extreme_lresid2)
+
+# The price with respect to the cut has a median price that is half the median price of normal diamonds of the same cut. There are 10 diamonds with this cut with low prices.
+```
+
+
+```{r}
+# Examine price with respect to color 
+count_filtered_diamonds2 <- filtered_diamonds2 %>% count(color)
+grouped_color_filtered_diamonds2 <- filtered_diamonds2 %>% group_by(color) %>% summarise(median(price))
+grouped_color_diamonds2_without_extreme_lresid2 <- diamonds2_without_extreme_lresid2 %>% group_by(color) %>% summarise(median(price))
+
+grouped_color_diamonds2_without_extreme_lresid2 <- semi_join(grouped_color_diamonds2_without_extreme_lresid2, filtered_diamonds2)
+
+# (count_filtered_diamonds2)
+# (grouped_color_filtered_diamonds2)
+# (grouped_color_diamonds2_without_extreme_lresid2)
+
+count_filtered_diamonds2 <- count_filtered_diamonds2 %>% rename(count_n = 'n')
+grouped_color_filtered_diamonds2 <- grouped_color_filtered_diamonds2 %>% rename(outlier_median_price = `median(price)`)
+grouped_color_diamonds2_without_extreme_lresid2 <- grouped_color_diamonds2_without_extreme_lresid2 %>% rename(original_median_price = `median(price)`)
+
+color_comparison <- left_join(count_filtered_diamonds2, grouped_color_filtered_diamonds2, by = 'color')
+color_comparison <- left_join(color_comparison, grouped_color_diamonds2_without_extreme_lresid2, by = 'color')
+(color_comparison)
+
+# Summary
+# There are two D color diamonds, two E color diamonds, eight F color diamonds, and four G color diamonds with incorrect prices. There is approximately a three times markup in price when compared to typical D color diamonds. 
+
+# There is a markup in the median price by a factor of two for E color diamonds.
+
+# There is a markup in the median price of F color diamonds by approximately a quarter. 
+
+# There is a markdown in price for G color diamonds by approximately two-thirds the price.  
+
+```
+
+```{r}
+# Examine price with respect to clarity 
+count_filtered_diamonds2 <- filtered_diamonds2 %>% count(clarity)
+summary_filtered_diamonds2 <- filtered_diamonds2 %>% group_by(clarity) %>% summarise(median(price))
+grouped_diamonds2_without_extreme_lresid2 <- diamonds2_without_extreme_lresid2 %>% group_by(clarity) %>% summarise(median(price))
+grouped_diamonds2_without_extreme_lresid2 <- semi_join(grouped_diamonds2_without_extreme_lresid2, filtered_diamonds2)
+
+# (count_filtered_diamonds2)
+# (summary_filtered_diamonds2)
+# (grouped_diamonds2_without_extreme_lresid2)
+
+count_filtered_diamonds2 <- count_filtered_diamonds2 %>% rename(count_n = 'n')
+summary_filtered_diamonds2 <- summary_filtered_diamonds2 %>% rename(outlier_median_price = `median(price)`)
+grouped_diamonds2_without_extreme_lresid2 <- grouped_diamonds2_without_extreme_lresid2 %>% rename(original_median_price = `median(price)`)
+
+clarity_comparison <- left_join(count_filtered_diamonds2, summary_filtered_diamonds2, by = 'clarity')
+clarity_comparison <- left_join(clarity_comparison, grouped_diamonds2_without_extreme_lresid2, by = 'clarity')
+(clarity_comparison)
+
+# All clarities I1, SI2, SI1, & VS2 are significantly marked down. 
+# Clarity VVS2 has a markup median price of over double. 
+```
+
+```{r}
+# Clarity, color, & cut comparison
+(clarity_comparison)
+(color_comparison)
+(cut_comparison)
+```
+
+
+
+```{r}
+# Summary: Overpriced
+# Fair F VVS2
+(filtered_diamonds2)
+# filtered_diamonds2 %>% filter(cut == "Fair", color == "F") %>% select(everything()) %>% arrange(color, clarity) 
+
+fair_f_vvs2 <- filtered_diamonds2 %>% filter(cut == "Fair", color == "F", clarity == 'VVS2') %>% select(everything()) %>% arrange(color, clarity) # These diamonds are high clarity and good color but poor cuts (VVS2, F, Fair) There is a markup on the clarity; There is a markup on diamonds with color F, cut of Fair, and clarity of VVS2. The median price is much higher than the price of diamonds with fair cuts, and the median prices for diamonds with the same clarity and color are typically much lower.  Furthermore, the same type of diamond at a similar carat is significantly cheaper. 
+
+(fair_f_vvs2 %>% select(price, everything()))
+
+diamonds2 %>% filter(cut == "Fair", color == "F", clarity == "VVS2") %>% group_by(carat) %>% arrange(price) %>% select(price, carat, everything())
+```
+
+
+```{r}
+reduced_filtered_diamonds2 <- anti_join(filtered_diamonds2, fair_f_vvs2)
+(reduced_filtered_diamonds2)
+
+```
+```{r}
+# Summary: Overpriced
+premium_g_si2 <- reduced_filtered_diamonds2 %>% filter(cut == "Premium", color == "G", clarity == "SI2") %>% select(price, everything()) %>% arrange(color, clarity)
+diamonds2 %>% filter(cut == "Premium", color == "G", clarity == "SI2") %>% group_by(carat) %>% arrange(price) %>% select(price, carat, everything())
+# There is a markdown in price of diamonds with cuts of Premium, color of G, and clarity of SI2 with respect to the median price. However, there is a significant markup in price for diamonds of a similar carat and same cut, color, and clarity. These diamonds are overpriced. 
+
+```
+
+```{r}
+
+reduced_filtered_diamonds2 <- anti_join(reduced_filtered_diamonds2, premium_g_si2)
+(reduced_filtered_diamonds2)
+
+```
+
+```{r}
+reduced_filtered_diamonds2 %>% filter(cut == "Premium")
+```
+
+
+```{r}
+# Summary: Overpriced
+# Premium F SI1
+premium_f_si1 <- reduced_filtered_diamonds2 %>% filter(cut == "Premium", color == "F", clarity == "SI1") %>% select(price, everything()) %>% arrange(color, clarity)
+(premium_f_si1)
+
+diamonds2 %>% filter(cut == "Premium", color == "F", clarity == "SI1") %>% filter(carat >= 0.50) %>% group_by(carat) %>% arrange(price) %>% select(price, carat, everything())
+# The markup for this diamond is significantly higher than a diamond of the comparable carat, cut, color, and clarity.  The diamonds will start at prices of $1063 for the same carat, cut, color, and clarity and increase in price along with the carat. At the same price, there are diamonds available that are 0.31 carat greater in value. 
+```
+
+```{r}
+reduced_filtered_diamonds2 <- anti_join(reduced_filtered_diamonds2, premium_f_si1)
+```
+
+
+
+```{r}
+(reduced_filtered_diamonds2) 
+```
+
+
+
+```{r}
+# Summary: Underpriced
+# Premium E SI2
+
+premium_E_si2 <- reduced_filtered_diamonds2 %>% filter(cut == "Premium", color == "E", clarity == "SI2") %>% select(price, everything()) %>% arrange(color, clarity)
+(premium_E_si2)
+
+diamonds2 %>% filter(cut == "Premium", color == "E", clarity == "SI2") %>% filter(carat >= 0) %>% group_by(carat) %>% arrange(price) %>% select(price, carat, everything())
+
+# This diamond is underpriced. Diamonds of the same color, clarity, and cut increase in price from 12,987 to 18,477 from carats that have an approximate weight of 2.0. This diamond is priced with diamonds that are approximately 1.5 carats, but is greater by nearly a carat. This is a great deal. 
+```
+```{r}
+reduced_filtered_diamonds2 <- anti_join(reduced_filtered_diamonds2, premium_E_si2)
+```
+
+```{r}
+reduced_filtered_diamonds2
+```
+
+```{r}
+# Clarity, color, & cut comparison
+(clarity_comparison)
+(color_comparison)
+(cut_comparison)
+```
+
+```{r}
+# Quesion 3
+# Answer
+
+# These diamonds vary by price. Diamonds in this set of diamonds are incorrectly priced. There exists at least one diamond in this set that is underpiced and more than a few diamonds that are overpriced in this set of outliers. I believe these are pricing errors. 
+
+```
+
+```{r}
+# mod_diamond2
+# create a linear model of the data. 
+# mod_diamond <- lm(lprice ~ lcarat, data = diamonds2)
+
+# diamonds2 <- diamonds2 %>% add_residuals(mod_diamond2, "lresid2")
+
+diamonds2
+mod_diamond2
+
+
+```
+
+```{r}
+diamonds2 %>% select("lresid2", everything())
+```
+
+
+```{r}
+mod_diamond2
+```
+
+```{r}
+
+# # diamonds2$lcarat
+# # plot_diamonds2
+# diamonds2 <- diamonds2 %>% add_predictions(mod_diamond2, "lprice2")
+# diamonds2 %>% select(lprice, lprice2, lcarat, everything())
+# plot_diamonds2 <- diamonds2 %>% select(lprice2, carat)
+# plot_diamonds2
+```
+```{r}
+# # plot_diamonds2$lprice2
+# 
+# diamonds2
+```
+
+
+```{r}
+# (plot_diamonds2)
+```
+
+
+```{r}
+# grid2 <- diamonds2 %>% 
+#   data_grid(carat = seq_range(carat,20)) %>%
+#   mutate(lcarat = log2(carat)) %>%
+#   add_predictions(mod_diamond2, "lprice2")
+# # %>%
+#   # mutate(price = 2 ^ lprice2)
+
+```
+
+```{r}
+# ggplot(diamonds2, aes(carat, price)) + 
+#   geom_hex(bins = 50) 
+#   geom_line(data = grid, aes(carat, price), color = "red")
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+# Quesion 4
+# Does the final model do a good job of predicting diamond prices? 
+# Would you trust it to tell you how much to spend if you were buying a diamond?
+
+# Comparison of AIC
+cat("Model 2 AIC:")
+AIC(mod_diamond2)
+cat("Model 1 AIC:")
+AIC(mod_diamond)
+
+
+# Model 2
+grid <- diamonds2 %>%
+  data_grid(cut, .model = mod_diamond2) %>%
+  add_predictions(mod_diamond2)
+
+ggplot(grid, aes(cut, pred)) + 
+  geom_point()
+
+grid <- diamonds2 %>%
+  data_grid(color, .model = mod_diamond2) %>%
+  add_predictions(mod_diamond2)
+
+ggplot(grid, aes(color, pred)) + 
+  geom_point()
+
+grid <- diamonds2 %>%
+  data_grid(clarity, .model = mod_diamond2) %>%
+  add_predictions(mod_diamond2)
+
+ggplot(grid, aes(clarity, pred)) + 
+  geom_point()
+
+diamonds2 <- diamonds2 %>% add_residuals(mod_diamond2, "lresid2")
+
+ggplot(diamonds2, aes(lcarat, lresid2)) + 
+  geom_hex(bins = 50)
+
+# The residuals of model 2 are a better fit to the data. The residuals of model 2 have less variance from zero. The AIC score of model 2 is lower than that of model 1. There is no heteroscedasticity in model 2. The predictions are in alignment with the expectations of the price with respect to the order of the variables within cut, color, and clarity when compared to the ordering of the same variables with respect to residuals in model 1. Because of this alignment, it is safe to infer that the predictions explain the variables contained within cut, color, and clarity appropriately with respect to real-world expectations. After comparing Model 1 and Model 2 (given that model 1 makes accurate predictions based on the data) I trust model 2 to make accurate predictions knowing that model 2 is a better fit to the data, incorporates more variables, and makes representations of those variables that are in alignment with real world expectations.
+```
+
+```{r}
+# Model 1
+diamonds2 <- diamonds2 %>%
+  add_residuals(mod_diamond, "lresid")
+
+ggplot(diamonds2, aes(lcarat, lresid)) +
+  geom_hex(bins = 50)
+
+ggplot(diamonds2, aes(cut, lresid))+
+  geom_boxplot()
+
+ggplot(diamonds2, aes(color, lresid)) + 
+  geom_boxplot()
+
+ggplot(diamonds2, aes(clarity, lresid)) + 
+  geom_boxplot()
+
+grid <- diamonds2 %>% 
+  data_grid(carat = seq_range(carat,20)) %>%
+  mutate(lcarat = log2(carat)) %>%
+  add_predictions(mod_diamond, "lprice") %>%
+  mutate(price = 2 ^ lprice)
+ggplot(diamonds2, aes(carat, price)) + 
+  geom_hex(bins = 50) + 
+  geom_line(data = grid, aes(carat, price), color = "red")
+```
+
+
+## Section 24.3: What affects the number of daily flights?
+```{r}
+daily <- flights %>%
+  mutate(date = make_date(year, month, day)) %>%
+  group_by(date) %>%
+  summarise(n = n())
+
+```
+
+```{r}
+ggplot(daily, aes(date, n)) + 
+  geom_line()
+```
+
+#### Section 24.3.1: Day of the week
+```{r}
+daily <- daily %>%
+  mutate(wday = wday(date, label = TRUE))
+ggplot(daily, aes(wday, n)) + 
+  geom_boxplot()
+```
+
+
+```{r}
+mod <- lm(n ~ wday, data = daily)
+
+grid <- daily %>%
+  data_grid(wday) %>%
+  add_predictions(mod, "n")
+
+ggplot(daily, aes(wday, n)) + 
+  geom_boxplot() +
+  geom_point(data = grid, color = "red", size = 4)
+```
+
+```{r}
+daily <- daily %>%
+  add_residuals(mod)
+daily %>%
+  ggplot(aes(date, resid)) + 
+  geom_ref_line(h = 0) + 
+  geom_line()
+```
+
+```{r}
+ggplot(daily, aes(date, resid, color = fct_reorder2(wday,date, resid))) + 
+  geom_ref_line(h = 0) + 
+  geom_line() +
+  labs(color = "Weekday")
+```
+
+```{r}
+daily %>% filter(resid < -100)
+```
+
+```{r}
+daily %>% ggplot(aes(date, resid)) + 
+  geom_ref_line(h = 0) + 
+  geom_line(color = "grey50") + 
+  geom_smooth(se = FALSE, span = 0.20)
+
+```
+
+```{r}
+daily %>%
+  filter(wday == "Sat") %>%
+  ggplot(aes(date, n)) + 
+  geom_point() + 
+  geom_line() + 
+  scale_x_date(NULL, date_breaks = "1 month", date_labels = "%b")
+```
+
+
+```{r}
+daily %>% select(date)
+```
+
+
+```{r}
+term <- function(date) {
+  cut(date,
+      breaks = ymd(20130101, 20130605,20130825, 20140101), 
+      labels = c("spring", "summer", "fall"))
+}
+
+daily <- daily %>%
+  mutate(term = term(date))
+
+daily %>%
+  filter(wday == "Sat") %>%
+  ggplot(aes(date, n, color = term)) +
+  geom_point(alpha = 1/3) +
+  geom_line() +
+  scale_x_date(NULL, date_breaks = "1 month", date_labels = "%b")
+```
+
+
+```{r}
+daily %>% 
+  ggplot(aes(wday, n, color = term)) +
+  geom_boxplot()
+```
+
+
+
+
+```{r}
+mod1 <- lm(n ~ wday, data = daily) 
+mod2 <- lm(n ~ wday * term, data = daily)
+
+daily %>%
+  gather_residuals(without_term = mod1, with_term = mod2) %>%
+  ggplot(aes(date, resid, color = model)) + 
+  geom_line(alpha = 0.75)
+```
+
+```{r}
+grid
+```
+
+
+
+```{r}
+grid <- daily %>%
+  data_grid(wday, term) %>%
+  add_predictions(mod2, "n")
+
+ggplot(daily, aes(wday, n)) +
+  geom_boxplot() + 
+  geom_point(data = grid, color = "red") + 
+  facet_wrap(~ term)
+```
+
+
+```{r}
+
+# rlm reduces the impact of outliers on the predictions
+mod3 <- MASS::rlm(n ~ wday * term, data = daily)
+
+daily %>%
+  add_residuals(mod3, "resid") %>%
+  ggplot(aes(date, resid)) + 
+  geom_hline(yintercept = 0, size = 2, color = "white") +
+  geom_line()
+```
+
+#### Section 24.3.3: Computed Variables
+```{r}
+compute_vars <- function(data) {
+  data %>%
+    mutate(
+      term = term(date),
+      wday = wday(date, label = TRUE)
+    )
+}
+
+wday2 <- function(x) wday(x, label = TRUE)
+mod3 <- lm(n ~ wday2(date) * term(date), data = daily)
+```
+
+```{r}
+# Using a non-linear model to fit to the data
+library(splines)
+mod <- MASS::rlm(n ~ wday * ns(date, 5), data = daily)
+
+daily %>%
+  data_grid(wday, date = seq_range(date, n = 13)) %>%
+  add_predictions(mod) %>%
+  ggplot(aes(date, pred, color = fct_reorder2(wday, date, pred))) + 
+  geom_line() + 
+  geom_point() + 
+  labs(color = "Weekday", title = "Predicted flights from NYC by day of week over the course of the year")
+```
+
+```{r}
+(daily)
+```
+
+
+#### Section 24.3.5: Exercises
+```{r}
+# Question 1
+# jan 20, may 26, sept 1st
+
+# On the days of January 20th 2013, May 26th 2013, and September 1st 2013 There were windspeeds that peaked at 39mph, 30mph, and 16 mph at the hottest times of the days which include 54, 66, and 84 degrees respectively. According to the National Weather Service, these wind speeds are categorized as moderate, low, and very low threat to life and property from High Wind. According to skyscanner.com, crosswinds at about 34 - 40 mph are generally prohibitive of take-off and landing. Tropical Storms are categorized by the Saffir-Simpson scale to hvae 39-73 mph winds and form in warm weather. I believe the evidence suggests that on these days preventative measures were taken to prevent takeoffs and landings during strong crosswinds and possible tropical storms. These conditions can generalize to another year by categorizing the wind speeds and temperature and factoring these variables into further models. 
+
+
+```
+
+```{r}
+# Quesion 2
+# What do the three days with high positive residuals represent? How would these days generalise to another year?
+
+# These are days when the actual number of flights were much greater than the predicted number of flights. These flights appear to be seasonal given that they are during the same Thanksgiving and Christmas season. I believe these flights are return trips from Thanksgiving and Christmas. These could be generalised by creating a term that includes the period after Thanksgiving and the period after Christmas in order to break the dates into terms that include spring, summer, fall, Thanksgiving, and Christmas before fitting a model.
+
+daily %>%
+  slice_max(n = 3, resid)
+
+```
+
+
+
+```{r}
+# Quesion 3
+# Split the wday variable into terms but only for Saturdays. Include Thurs, Fri, Sat-summer, Sat-spring, Sat-fall.
+# How does this model compare with the model with every combination of wday and term?
+# 
+# Term for Sun, Mon, Tues, Wed, Thurs, Friday, Saturday
+
+# term <- function(date) {
+#   cut(date,
+#       breaks = ymd(20130101, 20130605,20130825, 20140101), 
+#       labels = c("spring", "summer", "fall"))
+# }
+# 
+# daily <- daily %>%
+#   mutate(term = term(date))
+# 
+# daily %>%
+#   filter(wday == "Sat") %>%
+#   ggplot(aes(date, n, color = term)) +
+#   geom_point(alpha = 1/3) +
+#   geom_line() +
+#   scale_x_date(NULL, date_breaks = "1 month", date_labels = "%b")
+```
+
+```{r}
+# Question 3.1
+# ymd(20130101, 20130605,20130825, 20140101)
+
+# Sun: 1
+# Mon: 2
+# Tue: 3
+# Wed: 4
+# Thur:5
+# Fri: 6
+# Sat: 7
+
+daily
+offset_week_number = 0
+day_of_week_number = 1
+daily[["date"]][[offset_week_number + day_of_week_number]]
+daily[["wday"]][[offset_week_number + day_of_week_number]]
+wday(daily[["date"]][[offset_week_number + day_of_week_number]])
+
+# breaks = ymd(20130101, 20130605,20130825, 20140101), 
+# wday(daily[["date"]])
+ 
+wterm <- function(date) {
+  cut(wday(date),
+      breaks = c(0,1,2,3,4,5,6,7),
+      labels = c("Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat")
+  )
+}
+
+daily_wterm <- daily %>% mutate(wterm = wterm(date))
+```
+
+
+```{r}
+# Question 3.1
+
+
+
+daily_wterm_Sat_spring <- daily_wterm %>% filter(wterm == "Sat") %>% filter(term == "spring") %>% mutate(wterm = "Sat-spring")
+daily_wterm_Sat_summer <- daily_wterm %>% filter(wterm == "Sat") %>% filter(term == "summer") %>% mutate(wterm = "Sat-summer")
+daily_wterm_Sat_fall <- daily_wterm %>% filter(wterm == "Sat") %>% filter(term == "fall") %>% mutate(wterm = "Sat-fall")
+daily_wterm_not_Sat <- daily_wterm %>% filter(wterm != "Sat")
+
+# (daily_wterm_not_Sat)
+# (daily_wterm_Sat_spring)
+# (daily_wterm_Sat_summer)
+# (daily_wterm_Sat_fall)
+
+daily_wterm_final <- add_row(daily_wterm_not_Sat, daily_wterm_Sat_spring)
+daily_wterm_final <- daily_wterm_final %>% arrange(date)
+
+daily_wterm_final <- add_row(daily_wterm_final, daily_wterm_Sat_summer)
+daily_wterm_final <- daily_wterm_final %>% arrange(date)
+
+daily_wterm_final <- add_row(daily_wterm_final, daily_wterm_Sat_fall)
+daily_wterm_final <- daily_wterm_final %>% arrange(date)
+
+(daily_wterm_final)
+
+```
+
+```{r}
+# daily_wterm_final %>% mutate(wterm_numeric = as.numeric(as.factor(wterm))) %>% group_by(wterm_numeric) %>% summarise()
+daily_wterm_final %>% mutate(wterm_numeric = as.numeric(as.factor(wterm)))
+
+```
+
+```{r}
+# daily_wterm_final %>% add_residuals(mod4) %>%
+#   ggplot(aes(date, resid)) + 
+#   geom_line(alpha = 0.75)
+```
+
+
+```{r}
+# These are not residuals are not correct. The predictions are the default predictions that are are added from daily_wterm_final based upon a change in date and a constant in wterm. Hence they are all the same. 
+
+
+# # Comparing model 2: mod2 <- lm(n ~ wday * term, data = daily)
+# Comparing model 4: mod4 <- lm(n ~ as.numeric(as.factor(wterm)), data = daily_wterm_final)
+
+# daily_wterm_final 
+# 
+# daily_wterm_final %>%
+#   data_grid(wterm, date = seq_range(date, n = 13)) %>%
+#   add_predictions(mod4)
+# 
+# daily_wterm_final %>%
+#   data_grid(wterm, date = seq_range(date, n = 13)) %>%
+#   add_predictions(mod4) %>%
+#   ggplot(aes(date, pred, color = fct_reorder2(wterm, date, pred))) +
+#   geom_line() +
+#   geom_point()
+```
+
+
+```{r}
+# daily %>%
+#   gather_residuals(without_term = mod1, with_term = mod2, with_new_term = mod4) %>%
+#   ggplot(aes(date, resid, color = model)) + 
+#   geom_line(alpha = 0.75)
+
+# daily %>%
+#   data_grid(term, date = seq_range(date, n = 13)) %>%
+#   add_predictions(mod3) %>%
+#   ggplot(aes(date, pred, color = fct_reorder2(term, date, pred))) +
+#   geom_line() +
+#   geom_point()
+
+# mod4 <- lm(n ~ wday2(date) * as.numeric(as.factor(wterm)), data = daily_wterm_final)
+```
+
+
+```{r}
+daily_wterm_final
+```
+
+
+
+
+
+```{r}
+mod1 <- lm(n ~ wday, data = daily) 
+mod2 <- lm(n ~ wday * term, data = daily)
+# mod4 <- lm(n ~ wday * as.numeric(as.factor(wterm)), data = daily_wterm_final)
+mod4 <- lm(n ~ wterm, data = daily_wterm_final)
+
+daily %>%
+  gather_residuals(without_term = mod1, with_term = mod2) %>%
+  ggplot(aes(date, resid, color = model)) + 
+  geom_line(alpha = 0.75)
+
+daily_gather_residuals <- daily %>%
+  gather_residuals(without_term = mod1, with_term = mod2) %>% filter(model == "with_term")
+(daily_gather_residuals)
+
+
+daily_wterm_final_mod4_pred_resid <- daily_wterm_final %>% add_predictions(mod4, "n_pred") %>% add_residuals(mod4) %>% select(date, n, n_pred, resid, everything())
+(daily_wterm_final_mod4_pred_resid)
+
+ggplot() + 
+  geom_jitter(aes(daily_wterm_final_mod4_pred_resid$date, daily_wterm_final_mod4_pred_resid$resid), color = "darkblue") + 
+  geom_line(aes(daily_wterm_final_mod4_pred_resid$date, daily_wterm_final_mod4_pred_resid$resid), color = "darkblue") +
+  geom_jitter(aes(daily_gather_residuals$date, daily_gather_residuals$resid), color = "red") + 
+  geom_line(aes(daily_gather_residuals$date, daily_gather_residuals$resid), color = "red") 
+
+ggplot() +
+  geom_jitter(aes(daily_gather_residuals$date, daily_gather_residuals$resid), color = "red") +
+  geom_line(aes(daily_gather_residuals$date, daily_gather_residuals$resid), color = "red")
+
+ggplot() + 
+  geom_jitter(aes(daily_wterm_final_mod4_pred_resid$date, daily_wterm_final_mod4_pred_resid$resid), color = "darkblue") + 
+  geom_line(aes(daily_wterm_final_mod4_pred_resid$date, daily_wterm_final_mod4_pred_resid$resid), color = "darkblue") 
+
+
+
+
+# Summary: I had anticipated that creating a model where the Saturdays where separated into Sat-spring, Sat-summer, & Sat-fall would have grouped the residuals tighter about zero based upon the trend of the residuals varying less in model 2 when a term was added to the weekday versus the lone model predicting the count based upon the weekday alone. However, after successfully creating an appropriate naming scheme where each date corresponds to a day of the week and each Saturday corresponds to every combination of Saturday and term (spring, summer, & fall), the residuals are greater in amplitude from zero than that in model 2 about the periods following July and January. However, there is a tighter grouping of residuals that cluster closer in amplitude to zero from the periods prior to April to approximately June and from approximately September to the end of the 2013 year. Significant outliers still remain in the residuals of both model 2 and model 4, however.
+```
+
+```{r}
+# Question 4.1
+public_holidays_labels <- c("New Year's Day", "Martin Luther King Jr. Day", "President's Day", "Memorial Day", "Independence Day", "Labor Day", "Columbus Day", "Veterans Day", "Thanksgiving Day", "Christmas Day")
+public_holidays <- c("2013-01-01", "2013-01-21", "2013-02-18", "2013-05-27", "2013-07-04", "2013-09-02", "2013-10-14", "2013-11-11", "2013-11-28", "2013-12-25")
+daily_wterm_final[1,]
+
+
+mutate_public_holidays <- function(data, public_holidays, public_holidays_labels) {
+  
+  return_data = tibble(data[1,])
+  for (holiday in seq_along(public_holidays)) {
+    
+    # cat(public_holidays[[holiday]])
+    # cat("\n")
+    # cat(public_holidays_labels[[holiday]])
+    # cat("\n")
+    
+    # print( data %>% filter(date %in% public_holidays) %>% filter(date == public_holidays[[holiday]]) %>% mutate(wterm = public_holidays_labels[[holiday]]))
+    
+    return_data <- add_row(return_data, data %>% filter(date %in% public_holidays) %>% filter(date == public_holidays[[holiday]]) %>% mutate(wterm = public_holidays_labels[[holiday]]))
+    if (near(holiday, 1)){
+      return_data <- anti_join(return_data, data[1,])  
+    }
+    # print(return_data[holiday,])
+    data <- anti_join(data, return_data[holiday, ], by = "date")
+    data <- add_row(data, return_data[holiday,])
+    data <- data %>% arrange(date)
+    
+    # print(return_data)
+    
+    
+    # data <- data %>% filter(date %in% public_holidays) %>% filter(date == public_holidays[[holiday]] %>% mutate(wterm = public_holidays_labels[[holiday]]))
+  }
+  # print(anti_join(daily_wterm_final, return_data, by = "date"))
+  
+  # daily_wterm_final_drop_public_holidays <- anti_join(daily_wterm_final, return_data, by = "date")
+    
+    # print(semi_join(daily_wterm_final_drop_public_holidays, return_data))
+  print(return_data)
+  return(data)
+}
+
+# daily_wterm_final %>% filter( date %in% public_holidays) %>% filter(date == public_holidays[[1]]) %>% mutate(wterm = public_holidays_labels[[1]])
+
+daily_wterm_public_holidays_final <- mutate_public_holidays(daily_wterm_final, public_holidays, public_holidays_labels)
+
+
+daily_wterm_public_holidays_final %>% filter( date %in% public_holidays)
+(daily_wterm_public_holidays_final)
+```
+
+```{r}
+# Question 4.2
+mod1 <- lm(n ~ wday, data = daily) 
+mod2 <- lm(n ~ wday * term, data = daily)
+# mod4 <- lm(n ~ wday * as.numeric(as.factor(wterm)), data = daily_wterm_final)
+mod4 <- lm(n ~ wterm, data = daily_wterm_final)
+mod5 <- lm(n ~ wterm, data = daily_wterm_public_holidays_final)
+
+# daily %>%
+#   gather_residuals(without_term = mod1, with_term = mod2) %>%
+#   ggplot(aes(date, resid, color = model)) + 
+#   geom_line(alpha = 0.75)
+
+daily_gather_residuals <- daily %>%
+  gather_residuals(without_term = mod1, with_term = mod2) %>% filter(model == "with_term")
+(daily_gather_residuals)
+
+daily_wterm_final_mod4_pred_resid <- daily_wterm_final %>% add_predictions(mod4, "n_pred") %>% add_residuals(mod4) %>% select(date, n, n_pred, resid, everything())
+(daily_wterm_final_mod4_pred_resid)
+
+daily_wterm_public_holidays_final_mod5_pred_resid <- daily_wterm_public_holidays_final %>% add_predictions(mod5, "n_pred") %>% add_residuals(mod5) %>% select(date, n, n_pred, resid, everything())
+
+alpha_level = 1
+jitter_level = 2
+
+ggplot() + 
+  geom_jitter(aes(daily_wterm_final_mod4_pred_resid$date, daily_wterm_final_mod4_pred_resid$resid, alpha = alpha_level), color = "darkblue", width = jitter_level, show.legend = FALSE) + 
+  geom_line(aes(daily_wterm_final_mod4_pred_resid$date, daily_wterm_final_mod4_pred_resid$resid, alpha = alpha_level), color = "darkblue", show.legend = FALSE) +
+  geom_jitter(aes(daily_gather_residuals$date, daily_gather_residuals$resid), color = "red", alpha = alpha_level,  width = jitter_level, show.legend = FALSE) + 
+  geom_line(aes(daily_gather_residuals$date, daily_gather_residuals$resid), color = "red", alpha = alpha_level, show.legend = FALSE) +
+  geom_jitter(aes(daily_wterm_public_holidays_final_mod5_pred_resid$date, daily_wterm_public_holidays_final_mod5_pred_resid$resid, alpha = alpha_level), color = "darkgreen",  width = jitter_level, show.legend = FALSE) +
+  geom_line(aes(daily_wterm_public_holidays_final_mod5_pred_resid$date, daily_wterm_public_holidays_final_mod5_pred_resid$resid, alpha = alpha_level), color = "darkgreen", show.legend = FALSE) +
+  labs(title = "A Collection of Model Residuals From Count of Daily NYC Flight Predictions", subtitle = "Models: 2, 4, & 5\nRespective Colors: Blue, Red, Green", x = "Date", y = "Residual", show.legend = FALSE)
+
+ggplot() +
+  geom_jitter(aes(daily_gather_residuals$date, daily_gather_residuals$resid), color = "red") +
+  geom_line(aes(daily_gather_residuals$date, daily_gather_residuals$resid), color = "red") +
+  labs(title = "Model 2 Residuals From Count of Daily NYC Flight Predictions", x = "Date", y = "Residual")
+
+ggplot() + 
+  geom_jitter(aes(daily_wterm_final_mod4_pred_resid$date, daily_wterm_final_mod4_pred_resid$resid), color = "darkblue") + 
+  geom_line(aes(daily_wterm_final_mod4_pred_resid$date, daily_wterm_final_mod4_pred_resid$resid), color = "darkblue") +
+  labs(title = "Model 4 Residuals From Count of Daily NYC Flight Predictions", x = "Date", y = "Residual")
+
+ggplot() +
+  geom_jitter(aes(daily_wterm_public_holidays_final_mod5_pred_resid$date, daily_wterm_public_holidays_final_mod5_pred_resid$resid), color = "darkgreen") +
+  geom_line(aes(daily_wterm_public_holidays_final_mod5_pred_resid$date, daily_wterm_public_holidays_final_mod5_pred_resid$resid), color = "darkgreen") +
+  labs(title = "Model 5 Residuals From Count of Daily NYC Flight Predictions", x = "Date", y = "Residual")
+
+```
+```{r}
+# Question 4.3
+# Summary: The addition of public holidays reduced the residuals to zero during those public holidays in comparison to models 4 & 2 which don't include holidays or seasonal Saturdays respectively. The clustering of residuals, the amplitude of residuals, & the presence of significant outliers remains otherwise unchanged between models 4 & 5. Model 5 appears to be the strongest predictor of the number of daily nyc flights.
+```
+
+```{r}
+# Quesion 5
+
+daily
+offset_week_number = 0
+day_of_week_number = 200
+
+daily[["date"]][[offset_week_number + day_of_week_number]]
+# daily[["wday"]][[offset_week_number + day_of_week_number]]
+
+month(daily[["date"]][[offset_week_number + day_of_week_number]])
+
+```
+
+
+```{r 5.1 }
+wterm <- function(date) {
+  cut(month(date),
+      breaks = c(0,1,2,3,4,5,6,7,8,9,10,11,12),
+      labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+  )
+}
+
+daily_wterm_month <- daily %>% mutate(wterm = wterm(date))
+(daily_wterm_month)
+```
+
+
+```{r 5.2}
+mod6 <- lm(n ~ wday * wterm, data = daily_wterm_month)
+
+daily_wterm_month_mod6_pred_resid <- daily_wterm_month %>% add_predictions(mod6, "n_pred") %>% add_residuals(mod6) %>% select(date, n, n_pred, resid, everything())
+(daily_wterm_month_mod6_pred_resid)
+
+alpha_level = 1
+jitter_level = 2
+
+ggplot() +
+  geom_jitter(aes(daily_wterm_month_mod6_pred_resid$date, daily_wterm_month_mod6_pred_resid$resid), color = "gold") +
+  geom_line(aes(daily_wterm_month_mod6_pred_resid$date, daily_wterm_month_mod6_pred_resid$resid), color = "gold") +
+  labs(title = "Model 6 Residuals From Count of Daily NYC Flight Predictions", x = "Date", y = "Residual")
+
+```
+```{r 5.3}
+ggplot() + 
+  geom_jitter(aes(daily_wterm_final_mod4_pred_resid$date, daily_wterm_final_mod4_pred_resid$resid, alpha = alpha_level), color = "darkblue", width = jitter_level, show.legend = FALSE) + 
+  geom_line(aes(daily_wterm_final_mod4_pred_resid$date, daily_wterm_final_mod4_pred_resid$resid, alpha = alpha_level), color = "darkblue", alpha = alpha_level, show.legend = FALSE) +
+  geom_jitter(aes(daily_gather_residuals$date, daily_gather_residuals$resid, alpha = alpha_level), color = "red", width = jitter_level, show.legend = FALSE) + 
+  geom_line(aes(daily_gather_residuals$date, daily_gather_residuals$resid, alpha = alpha_level), color = "red", show.legend = FALSE) +
+  geom_jitter(aes(daily_wterm_public_holidays_final_mod5_pred_resid$date, daily_wterm_public_holidays_final_mod5_pred_resid$resid, alpha = alpha_level), color = "darkgreen",  width = jitter_level, show.legend = FALSE) +
+  geom_line(aes(daily_wterm_public_holidays_final_mod5_pred_resid$date, daily_wterm_public_holidays_final_mod5_pred_resid$resid, alpha = alpha_level), color = "darkgreen", show.legend = FALSE) +
+  geom_jitter(aes(daily_wterm_month_mod6_pred_resid$date, daily_wterm_month_mod6_pred_resid$resid, alpha = alpha_level), color = "gold", width = jitter_level, show.legend = FALSE) +
+  geom_line(aes(daily_wterm_month_mod6_pred_resid$date, daily_wterm_month_mod6_pred_resid$resid, alpha = alpha_level), color = "gold", show.legend = FALSE) +
+  labs(title = "Collection of Model Residuals From Count of Daily NYC Flight Predictions", subtitle = "Models: 2, 4, & 5\nRespective Colors: Blue, Red, Green", x = "Date", y = "Residual", show.legend = FALSE)
+
+ggplot() +
+  geom_jitter(aes(daily_gather_residuals$date, daily_gather_residuals$resid), color = "red") +
+  geom_line(aes(daily_gather_residuals$date, daily_gather_residuals$resid), color = "red") +
+  labs(title = "Model 2 Residuals From Count of Daily NYC Flight Predictions", x = "Date", y = "Residual")
+
+ggplot() + 
+  geom_jitter(aes(daily_wterm_final_mod4_pred_resid$date, daily_wterm_final_mod4_pred_resid$resid), color = "darkblue") + 
+  geom_line(aes(daily_wterm_final_mod4_pred_resid$date, daily_wterm_final_mod4_pred_resid$resid), color = "darkblue") +
+  labs(title = "Model 4 Residuals From Count of Daily NYC Flight Predictions", x = "Date", y = "Residual")
+
+ggplot() +
+  geom_jitter(aes(daily_wterm_public_holidays_final_mod5_pred_resid$date, daily_wterm_public_holidays_final_mod5_pred_resid$resid), color = "darkgreen") +
+  geom_line(aes(daily_wterm_public_holidays_final_mod5_pred_resid$date, daily_wterm_public_holidays_final_mod5_pred_resid$resid), color = "darkgreen") +
+  labs(title = "Model 5 Residuals From Count of Daily NYC Flight Predictions", x = "Date", y = "Residual")
+
+ggplot() +
+  geom_jitter(aes(daily_wterm_month_mod6_pred_resid$date, daily_wterm_month_mod6_pred_resid$resid), color = "gold") +
+  geom_line(aes(daily_wterm_month_mod6_pred_resid$date, daily_wterm_month_mod6_pred_resid$resid), color = "gold") +
+  labs(title = "Model 6 Residuals From Count of Daily NYC Flight Predictions", x = "Date", y = "Residual")
+```
+```{r 5 Answer}
+# It is not very helpful to fit a day of week effect that varies by month (i.e. n ~ wday * month) because the effect of the number of flights per month is already captured within the predictions based on the number of flights per weekday. This model has the tightest groupings with respect to the residuals. However, this indicates that the model is overfit to the data and will not generalize well to days beyond those that do not appear in the current dataset. 
+```
+
+```{r}
+# Quesion 6
+# What would you expect the model n ~ wday + ns(date, 5) to look like? Knowing what you know about the data, why would you expect it to be not particularly effective?
+# I expect the model n ~ wday + ns(date, 5) to look like smooth polynomial lines separated by weekday with a 5th degree polynomial. I expect it not to be particularly effective because outside the bounds of the data, a Taylor Series polynomial will spread towards the limits of negative and positive infinity. This dillutes accurate predictions. Furthermore, this model does not take into account the effects of seasonality within the data nor trends that are present due to pubilc holidays which require prior domain knowledge to incorporate into the model.
+
+mod7 <- lm(n ~ wday * ns(date, 5), data = daily)
+
+daily %>%
+  data_grid(wday, date = seq_range(date, n = 13)) %>%
+  add_predictions(mod7) %>%
+  ggplot(aes(date, pred, color = fct_reorder2(wday, date, pred))) + 
+  geom_line() + 
+  geom_point() + 
+  labs(color = "Weekday", title = "Predicted flights from NYC by day of week over the course of the year")
+
+```
+
+
+```{r}
+# Quesion 7
+# We hypothesised that people leaving on Sundays are more likely to be business travellers who need to be somewhere on Monday. Explore that hypothesis by seeing how it breaks down based on distance and time: if it’s true, you’d expect to see more Sunday evening flights to places that are far away.
+
+nycflights13::flights
+```
+```{r 7.1}
+wday2 <- function(x) wday(x, label = TRUE)
+
+daily_business <- nycflights13::flights
+daily_business <- daily_business %>% mutate(date = make_date(year, month, day)) %>% select(date, everything())
+# (daily_business)
+
+daily_business <- daily_business %>% mutate(wday = wday2(date)) %>% select(date, wday, everything())
+
+# daily_business <- daily_business %>% filter(wday == "Sun") %>% mutate(flight_id = row_number()) %>% select(flight_id, date, wday, flight, tailnum, distance, everything())
+
+daily_business <- daily_business %>% select(date, wday, flight, tailnum, distance, everything())
+daily_business %>% count(wday)
+```
+
+```{r 7.2}
+daily_business[1,]
+```
+
+
+
+
+```{r 7.3}
+daily_business_sun <- daily_business %>% filter(wday == "Sun")
+daily_business_sun <- daily_business_sun %>% mutate(flight_id = row_number()) %>% select(flight_id, everything())
+(daily_business_sun)
+```
+
+
+```{r 7.4}
+# daily_business_mon
+# daily_business_tues
+# daily_business_wed
+# daily_business_thurs
+# daily_business_fri
+# daily_business_sat
+
+
+
+# ggplot(daily_business) +
+#   geom_point(aes(date, distance)) + 
+  # facet_wrap(~wday)
+
+daily_business_flight_id <- daily_business %>% mutate(flight_id = row_number()) %>% select(flight_id, everything())
+daily_business_thousand <- daily_business_flight_id %>% filter(flight_id <= 1000)
+
+# (daily_business)
+(daily_business_thousand)
+
+```
+
+
+```{r 7.5}
+ggplot(daily_business_thousand) +
+  geom_point(aes(flight_id, distance)) + 
+  facet_wrap(~wday)
+  
+```
+
+
+```{r 7.6}
+weekday <- c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+weekday[[1]]
+separate_wday_and_mutate_row_number <- function(flight_data, day) {
+    current_day <- day
+    return_flight_data <- flight_data %>% filter(wday == current_day) %>% mutate(flight_id = row_number()) %>% select(flight_id, everything())
+    return(return_flight_data)
+}
+daily_business_sun <- separate_wday_and_mutate_row_number(daily_business, "Sun")
+daily_business_mon <- separate_wday_and_mutate_row_number(daily_business, "Mon")
+daily_business_tue <- separate_wday_and_mutate_row_number(daily_business, "Tue")
+daily_business_wed <- separate_wday_and_mutate_row_number(daily_business, "Wed")
+daily_business_thu <- separate_wday_and_mutate_row_number(daily_business, "Thu")
+daily_business_fri <- separate_wday_and_mutate_row_number(daily_business, "Fri")
+daily_business_sat <- separate_wday_and_mutate_row_number(daily_business, "Sat")
+
+number_of_flights <- 100
+
+daily_business_sun <- daily_business_sun %>% filter(flight_id < number_of_flights)
+daily_business_mon <- daily_business_mon %>% filter(flight_id < number_of_flights)
+daily_business_tue <- daily_business_tue %>% filter(flight_id < number_of_flights)
+daily_business_wed <- daily_business_wed %>% filter(flight_id < number_of_flights)
+daily_business_thu <- daily_business_thu %>% filter(flight_id < number_of_flights)
+daily_business_fri <- daily_business_fri %>% filter(flight_id < number_of_flights)
+daily_business_sat <- daily_business_sat %>% filter(flight_id < number_of_flights)
+
+alpha_level = 0.6
+
+ggplot() +
+  geom_jitter(aes(daily_business_sun$flight_id, daily_business_sun$distance), color = "red") 
+
+
+
+daily_business %>% group_by(wday) %>% summarise(mean(distance), count = n())
+# The mean distance of flights on Sundays is 1056.966 miles with a count of 46,357 flights. Except for Saturday, the mean distance is greater with fewer flights than any other day of the week. This means that the flights on Sunday were traveling farther on average per flight. 
+```
+
+
+```{r}
+# Examine the distance of Sunday Evening flights. 
+daily_business_sun_hour <- daily_business %>% filter(wday == "Sun") %>% select(distance, hour, everything()) %>% arrange(hour)
+daily_business_sun_hour_id <- daily_business_sun_hour %>% mutate(flight_id = row_number()) %>% select(flight_id, distance, hour, everything())
+(daily_business_sun_hour)
+```
+
+```{r}
+ggplot(daily_business_sun_hour_id) +
+  geom_freqpoly(aes(distance))
+```
+
+```{r}
+daily_business_sun_hour_distance_greater_than_1000 <- daily_business_sun_hour %>% filter(distance > 1000)
+```
+
+```{r}
+# daily_business_sun_hour$flight_id
+ggplot(daily_business_sun_hour_id) + 
+  geom_point(aes(flight_id, distance)) + 
+  facet_wrap(~hour)
+
+ggplot(daily_business_sun_hour_id) +
+  geom_freqpoly(aes(distance))
+
+ggplot(daily_business_sun_hour_distance_greater_than_1000) + 
+  geom_freqpoly(aes(hour), bins = 12)
+```
+```{r 7 Answer}
+# From the facet-wrapped graph above, it is clear that there are high-distance flights during the hours of 9, 10, & 13 on Sundays during the year of 2013 from NYC.
+# After closer inspection, their is a significant impulse in the number of flights for distances that are greater than 1000 miles. Considering flights that are greater than 1000 miles are long-distance flights, and upon examining the frequency of long-distance flights with respect to hour of the day, it is clear that there is a bi-modal distribution of flights with peaks before and after evening. I cannot suggest that the distribution is right-skewed, which would indicate that the majority of long-distance flights are evening flights. Although the presence of a significant portion of long-distance flights during evening hours does exist, this portion is not greater than the number of flights during other hours on the same day. 
+```
+
+```{r}
+# Quesion 8
+# It’s a little frustrating that Sunday and Saturday are on separate ends of the plot. Write a small function to set the levels of the factor so that the week starts on Monday.
+reorder_wday <- function(data) {
+  new_order <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+  data$wday <- ordered(data$wday, levels = new_order)
+  return(data)
+}
+daily <- reorder_wday(daily)
+```
+```{r}
+# Ordering factors
+# ---------------- #
+# x1 <- c("Dec", "Apr", "Jan", "Mar")
+# 
+# month_levels <- c(
+#   "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+#   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+# )
+# y1 <- factor(x1, levels = month_levels)
+# y1
+# factor(x1) %>% fct_inorder()
+# wdays_reordered <- ordered(daily$wday, levels = new_order)
+# wdays_reordered
+```
+
+
+## Section 24.5: Learning more about models
+```{r}
+library(modelr)
+library(tidyverse)
+if(!require("gapminder")) install.packages("gapminder")
+library(gapminder)
+```
+
+
+## Section 25.2: gapminder
+```{r}
+gapminder
+```
+
+```{r}
+# How does life expectancy change over time for each country?
+gapminder %>%
+  ggplot(aes(year, lifeExp, group = country)) + 
+  geom_line(alpha = 1/3)
+```
+```{r}
+nz <- filter(gapminder, country == "New Zealand")
+nz %>%
+  ggplot(aes(year, lifeExp)) +
+  geom_line() + 
+  ggtitle("Full data = ")
+
+nz_mod <- lm(lifeExp ~ year, data = nz)
+nz %>%
+  add_predictions(nz_mod) %>%
+  ggplot(aes(year, pred)) + 
+  geom_line() + 
+  ggtitle("Linear trend + ")
+
+nz %>%
+  add_residuals(nz_mod) %>%
+  ggplot(aes(year, resid)) +
+  geom_hline(yintercept = 0, color = "white", size = 3) + 
+  geom_line() + 
+  ggtitle("Remaining pattern")
+
+```
+
+#### Section 25.2.1: Nested Data
+
+```{r}
+gapminder
+```
+
+
+```{r}
+by_country <- gapminder %>%
+  group_by(country, continent) %>%
+  nest()
+```
+
+```{r}
+by_country
+```
+
+```{r}
+by_country$data[[1]]
+```
+
+
+#### Section 25.2.2: List-columns
+```{r}
+country_model <- function(df) {
+  lm(lifeExp ~ year, data = df)
+}
+```
+
+```{r}
+models <- map(by_country$data, country_model)
+```
+
+
+```{r}
+by_country <- by_country %>%
+  mutate(model = map(data, country_model))
+by_country
+```
+
+```{r}
+by_country %>%
+ filter(continent == "Europe")
+```
+
+```{r}
+by_country %>%
+  arrange(continent, country)
+```
+
+
+#### Section 25.2.3: Unnesting
+```{r}
+by_country <- by_country %>%
+  mutate(
+    resids = map2(data, model, add_residuals)
+  )
+```
+
+```{r}
+resids <- unnest(by_country, resids)
+resids
+```
+
+```{r}
+resids %>%
+  ggplot(aes(year, resid)) +
+  geom_line(aes(group = country ),alpha = 1/3) +
+  geom_smooth(se = FALSE) + 
+  facet_wrap(~continent)
+```
+
+#### Section 25.2.4: Model Quality
+
+
+```{r}
+broom::glance(nz_mod)
+test_tb <- by_country %>% mutate(glance = map(model, broom::glance)) 
+test_tb
+# %>% unnest(glance)
+```
+
+
+
+
+```{r}
+broom::glance(nz_mod)
+```
+```{r}
+by_country
+```
+
+
+```{r}
+by_country %>%
+  mutate(glance = map(model, broom::glance)) %>%
+  unnest(glance)
+```
+
+```{r}
+glance <- by_country %>%
+  mutate(glance = map(model, broom::glance)) %>%
+  unnest(glance, .drop = TRUE)
+(glance)
+```
+
+```{r}
+glance %>%
+  arrange(r.squared)
+```
+
+```{r}
+glance %>%
+  ggplot(aes(continent, r.squared)) +
+  geom_jitter(width = 0.5)
+```
+
+```{r}
+bad_fit <- filter(glance, r.squared < 0.25)
+
+gapminder %>%
+  semi_join(bad_fit, by = "country") %>%
+  ggplot(aes(year, lifeExp, color = fct_reorder2(country, year, lifeExp))) +
+  geom_line() + 
+  labs(color = "Country")
+```
+
+#### Section 25.2.5: Exercises
+```{r}
+# A linear trend seems to be slightly too simple for the overall trend. Can you do better with a quadratic polynomial? How can you interpret the coefficients of the quadratic? (Hint you might want to transform year so that it has mean zero.)
+
+# zero out the year
+
+# Add a "zeroed-year" column to each data tibble: This is a hinted suggestion. I do not yet see the purpose.
+by_country_unnested <- by_country %>% unnest(data)
+```
+
+
+```{r}
+by_country_unnested %>% group_by(country, continent) %>% mutate(mean_zero_year = mean((year - mean(year - min(year))) - min(year))) # Proof that mean of the year is zero
+by_country_mean_zero_year_nest <- by_country_unnested %>% group_by(country, continent) %>% mutate(mean_zero_year = (year - mean(year - min(year))) - min(year)) %>% nest()
+(by_country_mean_zero_year_nest$data[[1]])
+# %>% mutate(mean_zero_year = mean(year))
+```
+
+
+```{r}
+library(splines)
+
+power = 3
+
+qmod <- MASS::rlm(lifeExp ~ ns(mean_zero_year, power), by_country_mean_zero_year_nest$data[[1]])
+
+by_country_mean_zero_year_nest
+
+# create a function for MASS::rlm
+quadratic_model <- function(df) {
+  MASS::rlm(lifeExp ~ ns(mean_zero_year, power), df)  
+}
+
+by_country_mean_zero_year_nest_qmod <- by_country_mean_zero_year_nest %>% mutate(qmod = map(data, quadratic_model))
+
+```
+
+```{r}
+by_country_mean_zero_year_nest_qmod_qresids <- by_country_mean_zero_year_nest_qmod %>% mutate(qresids = map2(data, qmod, add_residuals))
+(by_country_mean_zero_year_nest_qmod_qresids)
+```
+
+```{r}
+# Question 1
+qresids <- by_country_mean_zero_year_nest_qmod_qresids %>% unnest(country, qresids)
+qresids$qmod[[1]]
+# The coefficients are providing a weight to the Taylor Series polynomial for each degree of the variable mean_zero_year.
+```
+```{r}
+# Question 1
+ggplot(qresids) +
+  geom_line(aes(year, resid)) + 
+  geom_smooth(aes(year, resid), se = FALSE)
+```
+
+```{r}
+# Quesion 2
+# if(!require("ggbeeswarm")) install.packages("ggbeeswarm")
+# library(ggbeeswarm)
+
+
+
+```
+
+```{r}
+# Quesion 3
+
+```
+
+
+
+
+
+## Section 25.3: List-columns
+```{r}
+# stringr::str_split() takes an atomic vector and returns a list
+df <- tribble(
+  ~x1,
+  "a,b,c",
+  "d,e,f,g"
+)
+
+df_new <- df %>% mutate(x2 = stringr::str_split(x1, ","))
+(df_new)
+df_new$x2
+```
+
+```{r}
+# Unnest
+df_new %>% unnest(x2)
+```
+
+```{r}
+sim <- tribble(
+  ~f, ~params,
+  "runif", list(min = -1, max = 1),
+  "rnorm", list(sd = 5),
+  "rpois", list(lambda = 10)
+)
+
+sim %>%
+  mutate(sims = invoke_map(f, params, n = 10))
+```
+```{r}
+mtcars %>%
+  group_by(cyl) 
+```
+
+
+#### Section 25.4.5: Exercises
+```{r}
+# Question 1
+# Invokemap will take a tribble and return a list;
+# stringr::split will take an atomic vector and return a list;
+# list() will take an atomic vector and return a list.
+
+```
+
+```{r}
+# Quesion 2
+# quantile will return multiple values
+# glance will return multiple values
+```
+
+```{r}
+# Quesion 3
+# What's missing from the following dataframe? How does quantile() return that missing piece? Why isn't that helpful here?
+# The probabilities are missing from this dataframe. This is not helpful because the probability of the mpg given the cylinder is a fixed listed quantity. 
+
+mtcars %>%
+  group_by(cyl) %>%
+  summarise(q = list(quantile(mpg))) %>%
+  unnest(q)
+```
+
+```{r}
+# Quesion 4
+# Grouping on a column then summarising all into a list of list will create an series of rows where each observation contains one unique element from the group and every column on the same row contains a list of all elements that relate to the unique variable in the group on the same row. This is a helpful way to view individual column values that are grouped in reference to another column (i.e. all values of horsepower that relate to 4 or six cylinders)
+
+summarise_all_cylinders <- mtcars %>%
+  group_by(cyl) %>%
+  summarise_all(list(list))
+
+
+(summarise_all_cylinders)
+summarise_all_cylinders$mpg
+
+mtcars %>% group_by(cyl) %>% filter( cyl == 6)
+```
+
+## Section 25.5: Simplifying list-columns
+```{r}
+
+```
+
+#### Section 25.5.1: List to vector
+```{r}
+df <- tribble(
+  ~x,
+  letters[1:5],
+  1:3,
+  runif(5)
+)
+
+df %>% mutate(
+  type = typeof(x),
+  length = length(x)
+)
+```
+
+```{r}
+# Extract individual elements from a list:
+# mutate(variable = func); where "func" implements an atomic vector: map_dbl(), map_chr(), map_lgl(), or map_int()
+
+
+df <- tribble(
+  ~x, 
+  list(a = 1, b = 2),
+  list(a = 2, c = 4)
+)
+
+df %>% mutate(
+  a = map_dbl(x , "a"),
+  b = map_dbl(x, "b", .null = NA_real_),
+  c = map_dbl(x, "c", .null = NA_real_)
+)
+```
+#### Section 25.5.2: Unnesting
+```{r}
+tibble(x = 1:2, y = list(1:4, 1)) %>% unnest(y)
+```
+
+```{r}
+df1 <- tribble(
+  ~x, ~y, ~z,
+  1, c("a", "b"), 1:2,
+  2, "c", 3
+)
+df1
+```
+
+```{r}
+
+df1 %>% unnest(c(y,z))
+
+
+```
+
+```{r}
+df2 <- tribble(
+  ~x, ~y, ~z,
+  1, "a", 1:2,
+  2, c("b", "c"), 3
+)
+df2
+```
+
+```{r}
+# y & z do not have the same number of rows. This unnest will not display properly. 
+df2 %>% unnest(c(y, z))
+```
+
+
+#### Section 25.5.3: Exercises
+```{r}
+# Question 1
+# Why might the lengths() function be useful for creating atomic vector columns from list-columns?
+# The ".f" function must return a lengths - 1 vector of the appropriate type when creating atomic vector columns from list-columns. lengths() can be used to verify the correct return length. 
+
+
+```
+
+```{r}
+# Quesion 2
+# List the most common types of vector found in a data frame. What makes lists different?
+# character vectors
+# double vectors
+# logical vectors
+# integer vectors
+
+# Lists are different because they can be comprised of many different types of atomic vectors. Not all elements within a list need to be homogeneous. 
+
+```
+
+
+## Section 25.6: Making tidy data with broom
+```{r}
+# Returns a row for each model where each column gives a summary
+broom::glance(nz_mod)
+```
+
+
+
+
+```{r}
+# Returns a row for each coefficient in the model. 
+broom::tidy(nz_mod)
+```
+
+```{r}
+# broom::augment will add columns that describe summary statistics to each row in the data.
+broom::augment(nz_mod, nz)
+```
+# Section 26: Introduction
+
+
+#### Section 27.2.1: Exercises
+```{r}
+# Quesion 3
+# The R notebook contains a header file. The output of the cells in the R Notebook and the R Markdown file are both the same. Copying the output from the R Notebook to the R Markdown file allows the R Markdown file to behave as an R Notebook. 
+```
+
+
+## Section 27.3 Text formatting with Markdown
+```{r}
+# See "text-formatting-with-r-markdown.rmd"
+
+```
+
+#### Section 27.4.2: Chunk options
+```{r}
+# options include: 
+# eval = FALSE: prevents code from being evaluated
+# include = FALSE: runs the code, doesn't show the code or the results in the final document
+# echo = FALSE: prevents the code but not the results from appearing in the final file. 
+# message = FALSE or warnings = FALSE: prevents messages or warnings from appearing in the finished file.
+# results = 'hide': hides printed output;
+# fig.show = 'hide': hides plots;
+# error = TRUE: causes knitting to fail if there is a single error in the document. 
+```
+
+
+#### Section 27.4.3: Table
+```{r}
+mtcars[1:5,]
+```
+
+```{r}
+# Creating tables:
+knitr::kable(
+  mtcars[1:5, ],
+  caption = "A knitr kable"
+)
+```
+
+```{r}
+# Other options for tables:
+# Xtable
+# stargazer
+# pander
+# tables
+# ascii
+if(!require("xtable")) install.packages("xtable")
+library(xtable)
+xtable(mtcars[1:5, ])
+```
+
+```{r}
+# Xtable
+if(!require("xtable")) install.packages("xtable")
+library(xtable)
+xtable(mtcars[1:5, ], type = 'html')
+```
+
+```{r}
+# stargazer
+if(!require("stargazer")) install.packages("stargazer")
+library(stargazer)
+stargazer(mtcars, type = 'text')
+```
+```{r}
+# pander
+if(!require("pander")) install.packages("pander")
+library(pander)
+pander(mtcars)
+
+```
+
+```{r}
+# ascii
+if(!require("ascii")) install.packages("ascii")
+library(ascii)
+ascii(mtcars)
+```
+#### 27.4.4: Caching
+```{r raw_data}
+getwd()
+rawdata <- readr::read_csv("/Users/evanwoods/Github/lpa/r-for-data-science/data/EEG_Eye_State_Classification.csv")
+```
+```{r processed_data, cache = TRUE}
+# Example processing data based on "rawdata" which is cached. 
+# processed_data <- rawdata %>%
+#   filter(!is.na(import_var)) %>%
+#   mutate(new_variable = complicated_transformation(x,y,z))
+```
+```{r}
+# Track changes to the file: use "cache.extra" option
+```
+
+
+#### Section 27.4.5: Global Options
+```{r}
+# Set the global options for chunks
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE
+)
+```
+
+```{r}
+# Preparing a report
+knitr::opts_chunk$set(
+  echo = FALSE
+)
+```
+
+
+#### Section 27.4.6: Inline code
+```{r}
+comma <- function(x) format(x, digits = 2, big.mark = ",")
+comma(3452345)
+comma(.12358124331)
+```
+
+
+#### Section 27.4.7: Exercises
+```{r}
+# Question 1
+knitr::opts_chunk$set(
+  echo = FALSE
+)
+# How do diamond sizes vary by cut, color, and clarity?
+
+# Dodge will show the bars side by side
+ggplot(diamonds, aes(cut, fill = clarity)) + 
+  geom_bar(position = "dodge")
+
+```
+
+```{r}
+# Quesion 4
+# Set up a network of chunks where d depends on c and b, and both b and c depend on a. Have each chunk print lubridate::now(), set cache = TRUE, then verify your understanding of caching. 
+```
+
+
+## Section 27.5 Troubleshooting
+```{r}
+
+```
+
+
+# Section 28: Graphics for communication
+```{r}
+
+```
+
+## Section 28.4: Scales
+```{r}
+# Default scales shown behind the scenes.
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = class)) + 
+  scale_x_continuous() + 
+  scale_y_continuous() + 
+  scale_color_discrete()
+```
+
+```{r}
+# Overriding the default breaks: Notice the change on the y-axis.
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() + 
+  scale_y_continuous(breaks = seq(15, 40, by = 5))
+```
+
+```{r}
+# Changing the x-axis
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() + 
+  scale_y_continuous(breaks = seq(15, 40, by = 5)) + 
+  scale_x_continuous(breaks = seq(0, 10, by = 2)) # Altered the x-axis; 0 to 10 by 2.
+```
+
+```{r}
+# Removing numbers from the axes:
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point() + 
+  scale_x_continuous(labels = NULL) + 
+  scale_y_continuous(labels = NULL) 
+```
+
+```{r}
+# Note: axes and legends are called: guides
+# breaks and labels enable the control of legends.
+```
+
+```{r}
+presidential %>% 
+  mutate(id = 33 + row_number()) %>%
+  ggplot(aes(start, id)) + 
+  geom_point() +
+  geom_segment(aes(xend = end, yend = id)) +
+  scale_x_date(NULL, breaks = presidential$start, date_labels = "'%y") # breaks are set to a specific value. 
+# date_labels takes a format specification like parse_datetime()
+# date_breaks takes a string such as "2 years" or "2 days" or "1 month"
+```
+
+
+#### Section 28.4.2: Legend Layout
+```{r}
+# Use legend.position to change the position of the legend. 
+base <- ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = class))
+
+base + theme(legend.position = "left")
+base + theme(legend.position = "right")
+base + theme(legend.position = "top")
+base + theme(legend.position = "bottom")
+
+# Suppress the display of the legend with legend.position = "none"
+# base + theme(legend.position = "none")
+
+# Suppress all: legend, x-axis label, y-axis label, x-axis scale-ticks, y-axis scale-ticks
+base + theme(legend.position = "none") + scale_x_continuous(NULL, labels = NULL) + scale_y_continuous(NULL, labels = NULL)
+```
+
+```{r}
+# To control the display of individual legends use guides() with guide_legend() or guide_colorbar()
+# Example: 
+# Controlling the number of rows the legend uses with nrow: guides(color = guide_legend(nrow = 1))
+# Changing the legend point sizes: guides(guide_legend(override.aes = list(size = 4)))
+
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = class)) + 
+  geom_smooth(se = FALSE) + 
+  theme(legend.position = "bottom") +
+  guides(color = guide_legend(nrow = 1, override.aes = list(size = 4)))
+
+```
+
+#### Section 28.4.3: Replacing a scale
+```{r}
+# scale_x_log10 will modify the data by multiplying by log10 of the x variable whilst keeping the x-axis label the same. 
+ggplot(diamonds, aes(carat, price)) + 
+  geom_bin2d() +
+  scale_x_log10() + 
+  scale_y_log10()
+
+ggplot(diamonds, aes(log10(carat), log10(price))) + 
+  geom_bin2d() 
+
+```
+
+```{r}
+# scale_color_brewer will change the color palette to accommodate readers with color blindness
+# Color brewer scales: https://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = drv))
+
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = drv)) + 
+  scale_color_brewer(palette = "Set1")
+```
+
+```{r}
+# Using a predefined mapping between values and colors
+# Setting custom colors on the legend
+presidential %>%
+  mutate(id = 33 + row_number()) %>%
+  ggplot(aes(start, id, color = party)) + 
+  geom_point() + 
+  geom_segment(aes(xend = end, yend = id)) +
+  scale_color_manual(values = c(Republican = "red", Democratic = "blue"))
+```
+
+```{r}
+# A continuous analogue of the ColorBrewer Scales
+if(!require("viridis")) install.packages("viridis")
+library(viridis)
+```
+
+
+```{r}
+df <- tibble(
+  x = rnorm(10000), 
+  y = rnorm(10000)
+)
+
+ggplot(df, aes(x, y)) + 
+  geom_hex() + 
+  coord_fixed()
+
+ggplot(df, aes(x, y)) + 
+  geom_hex() +
+  viridis::scale_fill_viridis() + 
+  coord_fixed() 
+```
+#### Section 28.4.4: Exercises
+```{r eval = FALSE}
+# Question 1
+# Why doesn't the following code override the default scale?
+
+# geom_point is not implementing a color scale to be modified. No color scale is applied.
+ggplot(df, aes(x, y)) + 
+  geom_point() + 
+  scale_color_gradient(low = "white", high = "red") +
+  coord_fixed()
+
+
+ggplot(df, aes(x, y)) +
+  geom_point(aes(color = z2)) +
+  scale_color_gradient(low = "white", high = "red") +
+  coord_fixed()
+```
+
+
+```{r}
+#  1.1
+# Working Example
+df <- data.frame(
+  x = runif(100),
+  y = runif(100),
+  z1 = rnorm(100),
+  z2 = abs(rnorm(100))
+)
+
+ggplot(df, aes(x, y)) +
+  geom_point(aes(colour = z2)) +
+  scale_colour_gradient(low = "white", high = "black")
+```
+
+```{r}
+# Quesion 2
+# The first argument to every scale is the color or palette that you want to assign to the scale. "labs" will allow a variety of choices for the first argument including title, x, etc.
+```
+
+```{r}
+# Quesion 3
+
+# Change the display of the presidential terms by:
+# 
+#     Combining the two variants shown above.
+#     Improving the display of the y axis.
+#     Labelling each term with the name of the president.
+#     Adding informative plot labels.
+#     Placing breaks every 4 years (this is trickier than it seems!).
+
+```
+
+```{r}
+# Quesion 4
+# Use override.aes to make the legend on the following plot easier to see.
+ggplot(diamonds, aes(carat, price)) + 
+  geom_point(aes(color = cut), alpha = 1/20)
+```
+
+## Section 28.5: Zooming
+```{r}
+ggplot(mpg, mapping = aes(displ, hwy)) + 
+  geom_point(aes(color = class)) + 
+  geom_smooth() + 
+  coord_cartesian(xlim = c(5, 7), ylim = c(10, 30))
+
+mpg %>%
+  filter(displ >= 5, displ <= 7, hwy >= 10, hwy <= 30) %>%
+  ggplot(aes(displ, hwy)) + 
+  geom_point(aes(color = class)) + 
+  geom_smooth()
+
+```
+
+
+```{r}
+suv <- mpg %>% filter(class == "suv")
+
+compact <- mpg %>% filter(class == "compact")
+
+ggplot(suv, aes(displ, hwy, color = drv)) +
+  geom_point()
+
+ggplot(compact, aes(displ, hwy, color = drv)) +
+  geom_point()
+```
+
+```{r}
+# Sharing scales across multiple plots; set the values as limits.
+x_scale <- scale_x_continuous(limits = range(mpg$displ))
+y_scale <- scale_y_continuous(limits = range(mpg$hwy))
+col_scale <- scale_color_discrete(limits = unique(mpg$drv))
+
+ggplot(suv, aes(displ, hwy, color = drv)) + 
+  geom_point() + 
+  x_scale + 
+  y_scale +
+  col_scale
+
+ggplot(compact, aes(displ, hwy, color = drv)) + 
+  geom_point() + 
+  x_scale + 
+  y_scale +
+  col_scale
+
+```
+## Section 28.6: Themes
+```{r}
+# Customize the non-data elements of your plot with a theme
+# Example of changing the background
+
+# Default: No theme
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = class)) + 
+  geom_smooth(se = FALSE) +
+  labs(title = "Default: no theme")
+
+# Black & White Theme
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = class)) + 
+  geom_smooth(se = FALSE) +
+  theme_bw() + 
+  labs(title = "theme_bw()")
+
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = class)) + 
+  geom_smooth(se = FALSE) +
+  theme_classic() + 
+  labs(title = "theme_classic()")
+  
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = class)) + 
+  geom_smooth(se = FALSE) +
+  theme_dark() + 
+  labs(title = "theme_dark()")
+
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = class)) + 
+  geom_smooth(se = FALSE) +
+  theme_gray() +
+  labs(title = "theme_gray()")
+
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = class)) + 
+  geom_smooth(se = FALSE) +
+  theme_light() + 
+  labs(title = "theme_light()")
+  
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = class)) + 
+  geom_smooth(se = FALSE) +
+  theme_linedraw() + 
+  labs(title = "theme_linedraw()")
+
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = class)) + 
+  geom_smooth(se = FALSE) +
+  theme_minimal() + 
+  labs(title = "theme_minimal()")
+
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = class)) + 
+  geom_smooth(se = FALSE) +
+  theme_void() +
+  labs(title = "theme_void()") 
+
+```
+
+## Seciton 28.7: Saving your plots
+```{r }
+ggplot(mpg, aes(displ, hwy)) + geom_point()  
+```
+
+```{r}
+ggsave("my-plot.pdf") # Saves the most recent plot to disk. 
+```
+
+
+### Section 28.7.1: Figure Sizing
+```{r}
+# Options to set in the chunk:
+
+# fig.width
+# fig.height
+# fig.asp
+# out.width
+# out.height
+
+# Optimal values; set in defaults: 
+# fig.width = 6 # 6 inches; contsant width amongst plots
+# fig.asp = 0.618 # golden ratio
+
+# fig.show = "hold" # this will allow plots to be shown after the code.
+# Add a caption to the plot: fig.cap will set the figure from inline to floating. 
+# When creating many plots that don't require high quality graphics, speed up plot creation by forcing the use of PNGs with dev = "png".
+# The chunk label is used to create the file name on disk; name code chunks that produce figures.
+
+# fig.width will change the size of the figure axis lines and figure axis tick-marks
+# Set out.width = 70% & fig.align = "center"
+# 
+```
+
+# Section 29: R Markdown Formats
+```{r}
+
+```
+
+## Section 29.7: Interactivity
+```{r}
+
+```
+
+### Section 29.7.1 htmlwidgets
+
+```{r}
+if(!require("leaflet")) install.packages("leaflet")
+library(leaflet)
+leaflet() %>%
+  setView(174.764, -36.877, zoom = 16) %>%
+  addTiles() %>%
+  addMarkers(174.764, -36.877, popup = "Maungawhau")
+```
+
+
+```{r}
+# htmlwidgets
+# - dygraphs
+# - diagrammeR
+# - rthreejs
+# - DT
+```
+
+```{r}
+# Shiny
+
+# Call Shiny code from R Markdown: Add runtime: shiny to the header
+# title: "Shiny Web App"
+# output: html_document
+# runtime: shiny
+```
+
