@@ -2,7 +2,8 @@
 title: "R-for-data-science"
 author: "Evan-Woods"
 date: "2023-11-10"
-output: pdf_document
+output: github_document
+always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
@@ -32,6 +33,10 @@ When you click the **Knit** button a document will be generated that includes bo
 
 ```{r cars}
 summary(cars)
+```
+
+```{r}
+# knitr::knit_exit()
 ```
 
 ## Including Plots
@@ -563,7 +568,7 @@ filter(diamonds, carat > 3)
 ```
 ## 5 Data Transformation
 ```{r}
-install.packages("nycflights13")
+if(!require("nycflights13")) install.packages("nycflights13")
 library(nycflights13)
 library(tidyverse)
 ```
@@ -662,7 +667,19 @@ select(flights, -(year:day))
 # matches("(.)\\1") # matches a regular expression
 ```
 
-```{r rename will rename all the variables that aren't mentioned when using a select}
+
+```{r}
+flights_sml <- select(flights, 
+                      year:day,
+                      ends_with("delay"),
+                      distance,
+                      air_time
+                      )
+```
+
+
+```{r}
+# rename will rename all the variables that aren't mentioned when using a select
 rename(flights_sml, arrival_delay = arr_delay)
 ```
 ```{r}
@@ -852,12 +869,14 @@ flights <- mutate(flights, delay_rank = min_rank(desc(delays))) %>% select(delay
 ```
 
 
-```{r 5}
+```{r}
+# Quesion 5
 # 1:3 + 1:10 returns the sum of 1 - 3 and 1 - 3 followed by the sum of 1 - 3 and  4 - 6 until the limit is of 10 is reached in the longer sequence. The shorter sequence is cycled until the longer sequence completes within the sum. 
 1:3 + 1:10
 ```
 
-```{r 6}
+```{r}
+# Quesion 6
 # sin
 # cos
 # tan
@@ -1229,7 +1248,8 @@ carrier_delays_ranked
 ```
 
 
-```{r 5.6.7.5 disentangle the effects of bad airports vs. bad carriers}
+```{r}
+# 5.6.7.5 disentangle the effects of bad airports vs. bad carriers
 # Which carrier has the worst delays? Challenge: can you disentangle the effects of bad airports vs. bad carriers? Why/why not? (Hint: think about flights %>% group_by(carrier, dest) %>% summarise(n()))
 
 # compare the average of arrival delays to a destination vs the average of delays by carrier
@@ -1255,7 +1275,8 @@ filter(average_dest_delays, dest == "HNL")
 ```
 
 
-```{r 5.6.7.5 disentangle the effects of bad airports vs. bad carriers}
+```{r}
+# 5.6.7.5 disentangle the effects of bad airports vs. bad carriers
 # The number of late arrivals / total flights by carrier
 
 
@@ -1280,7 +1301,8 @@ proportion_late_arrivals_total_flights_by_carrier <- proportion_late_arrivals_to
 proportion_late_arrivals_total_flights_by_carrier
 ```
 
-```{r 5.6.7.5 disentangle the effects of bad airports vs. bad carriers}
+```{r}
+# 5.6.7.5 disentangle the effects of bad airports vs. bad carriers
 # The number of late arrivals / total flights to destination
 
 (arrival_delays_greater_than_zero_dest <- carrier_delays_ranked %>% group_by(dest) %>% count(late_arrival = arr_delay > 0) %>% filter(late_arrival == TRUE) %>% select(dest, n) %>% rename(late_arrival = n))
@@ -1310,8 +1332,8 @@ proportion_late_arrivals_total_flights_by_dest <- proportion_late_arrivals_total
 proportion_late_arrivals_total_flights_by_dest
 ```
 
-```{r 5.6.7.5 disentangle the effects of bad airports vs. bad carriers}
-
+```{r}
+# 5.6.7.5 disentangle the effects of bad airports vs. bad carriers
 
 (first_obs <- filter(first(top_ten_greatest_delays)))
 filter(average_carrier_delays, carrier == "HA")
@@ -1324,13 +1346,15 @@ filter(proportion_late_arrivals_total_flights_by_carrier, carrier == "HA")
 ```
 
 
-```{r 6}
+```{r}
+# 6
 # if sort is true, then count(sort= True) will show the largest groups at the top; only works for atomic and list types
 starwars %>% count(sex, gender, species, sort = TRUE)
 ```
 ### 5.7 Grouped mutates and filters
 
-```{r 1}
+```{r}
+# Quesion 1
 # Grouped mutates vs a normal mutate:
 # Grouped mutates will aggregate all values together in a group for all columns
 # normal mutates will alter the values by individual observations, leaving each column as a representation of a single observation 
@@ -1416,7 +1440,8 @@ left_join(delays_greater_than_zero_group_by_flights_dest, total_minutes_of_delay
 
 ```
 
-```{r Explore how the delay of a flight is related to the delay of an immediately preceding flight}
+```{r}
+# Explore how the delay of a flight is related to the delay of an immediately preceding flight
 # how lag works
 # (x <- seq(1, 10))
 # (x_lag <- lag(x))
@@ -1437,7 +1462,8 @@ head(comparison_of_flight_delay)
 ```
 
 
-```{r Explore how the delay of a flight is related to the delay of an immediately preceding flight}
+```{r}
+# Explore how the delay of a flight is related to the delay of an immediately preceding flight
 comparison_of_flight_delay<- comparison_of_flight_delay %>%
   select(year, month, day, flight, sched_dep_time, dep_time, total_delay, dep_time_min_since_midnight, sched_arr_time, everything()) %>% arrange(year, month, day, sched_dep_time)
 
@@ -1447,12 +1473,14 @@ comparison_of_flight_delay<- comparison_of_flight_delay %>%
 ```
 
 
-```{r Explore how the delay of a flight is related to the delay of an immediately preceding flight}
+```{r}
+# Explore how the delay of a flight is related to the delay of an immediately preceding flight
 (comparison_of_flight_delay_no_na <- comparison_of_flight_delay %>% filter(!is.na(dep_delay)))
 ```
 
 
-```{r 5. Explore how the delay of a flight is related to the delay of an immediately preceding flight}
+```{r}
+# Explore how the delay of a flight is related to the delay of an immediately preceding flight
 # After increase in the difference of delays between prior flights, there is a decrease in  of nearly the same magnitude from zero. It appears as if the planes are making up time lost from the previous delays by leaving early. 
 
 # (comparison_of_flight_delay_no_na)
@@ -1470,7 +1498,8 @@ print("lag_delay_difference")
 ```
 
 
-```{r Explore how the delay of a flight is related to the delay of an immediately preceding flight}
+```{r}
+# Explore how the delay of a flight is related to the delay of an immediately preceding flight
 ggplot()+
   geom_jitter(aes(x = seq(1:length(lag_delay_difference)), y = lag_delay_difference))
   geom_smooth(aes(x = length(lag_delay_difference), y = lag_delay_difference))
@@ -1567,17 +1596,20 @@ dest_two_carriers_by_carrier %>% mutate(dest_count = as.numeric(as.factor(dest))
 ```
 
 
-```{r For each plane, count the number of flights before the first delay of greater than 1 hour}
+```{r}
+# For each plane, count the number of flights before the first delay of greater than 1 hour
   n_flights_before_first_delay_greater_than_1_hour <- comparison_of_flight_delay
 ```
 
 
-```{r For each plane, count the number of flights before the first delay of greater than 1 hour}
+```{r}
+# For each plane, count the number of flights before the first delay of greater than 1 hour
   n_flights_before_first_delay_greater_than_1_hour
 ```
 
 
-```{r For each plane, count the number of flights before the first delay of greater than 1 hour}
+```{r}
+# For each plane, count the number of flights before the first delay of greater than 1 hour
 first_time_dep_delay_is_greater_than_one_hour <- first(n_flights_before_first_delay_greater_than_1_hour %>% group_by(year, month, day, sched_dep_time) %>% filter(dep_delay > 60) %>% arrange(year, month, day, sched_dep_time))
 
 (first_time_dep_delay_is_greater_than_one_hour)
@@ -1585,7 +1617,8 @@ first_time_dep_delay_is_greater_than_one_hour <- first(n_flights_before_first_de
 ```
 
 
-```{r For each plane, count the number of flights before the first delay of greater than 1 hour}
+```{r}
+# For each plane, count the number of flights before the first delay of greater than 1 hour
 ### Answer
 n_flights_before_first_delay_greater_than_1_hour %>% group_by(year, month, day, sched_dep_time) %>% filter(
   sched_dep_time < first_time_dep_delay_is_greater_than_one_hour$sched_dep_time & 
@@ -1642,6 +1675,7 @@ ggplot(diamonds, aes(carat)) +
   # ylim(y = c(0, 3000))
 
 ```
+
 ```{r 4. }
 # If you leave binwidth unset then the default binwidth of 30 will be used. If you try and zoom so only half a bar shows, then your bin width is too large for your current resolution & you need to scale it down so that you can view more points. 
 ```
@@ -1669,18 +1703,20 @@ diamonds3 <- diamonds %>% mutate(y = ifelse(y < 3 | y > 20, NA, y))
 
 ## Section 7.4.1 Exercises
 ```{r}
-diamonds2
+diamonds2 <- diamonds %>% select(y, everything()) %>% arrange(desc(y))
 ```
 
 
-```{r 1}
+```{r}
+# Quesion 1
 # The default missing values are removed with a warning win geom_hist. This is the same as with geom_bar. There is no difference.
 
 ggplot(diamonds2) +
   geom_histogram(aes(y), na.rm = TRUE)
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # It removes values that are NA.
 ```
 
@@ -1693,7 +1729,8 @@ ggplot(diamonds2) +
 
 ## Section 7.5.1.1 Exercises
 
-```{r 1}
+```{r}
+# Quesion 1
 nycflights13::flights %>% 
   mutate(
     cancelled = is.na(dep_time),
@@ -1705,12 +1742,14 @@ nycflights13::flights %>%
     geom_freqpoly(mapping = aes(colour = cancelled), binwidth = 1/4)
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 diamonds
 ```
 
 
-```{r 2.1}
+```{r}
+# Quesion 2.1
 
 ggplot(data = diamonds, mapping = aes(x = price, y = after_stat(density))) + 
   geom_freqpoly(mapping = aes(colour = cut), binwidth = 500) 
@@ -1720,8 +1759,9 @@ ggplot(data = diamonds, mapping = aes(x = price, y = after_stat(density))) +
 #   geom_freqpoly(mapping = aes(colour = color), binwidth = 500)
 
 ```
-```{r 3}
-install.packages("ggstance")
+```{r}
+# Quesion 3
+if(!require("ggstance")) install.packages("ggstance")
 library(ggstance)
 
 
@@ -1766,31 +1806,35 @@ diamonds_half_scale <- diamonds %>%
   count(color, cut) %>% mutate( n = n*.5)
 ```
 
-```{r 1.1}
+```{r}
+#  1.1
 ggplot(data = diamonds_half_scale) +
   geom_count(aes(cut, color))
 ```
 
-```{r Explore how average flight delays vary by destination and month of year}
+```{r}
+# Explore how average flight delays vary by destination and month of year
 (dest_month_avg_delay <- flights %>% group_by(month, dest) %>% select(dest, month, everything()) %>% summarise(avg_delay = mean(delays, na.rm = TRUE)))
 ```
 
 
-```{r Explore how average flight delays vary by destination and month of year}
+```{r}
+# Explore how average flight delays vary by destination and month of year
 # There are too many destinations related to individual months. It could be improved by limiting the number of destinations on a given graph. 
 ggplot(dest_month_avg_delay) + 
   geom_tile(aes(month, dest, fill = avg_delay))
 
 ```
 
-```{r 3 Why is it slightly better to use aes(x = color, y = cut) rather than aes(x = cut, y = color) in the example above}
+```{r}
+# 3 Why is it slightly better to use aes(x = color, y = cut) rather than aes(x = cut, y = color) in the example above
 # There are increasing levels of quality from left to right. 
 ```
 
 ## Section 7.5.3 Two Continuous Variables
 ```{r}
 # To use geom_hex
-install.packages("hexbin")
+if(!require("hexbin")) install.packages("hexbin")
 library(hexbin)
 ```
 
@@ -1852,11 +1896,13 @@ ggplot(data = smaller, aes(carat)) +
 # The price distribution is greater for large diamonds as compared to small diamonds. This does not surprise me.
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 ggplot(data = smaller) + 
   geom_hex(aes(carat, price))
 ```
-```{r 5}
+```{r}
+# Quesion 5
 # It is clear to see that there are outliers in a scatter plot as they are single points that are differentiated from the group. In a binned plot this would be indicated by a bin that was abnormally stretched. Without a reference group, normalcy of a binned plot's bin shape is speculative, whereas in a scatterplot, the majority of point grouping may be clearly defined.
 ```
 
@@ -1868,7 +1914,7 @@ as_tibble(iris)
 tibble(
   x = 1:5,
   y = 1, 
-  z = x ^ 2 + yf
+  z = x ^ 2 + y
 )
 ```
 
@@ -1890,7 +1936,7 @@ tribble(
   "b", 1, 8.5
 )
 ```
-```{r}
+```{r eval = FALSE}
 nycflights13::flights %>% View()
 ```
 
@@ -1944,7 +1990,8 @@ class(tb)
 # print(mtcars)
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # The default data frame behaviors assign the value of "a" to x, y, and z rather than "xyz"
 df <- data.frame(abc = 1, xyz = "a")
 ```
@@ -1953,17 +2000,20 @@ df
 ```
 
 
-```{r 2.1}
+```{r}
+# Quesion 2.1
 df$x
 ```
 
 
-```{r 2.2}
+```{r}
+#  2.2
 df[, "xyz"]
 ```
 
 
-```{r 2.3}
+```{r}
+#  2.3
 df[, c("abc", "xyz")]
 ```
 ```{r}
@@ -1977,7 +2027,8 @@ tb1<- tibble(
 tb1["abc"] # select the column (returned data is a tibble)
 tb1[["abc"]] # select the values of column "abc" (returned data is the type of the returned data)
 ```
-```{r 4}
+```{r}
+# Quesion 4
 annoying <- tibble(
   `1` = 1:10,
   `2` = `1` * 2 + rnorm(length(`1`))
@@ -1998,7 +2049,8 @@ annoying <- annoying %>% rename("one" = `1`, "two" = `2`, "three" = `3`)
 annoying
 ```
 
-```{r 5}
+```{r}
+# Quesion 5
 # tibble::enframe will frame data in tibble format. i.e.
 # enframe(1:3) produces a tibble
 # deframe will extract the data from the tibble, using the class of the data itself as the type of data: i.e.
@@ -2008,7 +2060,8 @@ val
 val[1]
 
 ```
-```{r 6}
+```{r}
+# Quesion 6
 # max footer lines controls how many extra lines are printed at the footer of a tibble
 ```
 
@@ -2129,7 +2182,8 @@ table4b  # population
 #> 2 Brazil       172006362  174504898
 #> 3 China       1272915272 1280428583
 ```
-```{r 1}
+```{r}
+# Quesion 1
 # Table 1 organizes its columns by country, year, cases, and population. It organizes its rows numerically where each row represents data that is associated with a country. The data within the table are individual values. 
 table1
 #> # A tibble: 6 × 4
@@ -2192,13 +2246,15 @@ table4b  # population
 #> 3 China       1272915272 1280428583
 ```
 
-```{r Compute rate for table2 and table4a and table4b}
+```{r}
+# Compute rate for table2 and table4a and table4b
 # Extract the number of TB cases per country per year From table2.
 n_cases_per_country <- table2 %>% group_by(type_cases = type == "cases") %>% filter(type_cases == TRUE) %>% group_by(country) %>% summarise(n_cases = sum(count))
 ```
 
 
-```{r Compute rate for table2 and table4a and table4b}
+```{r}
+# Compute rate for table2 and table4a and table4b
 n_years_per_country <- table2 %>% group_by(type_cases = type == "cases") %>% filter(type_cases == TRUE) %>% group_by(country, year) %>% summarise() %>% summarise(n_years = n())
 
 countries <- table2 %>% group_by(type_cases = type == "cases") %>% filter(type_cases == TRUE) %>% group_by(country) %>% summarise() 
@@ -2355,14 +2411,19 @@ table4a
 
 
 ```{r}
-table4a %>% 
-  pivot_longer(c(1999, 2000), names_to = "year", values_to = "cases")
+table4a
+```
+
+
+```{r eval = FALSE}
+# table4a %>% pivot_longer(c(1999, 2000), names_to = "year", values_to = "cases")
 # The names need to be in backticks because they are numbers. i.e.
 #table4a %>% 
   # pivot_longer(c(1999, 2000), names_to = "year", values_to = "cases")
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 # Calling wider on this tribble will allow the values to be placed in a double, a column for personid would allow this data to be transformed appropriately.
 people <- tribble(
   ~name,             ~names,  ~values, ~pid,
@@ -2386,7 +2447,8 @@ people %>% group_by(name, names,) %>% summarise(values)
 ```
 
 
-```{r 4}
+```{r}
+# Quesion 4
 preg <- tribble(
   ~pregnant, ~male, ~female,
   "yes", NA, 10,
@@ -2420,10 +2482,12 @@ tibble(x = c("a,b,c", "d, e", "f, g, i")) %>%
   separate(x, c("one", "two", "three"), fill = "left")
 
 ```
-```{r 2}
+```{r}
+# Quesion 2
 # Removes input columns from the output dataframe
 ```
-```{r 3}
+```{r}
+# Quesion 3
 # Extract will turn a group into columns. Extract will separate groups into columns as well. Extract has been superceded. 
 ```
 
@@ -2476,7 +2540,8 @@ df %>% complete(group, nesting(item_id, item_name))
 # Fill will fill in missing value with the last observation carried forward.
 # 
 ```
-```{r 1}
+```{r}
+# Quesion 1
 # What does the direction argument to fill do?
 treatment %>% fill(person, .direction = "up")
 # Direction in fill will fill NA from a particular direction
@@ -2574,7 +2639,8 @@ who %>%
 ```
 
 
-```{r 1}
+```{r}
+# Quesion 1
 # Dropping NA values is necessary in order to create a tidy tibble. Otherwise, the values of cases are "NA". Yes, it is reasonable to drop NA values to ensure that the values that are present in the tibble are valid. On the contrary, dropping NA values could be filled rather than dropped. It is possible to show implicit missing values through the presence of NA values. If these values are dropped, then the implicit missing values in the data may be more challenging to detect as explicit missing values are turned implicit. The difference between NA and zero is that NA represents a value that is missing from the dataset and zero defines a numeric value that is present and recorded as having a value of literally zero. Yes, there are years missing between 1997 and 2000. There are many implicit missing values in the dataset. This can be shown by pivoting the dataset wider to bring the years into a column and then listing the values from cases. The year 1997 has many missing values for cases in Afghanistan for example. See the code snippet below:
 
 # n_who5 <- who5 %>% pivot_wider(names_from = year, values_from = cases) 
@@ -2583,7 +2649,8 @@ who %>%
 ```
 
 
-```{r 2}
+```{r}
+# Quesion 2
 # If you neglect the mutate step, data will be missing from the tibble. It will not separate on "new" because there is only the presence of "newrel" and the separator is "_".
 who %>%
   pivot_longer(
@@ -2602,7 +2669,8 @@ who %>%
 ```
 
 
-```{r 3 iso2 and iso3}
+```{r}
+# 3 iso2 and iso3
 redundant <- who %>%
   pivot_longer(
     cols = new_sp_m014:newrel_f65,
@@ -2642,7 +2710,8 @@ redundant_dropped <- who %>%
 ```
 
 
-```{r 3 iso2 and iso3}
+```{r}
+# 3 iso2 and iso3
 # redundant %>% select(iso3)
 (redundant)
 # redundant %>% group_by(country, new) %>% summarise() %>% count()
@@ -2734,7 +2803,8 @@ if (length(country_year$country) == n_unique_year_per_country){
 
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 base_who_q4 <- who %>%
   pivot_longer(
     cols = new_sp_m014:newrel_f65,
@@ -2763,20 +2833,24 @@ head(base_who_q4)
 (number_of_cases_per_sex <- base_who_q4 %>% group_by(sex, cases) %>% summarise() %>% summarise(cases_per_sex = sum(cases)))
 (number_of_cases_per_sex <- base_who_q4 %>% group_by(sex, cases) %>% summarise() %>% summarise(cases_per_sex = sum(cases)))
 ```
-```{r 1}
+```{r}
+# Quesion 1
 # I would need to combine tables airports, flights, and planes. I would need to gather the longitude and lattitude of the origin and destination from airports in order to calculate the trajectory of the plane on a world map. I would need the distance calculated by the distance from the origin to the destination to identify the lenght of the line. I would need to group origin and destination by tailnum in flights to identify which flight tailnum went to which origin and destination.
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # The relationship between weather and airports is origin
 ```
 
 
-```{r 3}
+```{r}
+# Quesion 3
 # Weather would need to include a relation to destination from flights.
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 # I would want the following values in the table: holiday, month, day, year, number_of_people. The primary key would be the year, month, day and the foreign key would be the year, month, day in flights.
 ```
 
@@ -2787,11 +2861,11 @@ surogate_key <- nycflights13::flights
 surogate_key %>% mutate(surogate_key = row_number()) %>% select(surogate_key, everything())
 ```
 ```{r 2. Identify the keys in the following datasets}
-install.packages("Lahman")
-install.packages("babynames")
-install.packages("nasaweather")
-install.packages("fueleconomy")
-install.packages("ggplot2")
+if(!require("Lahman")) install.packages("Lahman")
+if(!require("babynames")) install.packages("babynames")
+if(!require("nasaweather")) install.packages("nasaweather")
+if(!require("fueleconomy")) install.packages("fueleconomy")
+if(!require("ggplot2")) install.packages("ggplot2")
 ```
 
 
@@ -3037,7 +3111,8 @@ clean_airports_dest_avg_delay %>%
 ```
 
 
-```{r 2. Add the location of the origin and destination to flights}
+```{r}
+# 2. Add the location of the origin and destination to flights
 # Add the location of the origin and destination (i.e. the lat and lon) to flights.
 
 # There are only 3 origins
@@ -3045,25 +3120,29 @@ flights %>% filter(!is.na(dep_delay) & !is.na(arr_delay)) %>% mutate(total_delay
 
 ```
 
-```{r 2. Add the location of the origin and destination to flights}
+```{r}
+# 2. Add the location of the origin and destination to flights
 (avg_delay_per_origin <- flights %>% filter(!is.na(dep_delay) & !is.na(arr_delay)) %>% mutate(total_delay = dep_delay + arr_delay) %>% group_by(origin) %>% summarise(avg_total_delay = mean(total_delay, rm.na = TRUE)))
 ```
 
 
-```{r 2. Add the location of the origin and destination to flights}
+```{r}
+# 2. Add the location of the origin and destination to flights
 (airports_origin <- airports %>% semi_join(flights, c("faa" = "origin")))
 ```
 
 
 
-```{r 2. Add the location of the origin and destination to flights}
+```{r}
+# 2. Add the location of the origin and destination to flights
 airports_origin_avg_delay <- left_join(airports_origin, avg_delay_per_origin, by = c("faa" = "origin"))
 
 airports_origin_avg_delay %>% select(faa, avg_total_delay, everything())
 ```
 
 
-```{r 2. Add the location of the origin and destination to flights}
+```{r}
+# 2. Add the location of the origin and destination to flights
 (airports_dest_avg_delay) %>% filter(faa == "EWR" | faa == "JFK" | faa == "LGA")
 
 # (ewr <- first(airports_origin_avg_delay))
@@ -3138,7 +3217,8 @@ origin_dest_flights %>%
 ```
 
 
-```{r 3}
+```{r}
+# Quesion 3
 # Is there a relationship between the age of a plane and its delays?
 flights_total_delay <- flights %>% mutate(total_delay = (dep_delay + arr_delay)) %>% select(total_delay, everything())
 
@@ -3159,7 +3239,8 @@ clean_plane_age_vs_delays <- clean_plane_age_vs_delays %>% filter(!is.na(total_d
 clean_plane_age_vs_delays <- clean_plane_age_vs_delays %>% arrange(year_manufactured)
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 # Is there a relationship between the age of a plane and its delays?
 # Newer planes 
 year_manufactured_vs_total_delays <- clean_plane_age_vs_delays %>% group_by(year_manufactured, total_delay) %>% summarise() %>% summarise(total_delays_per_year = n())
@@ -3172,13 +3253,15 @@ ggplot(year_manufactured_vs_total_delays) +
   geom_smooth(aes(year_manufactured, total_delays_per_year), se = FALSE, color = "lightblue") + 
   labs(x = "Year Manufactured", y = "Total Delays Per Year", title = "Does Plane Age Effect Delays?")
 ```
-```{r 4}
+```{r}
+# Quesion 4
 # What weather conditions make it more likely to see a delay?
 flights
 ```
 
 
-```{r 4}
+```{r}
+# Quesion 4
 # calculate dep delay in minutes since midnight
 # dep_delay_minutes_since_midnight <- ((flights$dep_delay %/% 100) * 60) + (flights$dep_delay %% 100)
 # arr_delay_minutes_since_midnight <- ((flights$arr_delay %/% 100) * 60) + (flights$arr_delay %% 100)
@@ -3188,17 +3271,20 @@ flights
 ```
 
 
-```{r 4}
+```{r}
+# Quesion 4
 flights_weather <- flights %>% left_join(weather)
 ```
 
 
-```{r 4}
+```{r}
+# Quesion 4
 names(weather)
 ```
 
 
-```{r 4}
+```{r}
+# Quesion 4
 clean_flights_weather_tb <- flights_weather %>% select(dep_delay, arr_delay, temp, dewp, humid, wind_dir, wind_speed, wind_gust, precip, pressure, visib, time_hour, everything()) %>% filter(!is.na(wind_gust)) %>% arrange(desc(dep_delay))
 
 # (flights_weather)
@@ -3226,7 +3312,7 @@ ggplot(clean_flights_weather_tb) +
 ```
 
 ```{r}
-install.packages("corrr")
+if(!require("corrr")) install.packages("corrr")
 library(corrr)
 ```
 
@@ -3299,12 +3385,14 @@ ggplot(clean_flights_weather_arr_delay_positive_tb) +
 # There is a correlation between arrival and departure delays on days that are more humid, have higher dewpoints, have more rain, and have higher temperatures. 
 ```
 
-```{r 5. What happened on June 13, 2013?}
+```{r}
+#  5. What happened on June 13, 2013?
 names(flights)
 ```
 
 
-```{r 5. What happened on June 13, 2013?}
+```{r}
+#  5. What happened on June 13, 2013?
 june_13_2013 <- flights %>% filter(year == "2013", month == "6", day == "13") %>% arrange(sched_dep_time)
 ```
 
@@ -3385,7 +3473,8 @@ percent_of_planes_from_carrier_MQ_and_AA_not_in_planes_tb <- (n_planes_not_in_pl
 # tailnum_not_in_planes %>% group_by(dest) %>% summarise(n())
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # All Planes in planes tibble with at least 100 flights
 tailnumbers_with_at_least_100_flights <- flights %>% group_by(tailnum) %>% summarise(n_flights = n()) %>% arrange(n_flights) %>% filter(n_flights >= 100)
 
@@ -3394,7 +3483,8 @@ planes %>%
 
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 vehicles <- fueleconomy::vehicles
 common <- fueleconomy::common
 
@@ -3404,7 +3494,8 @@ vehicles %>%
 
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 # Find the 48 hours over the course of the whole year that have the worst delays. These hours are not contiguous. The hours in flights are contiguous only by 19 hours. 
 
 # Day and number of hours 
@@ -3423,7 +3514,8 @@ weather %>%
 ```
 
 
-```{r 5}
+```{r}
+# Quesion 5
 # These are all the flights that are not in airports where the destinations in flights are not located in the faa column in airports.
 anti_join(flights, airports, by = c("dest" = "faa")) 
 
@@ -3431,13 +3523,13 @@ anti_join(flights, airports, by = c("dest" = "faa"))
 anti_join(airports, flights, by = c("faa" = "dest"))
 
 ```
-```{r 6}
+```{r}
+# Quesion 6
 # names(planes)
 # 
 # names(flights)
 
 # flights[["carrier"]] %>% filter()
-
 
 (planes)
 # flights
@@ -3446,14 +3538,16 @@ anti_join(airports, flights, by = c("faa" = "dest"))
  
  (flights_filtered_by_planes_tb)
  
- flights_planes_tb <- flights_in_planes_tb %>% left_join(planes, by = "tailnum")
+ flights_planes_tb <- flights_filtered_by_planes_tb %>% left_join(planes, by = "tailnum")
 ```
 
 
-```{r 6}
+```{r}
+# Quesion 6
 (flights_planes_tb)
 ```
-```{r 6}
+```{r}
+# Quesion 6
 # flights_planes_tb %>% select(carrier, tailnum) %>% group_by(carrier, tailnum) %>% summarise() %>% summarise(n_planes = n())
 
 # flights_planes_tb %>% select(carrier, tailnum) %>% group_by(carrier, tailnum) 
@@ -3583,7 +3677,8 @@ str_sort(x, locale = "haw")
 
 
 #### 14.2.5 Exercises
-```{r 1}
+```{r}
+# Quesion 1
 # paste0 has no spaces in the separator between strings
 # paste has a default of " " in as the separator between strings that are combined.
 
@@ -3595,11 +3690,13 @@ str_sort(x, locale = "haw")
 ```
 
 
-```{r 2}
+```{r}
+# Quesion 2
 # Where separator adds a space, collapse will remove a space or designated character between string vectors
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 test_string <- "12345678"
 len <- str_length(test_string)
 ceiling(len/2)
@@ -3607,7 +3704,8 @@ str_sub(test_string, start = ceiling(len/2), end = ceiling(len/2))
 # The start and end are inclusive. If there are an odd number of characters, then I am using the ceiling to return the middle value. If there are an even number of characters, I will return the lower most of value between the difference.
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 thanks <- 'R would not be what it is today without the invaluable help of these people
 outside of the (former and current) R Core team, who contributed by donating
 code, bug fixes and documentation: Valerio Aimale, Suharto Anggono, Thomas
@@ -3628,20 +3726,24 @@ is acknowledged in the code files, including '
 
 ```
 
-```{r 4.1}
+```{r}
+# Question 4.1
 cat(str_wrap(thanks, width = 100), "\n")
 ```
 
-```{r 4.2}
+```{r}
+# Question 4.2
 # String wrap will wrap the number of characters used before a newline character is inserted. 
 ```
 
-```{r 5}
+```{r}
+# Quesion 5
 # str_trim will remove the whitespace at both ends of a string.
 # str_pad(sample, width = str_length(sample) + 2, side = "both", pad = " ") is the opposite of str_trim
 ```
 
-```{r 6}
+```{r}
+# Quesion 6
 vector <- c("a", "b")
 
 split_string_func <- function(input) {
@@ -3679,13 +3781,15 @@ split_string_func(vector)
 ```
 
 #### Section 14.3.1.1 Exercises
-```{r 1}
+```{r}
+# Quesion 1
 x <- "\\"
 writeLines(x)
 ```
 
 
-```{r 1}
+```{r}
+# Quesion 1
 # "\" as a string representation of a regular expression converts to "". It is converted to a NULL regular expression, and will not match a literal "\".
 # "\\" as a string representation of a regular expression becomes converted to the regular expression "\". The converted regular expression is escaping nothing and will not match a literal "\".
 # "\\\" as a string representation of a regular expression becomes converted to the regular expression "\\". The regular expression will be converted to search for the string "\". To write the string "\" to output, "\\" is needed. "\\" will convert to "\" on console output. The string representation of the a regular expression "\\\" will create a regular expression that is searching for "\" where "\\" is used in the string to print "\" to the console. One needs to find "\\" to find the "\" printed in a console because the string "\\" will convert to "\" on a print. Therefore, "\\\" will search for the string "\". "\" would escape nothing and would not print "\" to the console. "\\" will convert from a string to "\" on console output. Ultimately, the regular expression needs to find "\\" which in turn needs a string representation of a regular expression - each of which require an additional "\" resulting in the string representation of a regular expression that searches for a string "\\" which will output "\" to be "\\\\".
@@ -3694,14 +3798,16 @@ str_view(x, "\\\\")
 
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 x <- '"\'\\'
 writeLines(x)
 str_view(x,'\\"\\\'\\\\')
 ```
 
 
-```{r 3}
+```{r}
+# Quesion 3
 # "\..\..\.." will match ".a.b.c";
 # '\..\..\..'
 
@@ -3723,26 +3829,30 @@ x <- '$^$'
 str_view(x, '\\$\\^\\$')
 ```
 
-```{r 1}
+```{r}
+# Quesion 1
 x <- 'yes'
 
 str_view(x, '^y.+')
 
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 x <- 'spacex'
 
 str_view(x, '.+x$')
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 x <- "Sam"
 
 str_view(x, "^...$")
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 x <- '1234567'
 
 str_view(x, "^(.......+)$")
@@ -3755,14 +3865,16 @@ str_view(x, "^(.......+)$")
 ```
 
 #### Section 14.3.3.1 Exercises
-```{r 1.1}
+```{r}
+#  1.1
 x <- 'afterlife'
 
 str_view(x, '^[aeiou].[a-z]+')
 
 ```
 
-```{r 1.2}
+```{r}
+#  1.2
 x <- 'cnstnts'
 x_not <- 'constants'
 
@@ -3770,14 +3882,16 @@ str_view(x, '^[^aeiou]+$')
 ```
 
 
-```{r 1.3}
+```{r}
+# Question 1.3
 x <- 'started'
 x_not <- 'seed'
 
 str_view(x, '[a-z]+[^eed]ed$')
 ```
 
-```{r 1.4}
+```{r}
+# Question 1.4
 x <- 'starting'
 x2 <- 'concise'
 
@@ -3785,7 +3899,8 @@ str_view(x, '^[a-z]+(ing|ise)$')
 ```
 
 
-```{r 2}
+```{r}
+# Quesion 2
 x <- 'perceive'
 x2 <- 'piece'
 x_not <- 'percieve'
@@ -3793,20 +3908,23 @@ x_not <- 'percieve'
 str_view(x, '(cei)')
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 x <- 'queque'
 
 str_view(x, '(qu)')
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 american <- 'color'
 british <- 'colour'
 
 str_view(american, '[a-z]*[o][u][r]$')
 ```
 
-```{r 5}
+```{r}
+# Quesion 5
 x <- '800-867-5309'
 
 str_view(x, '[\\d]{3}[-][\\d]{3}[-][\\d]{4}')
@@ -3815,13 +3933,15 @@ str_view(x, '[\\d]{3}[-][\\d]{3}[-][\\d]{4}')
 
 
 #### Section 14.3.4.1 Exercises
-```{r 1}
+```{r}
+# Quesion 1
 # ? is {0,1}
 # + is {1,}
 # * is {0,}
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # Any character zero or more times
 x <- '{asdf}'
 str_view(x, '\\{.+\\}')
@@ -3835,7 +3955,8 @@ str_view(x, '\\{.+\\}')
 ```
 
 
-```{r 3}
+```{r}
+# Quesion 3
 x <- 'sdf'
 str_view(x, '^[^aeiou]{3}')
 
@@ -3847,7 +3968,8 @@ str_view(x, '([^aeiou][^aeiou]){2,}')
 
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 # https://regexcrossword.com/challenges/beginner.
 ```
 
@@ -3869,17 +3991,20 @@ str_view(x, "(.)(.)\\2\\1")
 # "(.)(.)(.).*\\3\\2\\1" will match any character followed by any character followed by any character followed by any character zero or more times follwed by the third character that is matched followed by the second character that is matched followed by the first character that is matched. 
 ```
 
-```{r 2.1} 
+```{r}
+# Quesion 2.1 
 x <- 'eve'
 str_view(x, "(.).*\\1")
 ```
 
-```{r 2.2}
+```{r}
+#  2.2
 x <- 'church'
 str_view(x, '(..).*\\1')
 ```
 
-```{r 2.3}
+```{r}
+#  2.3
 x <- 'eleven'
 str_view(x, '(.).*\\1.*\\1.*')
 ```
@@ -3892,13 +4017,15 @@ str_view(x, '(.).*\\1.*\\1.*')
 
 #### Section 14.4.1.1 Exercises
 
-```{r 1.1}
+```{r}
+#  1.1
 x <- 'x'
 words <- c("spacex", "x", "not")
 str_detect(words, '.*x$')
 ```
 
-```{r 1.2}
+```{r}
+#  1.2
 words <- c("alphabet", "evan", "neuralink")
 str_detect(words, '^[aeiou].*[^aeiou]$')
 ```
@@ -3928,7 +4055,8 @@ for (index in seq_along(words)) {
 
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 vowels <- str_count(words, '[aeiou]')
 word_count <- str_count(words, '[a-z]')
 
@@ -3956,7 +4084,8 @@ length(sentences)
 head(sentences)
 ```
 #### 14.4.2.1 Exercises
-```{r 1}
+```{r}
+# Quesion 1
 colours <- c("red", "orange", "yellow", "green", "blue", "purple")
 colour_match <- str_c(colours, collapse = "\\b|\\b")
 colour_match <- str_pad(colour_match, str_length(colour_match) + 2, side = "both", pad = " ")
@@ -4006,7 +4135,8 @@ str_extract_all(x, "[a-z]", simplify = TRUE)
 more
 ```
 
-```{r 2.1}
+```{r}
+# Quesion 2.1
 # Extract the first word from each sentence in the Harvard dataset.
 # head(sentences)
 
@@ -4015,7 +4145,8 @@ str_extract_all(sentences, first_word)
 
 ```
 
-```{r 2.2}
+```{r}
+#  2.2
 # All words ending in "ing"
 
 ending_ing <- '[A-Za-z]+(ing)'
@@ -4023,7 +4154,8 @@ ending_ing <- '[A-Za-z]+(ing)'
 str_extract_all(sentences, ending_ing, simplify = TRUE)
 ```
 
-```{r 2.3.2} 
+```{r}
+#  2.3.2 
 # !!! do not split this into smaller parts; do not use for... use regex only...?
 
 # All plurals sometimes
@@ -4050,7 +4182,8 @@ for (col in seq_along(sentences)) {
 
 ```
 
-```{r 2.3.2}
+```{r}
+#  2.3.2
 # !!! do not split this into smaller parts; do not use for... use regex only...?
 # Extract all plural words. 
 
@@ -4069,7 +4202,8 @@ str_extract_all(sentences, plurals, simplify = TRUE)
 
 
 #### 14.4.3.1 Exercises
-```{r 1}
+```{r}
+# Quesion 1
 # Find all words that come after a "number" like "one", "two", "three", etc. Pull out both the number and the word.
 
 numbers <- c("zero","one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
@@ -4087,7 +4221,8 @@ str_extract(test_string, regex_numbers)
 
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 contraction_exp <- "(\\w+)('s)"
 
 contractions <- tibble(sentence = sentences) %>%
@@ -4109,7 +4244,8 @@ sentences %>%
 
 
 #### Section 14.4.4.1: Exercises
-```{r 1}
+```{r}
+# Quesion 1
 # Replace all forward slashes with backslashses.
 
 test_string <- "/"
@@ -4123,7 +4259,8 @@ ans <- test_string %>% str_replace_all(forward_slash_regex, "\\\\")
 print(ans)
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 
 test_string <- "NEURALINK"
 
@@ -4157,7 +4294,8 @@ test_string %>%
 
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 # Switch the first and last letters in words. Which of those strings are still words?
 test_sample <- words[2]
 match_regex <- "\\b(.)([a-z]*)(.)\\b"
@@ -4216,17 +4354,20 @@ str_split(x, " ")
 ```
 
 #### Section 14.4.5.1: Exercises
-```{r 1}
+```{r}
+# Quesion 1
 sample_string <- "apples, pears, and bananas"
 
 sample_string %>% str_split(boundary("word"))
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # It is better to split by word boundary than by spaces because a boundary will not include punctuation whereas words at the end of a sentence will.
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 sample_string %>% str_split("")
 # Splitting by "" will split each element in a string into individual characters.
 # "" is equivalent to boundary(character)
@@ -4292,7 +4433,7 @@ str_match("888-867-5309", phone)
 # Other regex options
 # fixed() matches exactly the specified sequence in bytes. It ignores all special regular expressions and operates at a very low level.
 
-install.packages("microbenchmark")
+if(!require("microbenchmark")) install.packages("microbenchmark")
 library(microbenchmark)
 
 # Fixed is about 3 times as faster than regex. Do not use with non-English data.
@@ -4339,7 +4480,8 @@ str_view_all(x, boundary("word"))
 str_extract_all(x, boundary("word"))
 ```
 #### Section 14.5.1: Exercises
-```{r 1}
+```{r}
+# Quesion 1
 # Regex
 str_detect("\\", regex("\\\\"))
 
@@ -4347,7 +4489,8 @@ str_detect("\\", regex("\\\\"))
 str_detect("\\", fixed("\\"))
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # What are the five most common words in sentences?
 head(sentences)
 words_in_sentences <- str_split(sentences, boundary("word"), simplify = TRUE)
@@ -4403,7 +4546,8 @@ head(dir(pattern = "\\."))
 ```
 
 #### Section 14.7.1: Exercises
-```{r 1}
+```{r}
+# Quesion 1
 # Stringi functions
 # Count the number of words: stringi::stri_count()
 # Find duplicated strings: stringi::stri_dup()
@@ -4454,7 +4598,8 @@ levels(factordata)
 ```
 
 #### Section 15.3.1: Exercise
-```{r 1}
+```{r}
+# Quesion 1
 # This bar chart is rotated 90 degrees because the x-axis of rincome was illegible. Removing Refused, Don't Know, No Answer, and Not Applicable from the current chart into a different bar chart and/or creating a new chart that consists of only those variables would make it clear as to the distribution of rincome at first glance. It would be useful to add a legend that described precisely what is meant by the abbreviation: "Lt". It would be useful to know why there are a great number of values in the category "Not Applicable". 
 
 ggplot(gss_cat)+
@@ -4462,7 +4607,8 @@ ggplot(gss_cat)+
   coord_flip() 
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # Protestant is the most common religion in this survey.
 ggplot(gss_cat) + 
   geom_bar(aes(relig)) + 
@@ -4583,11 +4729,13 @@ gss_cat %>%
 ```
 
 #### Section 15.4.1: Exercises
-```{r 1}
+```{r}
+# Quesion 1
 # The mean may not be a good summary for tvhours if there are outliers. Outliers can effect the mean. The median would be a better choice to represent an average with outliers. 
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # head(gss_cat)
 # names(gss_cat)
 # Factors: marital, race, rincome, partyid, relig, denom
@@ -4602,7 +4750,8 @@ levels(gss_cat$rincome) # prinicipled: descending with respect to values
 # levels(gss_cat$denom) # arbitrary order
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 # The factors are decreasing in incremental value as the levels increase within the collection. Column 4 represents the largest value & column 15 represents the least significant numeric value in the penultimate significant position within the collection. The plot plots the values from the value within column of the least significant position  upwards as the position within the collection of levels increases. By moving the value from the column in the most significant position of factor levels to the least significant position, i.e. "the front", the least significant position, 1, was plotted first at the bottom of the plot.  
 ```
 
@@ -4670,11 +4819,6 @@ gss_cat %>%
 ```
 
 ```{r}
-gss_cat_party_collapse_year_partyid_count %>% count(year)
-```
-
-
-```{r}
 # gss_cat %>% count(year)
 (gss_cat_party_collapse_year_partyid_count <-gss_cat %>% mutate(partyid = fct_collapse(partyid,
   other = c("No answer", "Don't know", "Other party"),
@@ -4685,15 +4829,20 @@ gss_cat_party_collapse_year_partyid_count %>% count(year)
 
 ```
 
+```{r}
+gss_cat_party_collapse_year_partyid_count %>% count(year)
+```
 
-```{r 1}
+```{r}
+# Quesion 1
 ggplot(gss_cat_party_collapse_year_partyid_count) +
   geom_point(aes(year, count, group = partyid, color = partyid)) + 
   geom_smooth(aes(year, count, group = partyid, color = partyid), se = FALSE) +
   labs(title = "Number of Members in the Republican, Independent, and Democratic Parties", subtitle = "Years: 2000 - 2014", x = "Year", y = "Population")
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # rincome can be regrouped into "$10000 to $24999, "Lt $1000 to $9999", and over 25000. No answer, Don't know, Refused, & Not applicable can all be sorted into a category listed as Other.
 
 gss_cat %>% count(rincome) # original
@@ -4779,25 +4928,29 @@ as_date(now())
 ```
 
 #### 16.2.4: Exercises
-```{r 1}
+```{r}
+# Quesion 1
 # There is a warning that the function failed to parse & the data is NA.
 ymd(c("2010-10-10", "bananas"))
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # tzone sets the current time zone of the value today.
 today(tzone = "GMT")
 today(tzone = "EST")
 today(tzone = "UTC")
 ```
 
-```{r 3.1}
+```{r}
+# Question 3.1
 if(!require("lubridate")) install.packages("lubridate")
 library(lubridate)
 ```
 
 
-```{r 3.2}
+```{r}
+# Question 3.2
 d1 <- "January 1 2010"
 d2 <- "2015-Mar-07"
 d3 <- "06-Jun-2017"
@@ -4806,7 +4959,8 @@ d5 <- "12/30/14" # Dec 30, 2014
 
 ```
 
-```{r 3.3}
+```{r}
+# Question 3.3
 mdy(d1)
 ymd(d2)
 dmy(d3)
@@ -4873,7 +5027,8 @@ ggplot(sched_dep, aes(minute, avg_delay)) +
 ```
 
 #### Section 16.3.4: Exercises
-```{r 1}
+```{r}
+# Quesion 1
 # How does the distribution of flight times within a day change over the course of the year?
 flights_dt %>%
   mutate(day = day(dep_time)) %>% count(day)
@@ -4888,7 +5043,8 @@ flights_dt %>%
 ```
 
 
-```{r 2}
+```{r}
+# Quesion 2
 # dep_time
 # sched_dep_time
 # dep_delay
@@ -4906,12 +5062,14 @@ flights_dt %>%
 ```
 
 
-```{r 2}
+```{r}
+# Quesion 2
 flights_dt %>% select(dep_time, sched_dep_time, dep_delay)
 ```
 
 
-```{r 2}
+```{r}
+# Quesion 2
 # Compare the dep_time, sched_dep_time, & dep_delay. Are they consistent?
 
 flights_dt$dep_time[2] - flights_dt$sched_dep_time[2]
@@ -4919,7 +5077,8 @@ flights_dt$dep_time[2] - flights_dt$sched_dep_time[2]
 ```
 
 
-```{r 2}
+```{r}
+# Quesion 2
 flights_dt %>% group_by(dep_time, sched_dep_time, dep_delay) 
 
 dep_time_minus_sched_dep_time <- difftime(flights_dt$dep_time, flights_dt$sched_dep_time, units = c("mins"))
@@ -4958,7 +5117,8 @@ flights_dt$dep_delay[times1 != times2][1]  - calculated_difference_min
 
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 # Compare air_time with the duration between the departure and arrival.
 flights_dt %>% select(air_time)
 
@@ -4993,7 +5153,8 @@ flights_dt$distance[n_time]
 ```
 
 
-```{r 3}
+```{r}
+# Quesion 3
 flights_dt_diff <- flights_dt %>% filter(arr_time %in% unequal_arrival_times) %>% mutate(diff_arr_minus_dep = difftime(arr_time, dep_time, units = "mins")) %>% mutate(air_time = as.difftime(air_time, units = "mins")) %>% select(dep_time, arr_time, diff_arr_minus_dep, air_time, distance, dest, origin, everything()) 
 ```
 
@@ -5059,7 +5220,8 @@ length(air_time_greater_dest_list$dest)
 ```
 
 
-```{r 3}
+```{r}
+# Quesion 3
 # Airport destinations where the plane circled during its flight.
 airports %>% 
   semi_join(air_time_greater_dest_list, c("faa" = "dest")) %>%
@@ -5068,7 +5230,8 @@ airports %>%
   geom_point() +
   coord_quickmap()
 ```
-```{r 3}
+```{r}
+# Quesion 3
 # Airport destinations where the plane taxied after its flight.
 airports %>% 
   semi_join(air_time_less_dest_list, c("faa" = "dest")) %>%
@@ -5110,19 +5273,22 @@ average_flight_distance_air_time_less_than_arr_dep_diff
 ```
 
 
-```{r 4}
+```{r}
+# Quesion 4
 # How does the average delay time change over the course of a day? I will use the sched_dep_delay to group the departure delay times. Then I will compute the average amongst the groups. 
 
 flights_dt_diff
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 flights_dt %>% mutate(day = day(dep_time)) %>%
   select(day, dep_time, dep_delay) %>% group_by(day) %>% summarise(mean(dep_delay))
 ```
 
 
-```{r 4}
+```{r}
+# Quesion 4
 # how does the average 
 flights_dt %>% mutate(day = day(dep_time)) 
 
@@ -5134,7 +5300,8 @@ ggplot(flights_dt) +
   geom_smooth(aes(dep_time, dep_delay), se = FALSE)
 
 ```
-```{r 4}
+```{r}
+# Quesion 4
 # Change in average departure delay over the course of a day. 
 avg_dep_delay <- flights_dt %>% group_by(sched_dep_time, dep_delay) %>% summarise(n()) %>% summarise(mean(dep_delay))
 
@@ -5144,35 +5311,37 @@ ggplot(avg_dep_delay) +
 ```
 
 
-```{r 5}
+```{r}
+# Quesion 5
 avg_dep_delay <- flights_dt %>% group_by(sched_dep_time, dep_delay) %>% summarise(n()) %>% summarise(mean(dep_delay))
 ```
 
 
-```{r 5}
+```{r}
+# Quesion 5
 avg_dep_delay %>% mutate(wday = wday(sched_dep_time, label = TRUE)) %>% arrange(`mean(dep_delay)`) %>% filter(`mean(dep_delay)` >0)
 ```
 
 
-```{r 5}
+```{r}
+# Quesion 5
 # Saturday is the day with the lowest average delay. 
 flights_dt %>% mutate(wday = wday(sched_dep_time, label = TRUE)) %>% group_by(wday, dep_delay) %>% summarise(n()) %>% summarise(mean(dep_delay)) %>% arrange(`mean(dep_delay)`)
 ```
 
-```{r 6}
+```{r}
+# Quesion 6
 
 diamonds_carat <- diamonds %>% count(carat) %>% arrange(desc(`n`))
 flights_sched_dep_time <- flights %>% count(sched_dep_time) %>% arrange(desc(`n`))
 
 ggplot(diamonds_carat) +
-  geom_freqpoly(aes(diamonds_carat$n)
-  
-
-
+  geom_freqpoly(aes(diamonds_carat$n))
 ```
 
 
-```{r 6}
+```{r}
+# Quesion 6
 min(diamonds$carat)
 max(diamonds$carat)
 mean(diamonds$carat)
@@ -5223,7 +5392,8 @@ ggplot() +
 # These two distributions are not similar. 
 ```
 
-```{r 7}
+```{r}
+# Quesion 7
 
 ```
 ```{r}
@@ -5271,7 +5441,8 @@ ggplot(count_of_early_departed_flights_grouped_by_minute) +
 
 ```
 
-```{r 7 }
+```{r}
+#  Question 7
 # Hypothesis: Early Departures of flights in minutes 20-30 and 50-60 are caused by scheduled flights that leave early. 
 
 # flights_dt %>% mutate(min = minute(dep_time), delayed = dep_delay > 0, early = dep_delay < 0) %>% select(early, delayed, dep_delay, dep_time, min, everything()) 
@@ -5299,7 +5470,8 @@ flights_dt %>% mutate(min = minute(dep_time), delayed = dep_delay > 0, early = d
 ```
 
 
-```{r 7 }
+```{r}
+#  Question 7
 # scheduled flights that are delayed during minutes 20 to 30.
 
 flights_dt %>% 
@@ -5330,7 +5502,8 @@ flights_dt %>%
 ```
 
 
-```{r 7 }
+```{r}
+#  Question 7
 ####
 # scheduled flights that are not delayed (early) during minutes 20 to 30.
 scheduled_flights_min_20_30_not_delayed <- flights_dt %>% 
@@ -5348,7 +5521,8 @@ ggplot(scheduled_flights_min_20_30_not_delayed) +
 ```
 
 
-```{r 7 }
+```{r}
+#  Question 7
 ####
 
 # Flights that are early departures in minutes 20 - 30. 
@@ -5363,7 +5537,8 @@ ggplot(flights_min_20_30_early) +
 ```
 
 
-```{r 7 }
+```{r}
+#  Question 7
 # Late departures of flights in minutes 20-30
 flights_min_20_30_late <- flights_dt %>% mutate(min = minute(sched_dep_time), delayed = dep_delay > 0, early = dep_delay < 0) %>% select(early, delayed, dep_delay, dep_time, min, everything()) %>% filter(min >= 20, min <= 30, delayed == TRUE) %>% group_by(min, dep_delay) %>% summarise(count = n()) %>% summarise(count)
 
@@ -5443,11 +5618,13 @@ next_year <- today() + years(1)
 
 ```
 #### 16.4.5 Exercises
-```{r 1}
+```{r}
+# Quesion 1
 # There are months but no dmonths because the duration of months in seconds is inconsistent. 
 ```
 
-```{r 2} 
+```{r}
+# Quesion 2 
 
 flights_dt %>% 
   mutate(
@@ -5457,7 +5634,8 @@ flights_dt %>%
 ```
 
 
-```{r 2}
+```{r}
+# Quesion 2
 # Overnight flight arrivals and departures before adding the period of days.
 overnight_flights_dt_b4 <-flights_dt %>% mutate(overnight = arr_time < dep_time) %>% select(flight, overnight, arr_time, dep_time, everything()) %>% filter(overnight == TRUE)
 
@@ -5479,21 +5657,24 @@ overnight_flights_dt_after <- flights_dt %>%
 # days(overnight * 1) Uses the logical value of overnight to create a period of one day. This day is added to the arrival times such that the datetime-formatted arrival time's "day" is consistent with the departure time where the departure time is before or less than the arrival time.  
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 days()
 init_year <- ymd(20150101)
 class(init_year)
 ```
 
 
-```{r 3.1}
+```{r}
+# Question 3.1
 years(1)
 class(init_year %--% (init_year + years(1)))
 init_year + months(0:11)
 
 
 ```
-```{r 3.2}
+```{r}
+# Question 3.2
 year(today())
 init_current_year <- make_datetime(year(today()), month(1), day(1))
 init_current_year <- ymd(init_current_year)
@@ -5502,7 +5683,8 @@ init_current_year <- ymd(init_current_year)
 ```
 
 
-```{r 4}
+```{r}
+# Quesion 4
 age <- function(b_day){
   return (year(today()) - year(b_day))
 }
@@ -5510,7 +5692,8 @@ bday <- make_date(year = 1990, month = 5, day = 29)
 age(bday)
 ```
 
-```{r 5}
+```{r}
+# Quesion 5
 # months(1) returns a factor: January
 
 years(1) # period
@@ -5672,12 +5855,14 @@ df$d <- rescale01(df$d)
 
 
 #### Section 19.2.1: Exercises
-```{r 1}
+```{r}
+# Quesion 1
 # TRUE is not a parameter to rescale01() because it is a constant setting that does not change.
 # If x contained a single missing value and na.rm was false, then the missing value would percolate throughout the function. 
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 x <- c(1:10, Inf)
 
 rescale01 <- function(x) {
@@ -5697,27 +5882,31 @@ rescale01 <- function(x) {
 (rescale01(x))
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 avg_na <- function(x) {
   return(mean(is.na(x)))  
 }
 ```
 
 
-```{r 3}
+```{r}
+# Quesion 3
 proportion_x <- function(x) {
   x / sum(x, na.rm = TRUE)  
 }
 ```
 
 
-```{r 3}
+```{r}
+# Quesion 3
 sd_divided_by_mean_x <- function(x) {
   sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE)  
 }
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 var_x <- function(x) {
   n <- length(x)
   x_mean <- mean(x)
@@ -5747,7 +5936,8 @@ var_x(x)
 ```
 
 
-```{r 5}
+```{r}
+# Quesion 5
 both_na <- function(x, y) {
   num_positions = 0
   for (index in seq_along(x)){
@@ -5759,7 +5949,8 @@ both_na <- function(x, y) {
 }
 ```
 
-```{r 6}
+```{r}
+# Quesion 6
 # This function will indicate if a given path is a directory.
 is_directory <- function(x) file.info(x)$isdir
 
@@ -5773,7 +5964,8 @@ is_readable(path)
 
 ```
 
-```{r 7}
+```{r eval = FALSE}
+# Quesion 7
 # Little Bunny Foo Foo,
 # Hopping through the forest,
 # Scooping up the field mice,
@@ -5850,64 +6042,64 @@ is_readable(path)
 # And you didn't behave,
 # And now I'm gonna turn you into a goon. POOF!"
 
-foo_foo <- little_bunny()
-fairy <- good_fairy()
-
-foo_foo %>%
-  hop(through = forest) %>%
-  scoop(up = field_mice) %>%
-  bop(on = head)
-
-fairy %>%
-  came(direction = down) %>%
-  said(to = foo_foo) %>%
-  dontWant(to_see = foo_foo) %>%
-  scoop(up = field_mice) %>%
-  bop(on = head) %>%
-  give(chances = three) %>%
-  dontBehave(you = foo_foo) %>%
-  turn(you = goon) %>%
-  time(when = next_day)
-
-verses <- c(1:3)
-current_time <- c("that_evening", "later_that_night", "a_few_moments_later")
-
-for (verse in verses) {
-  foo_foo %>%
-    hop(through = forest) %>%
-    scoop(up = field_mice) %>%
-    bop(on = head)
-
-  fairy %>%
-    came(direction = down) %>%
-    said(to = foo_foo) %>%
-    dontWant(to_see = foo_foo) %>%
-    scoop(up = field_mice) %>%
-    bop(on = head) %>%
-    give(chances = (three - verse)) %>%
-    dontBehave(you = foo_foo) %>%
-    turn(you = goon) %>%
-    time(when = current_time[verse])
-}
-
-fairy %>%
-  gave(chances = three) %>%
-  didntBehave(you = foo_foo) %>%
-  turn(you = goon) %>%
-  poof()
+# foo_foo <- little_bunny()
+# fairy <- good_fairy()
+# 
+# foo_foo %>%
+#   hop(through = forest) %>%
+#   scoop(up = field_mice) %>%
+#   bop(on = head)
+# 
+# fairy %>%
+#   came(direction = down) %>%
+#   said(to = foo_foo) %>%
+#   dontWant(to_see = foo_foo) %>%
+#   scoop(up = field_mice) %>%
+#   bop(on = head) %>%
+#   give(chances = three) %>%
+#   dontBehave(you = foo_foo) %>%
+#   turn(you = goon) %>%
+#   time(when = next_day)
+# 
+# verses <- c(1:3)
+# current_time <- c("that_evening", "later_that_night", "a_few_moments_later")
+# 
+# for (verse in verses) {
+#   foo_foo %>%
+#     hop(through = forest) %>%
+#     scoop(up = field_mice) %>%
+#     bop(on = head)
+# 
+#   fairy %>%
+#     came(direction = down) %>%
+#     said(to = foo_foo) %>%
+#     dontWant(to_see = foo_foo) %>%
+#     scoop(up = field_mice) %>%
+#     bop(on = head) %>%
+#     give(chances = (three - verse)) %>%
+#     dontBehave(you = foo_foo) %>%
+#     turn(you = goon) %>%
+#     time(when = current_time[verse])
+# }
+# 
+# fairy %>%
+#   gave(chances = three) %>%
+#   didntBehave(you = foo_foo) %>%
+#   turn(you = goon) %>%
+#   poof()
 ```
 
 
-```{r}
-animal_sounds <- function(animal) {
-  switch(animal, 
-         cat = "Meow", 
-         cow = "Moo",
-         dog = "Bark",
-         "No Sound Found"
-         )
-}
-animal_sounds(animal)
+```{r eval = FALSE}
+# animal_sounds <- function(animal) {
+#   switch(animal, 
+#          cat = "Meow", 
+#          cow = "Moo",
+#          dog = "Bark",
+#          "No Sound Found"
+#          )
+# }
+# animal_sounds(animal)
 
 ```
 
@@ -5919,7 +6111,8 @@ animal_sounds(animal)
 
 
 #### Section 19.3.1: Exercises
-```{r 1}
+```{r}
+# Question 1
 verify_prefix <- function(string, prefix) {
   substr(string, 1, nchar(prefix)) == prefix
 }
@@ -5936,8 +6129,8 @@ replicate_y_x_times <- function(x, y) {
 ```
 
 
-```{r 2}
-
+```{r}
+# Quesion 2
 count_shared_na_position <- function(vector_one, vector_two) {
   num_positions = 0
   for (index in seq_along(vector_one)){
@@ -5951,7 +6144,8 @@ count_shared_na_position <- function(vector_one, vector_two) {
 ```
 
 
-```{r 3}
+```{r}
+# Quesion 3
 # rnorm 
 # Arguments: 
 # n = number of observations
@@ -5969,7 +6163,8 @@ count_shared_na_position <- function(vector_one, vector_two) {
 # rnorm and MASS::mvrnorm can be more consistent by changing "sd" to "Sigma" in rnorm & "mean" to "mu" in rnorm
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 # norm_r and norm_d would be better than rnorm() and dnorm() because they have the same prefix which makes the two simpler to look up.
 # rnorm() and dnorm() would be better than norm_r() and norm_d() because the type of normal distribution is identified from the beginning of function name meaning that one may circumvent human error when autocompleting to the wrong norm_ function.
 ```
@@ -6026,11 +6221,13 @@ count_shared_na_position <- function(vector_one, vector_two) {
 ```
 
 #### Section 19.4.4: Exercises
-```{r 1}
+```{r}
+# Question 1
 # The difference between if and ifelse(); if else accepts NA; if will not accept NA values. if else accepts a to verify the truthiness of, the value when the verified value is true, and the value when the verified value is false. 
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 greet <- function(){
   instant <- lubridate::now()
   today = today()
@@ -6050,7 +6247,8 @@ greet <- function(){
 greet()
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 fizzbuzz <- function(n) {
   if(identical((n %% 3), 0) && identical((n %% 5), 0)) {
     return("fizzbuzz")
@@ -6069,7 +6267,8 @@ fizzbuzz(15)
 fizzbuzz(13)
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 temp <- 100
 if (temp <= 0) {
   "freezing"
@@ -6095,7 +6294,8 @@ if (temp <= 0) {
 
 ```
 
-```{r 5}
+```{r}
+# Quesion 5
 n <- 3
 switch(n,
        "cat" = 1, 
@@ -6105,7 +6305,8 @@ switch(n,
 # Using numeric values on a switch case will allow the case to be selected where 1 is the first case and every case descending afterwards corresponds to the next integer in a sequence following 1.
 ```
 
-```{r 6}
+```{r}
+# Quesion 6
 # This expression will match on "a" or "b" and return "ab" in both cases; This Expression will also match on "c" or "d" and will return "cd" in both cases. "e" does not match in this switch case expression. 
 
 x <- "e"
@@ -6156,14 +6357,16 @@ list_ellipses(letters[1:10])
 ```
 
 #### Section 19.5.5: Exercises
-```{r 1}
+```{r}
+# Question 1
 # commas(letters, collapse = "-")
 # This function call will throw an error. The error states 'formal argument "collapse" matched by multiple actual arguments'.
 # This is because the code piece 'collapse = "-"' is being passed into the function as below after being captured from the ellipses:
 # stringr::str_c(collapse = "-", collapse = ", ")
 # Calling the function above will throw the same error.
 ```
-```{r 2}
+```{r}
+# Quesion 2
 # This currently doesn't work because the output line is duplicating pad 'width' number of times and presuming pad is a single character. By including nchar(pad), the number of characters used in padding can be known, and a division of the width by the number of characters in the pad can be used to set the appropriate width respective of the number of characters used in the pad. 
 
 rule <- function(..., pad = "-"){
@@ -6175,11 +6378,13 @@ rule <- function(..., pad = "-"){
 rule("Important output")
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 # The trim argument of mean takes a fraction of the observations to be trimmed from x before the mean is computed. The values outside the range are taken to the nearest endpoint. 
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 # The default value for the `method` argument to cor() is c("pearson", "kendall", "spearman"). These are three different individuals each of which are associated with a correlation coefficient. The Pearson correlation coefficient is a rank correlation coefficient that measures linear correlation between two sets of data. The Kendall correlation coefficient is a rank coefficient used to measure ordinal association between two quantities. Spearman's rank correlation coefficient results when two variables are monotomically related even if their relationship is non-linear. Pearson is the default method.
 ```
 
@@ -6251,7 +6456,7 @@ typeof(1L)
 #### Section 20.3.3: Character
 ```{r}
 if(!require("pryr")) install.packages("pryr")
-library(pr)
+library(pryr)
 ```
 
 
@@ -6275,30 +6480,35 @@ NA_character_ # character
 
 
 #### Section 20.3.5: Exercises
-```{r 1}
+```{r}
+# Question 1
 # The difference between is.finite(x) and !is.infinite(x) is that is.finite(NA) and is.finite(NaN) will present FALSE; is.infinite(NA) and is.infinite(NaN) will also present false; Therefore !is.infinite(NA) & !is.infinite(NaN) will both produce TRUE even though they are not finite. 
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # dplyr::near
 # dplyr::near() will take the absolute value of the difference between two values and compare the values as if to be less than a tolerance. 
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 # According to https://stat.ethz.ch/R-manual/R-devel/library/base/html/integer.html, 
 # R uses 32-bit integer vectors. This means that R can take integers within the range of +- 2 x 10^9.
 # R uses IEEE 754 standard with a precision of 53 bits for doubles. 
 # This means the range of doubles is the absolute value of 2 x 10^+-308. Doubles also except NaN, NA, +- Infinity, +-0 (which are treated as the same). The range of values accepted by a double vector include the absolute value of 2 x 10^+-308 plus five more values: NaN, NA, Inf, -Inf, and 0.
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 # as.integer() may be applied to a function to convert a double to an integer. This function will accept a double and return the return value from `as.integer`.
 # as.numeric() may be applied to a function to convert a double to an integer. This function will accept a double and return the return value from `as.numeric`.
 # floor() may be applied to a function to convert a double to an integer. This function will accept a double as an argument into floor before performing modular arithmetic on the result. This result will then be used as an input value into either as.integer or as.numeric to return an integer type. 
 # ceil() may be applied to a function to convert a double to an integer. This function will accept a double as an argument into ceil before performing modular arithmetic on the result. This result will then be used as an input value into either as.integer or as.numeric to return an ingeter type. 
 ```
 
-```{r 5}
+```{r}
+# Quesion 5
 # The `readr` package includes the parse_double, parse_integer, & parse_logical functions which enable the conversion of character strings to doubles, integers, and logicals.
 ```
 
@@ -6334,32 +6544,38 @@ x[c("abc", "def")]
 
 
 #### Section 20.4.6 Exercises
-```{r 1}
+```{r}
+# Question 1
 # mean(is.na(x)) Will tell you if there are NA values in vector x. It will then attempt to calculate the mean of the result. If there is an NA value, then is.na will be 1 which indicates the mean of that value is 1 which indicates that there is an NA value in the integer vector x. If there is no missing value in x, then is.na will return 0. The mean of zero will be 0 which will indicate that there is no missing value in x.
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # is.vector() returns TRUE if x is a vector of the specified mode having no attributes other than names. It tests to see if x is a vector with no other attributes other than names within the vector. 
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 # Atomic types are not atomic vectors in the sense that individual objects are accepted as 'atomic' without being vectors. NULL is not an atomic vector, but it is atomic, for example. 
 ```
 
-```{r 4.1}
+```{r}
+# Question 4.1
 # Either "[[" or "[" will work to return the last value. "[[" is explicitly defining a singular return value.
 return_last_vector_value <- function(input_vector) {
   return (input_vector[[length(input_vector)]])
 }
 ```
 
-```{r 4.2}
+```{r}
+# Question 4.2
 return_even_numbered_positioned_elements <- function(input_vector) {
   return(input_vector[seq(2, (length(input_vector) - length(input_vector) %% 2), by = 2)])
 }
 ```
 
-```{r 4.3}
+```{r}
+# Question 4.3
 return_elements_first_to_penultimate <- function(input_vector) {
   return(input_vector[-length(input_vector)])
 }
@@ -6371,11 +6587,13 @@ return_only_even_values <- function(input_vector) {
 }
 ```
 
-```{r 5}
+```{r}
+# Quesion 5
 # -which(x>0) returns the negative of all values of x that are greater than zero. x<=0 returns a logical. These two have different return types which is why they are not the same. 
 ```
 
-```{r 6}
+```{r}
+# Quesion 6
 # Subsetting with a value that is out of the length of a vector or a name that doesn't exist will return NA when using "[" notation. When using "[[" notation, the error 'subscript out of bounds' will be thrown.
 ```
 
@@ -6442,7 +6660,8 @@ str(a[[4]][[2]])
 ```
 
 #### Section 20.5.4: Exercises
-```{r 1}
+```{r}
+# Question 1
 # The means of addressing elements of a list are identical to the means of addressing elements of a tibble. A tibble allows one to pipe elements into functions such as filter whereas a list does not allow such functionality. 
 ```
 
@@ -6494,15 +6713,18 @@ attributes(x)
 
 
 #### Section 20.7.4: Exercises
-```{r 1}
+```{r}
+# Question 1
 attributes(hms::hms(3600))
 # This returns 01:00:00. This is 1 hour. It is built on top of a difftime class. It has attributes of units and class.
 ```
-```{r 2}
+```{r}
+# Quesion 2
 # tb <- tibble(c(1,2,3), c(1,2,3,4))
 # The error "Tibble columns must have compatible sizes" appears when attempting to build a tibble containing columns of differing lengths.
 ```
-```{r 3}
+```{r eval = FALSE}
+# Quesion 3
 tb <- tibble(list(1,2,3), list(1,2,3,4))
 # Lists are acceptable within a tibble so long as the lists are of the same length. 
 ```
@@ -6512,7 +6734,8 @@ tb <- tibble(list(1,2,3), list(1,2,3,4))
 ```
 
 #### Section 21.2.1: Exercises
-```{r 1.1}
+```{r}
+#  1.1
 # Compute the mean of every column in mtcars
 for (col in seq_along(mtcars)) {
   print(mean(mtcars[[col]]))
@@ -6520,13 +6743,15 @@ for (col in seq_along(mtcars)) {
 ```
 
 
-```{r 1.2}
+```{r}
+#  1.2
 # Determine the type of each column in nycflights13::flights
 for(col in seq_along(nycflights13::flights)){
   print(typeof(nycflights13::flights[[col]]))
 }
 ```
-```{r 1.3}
+```{r}
+# Question 1.3
 # Compute the number of unique values in each column of iris
 for (col in seq_along(iris)){
   print(length(unique(iris[[col]])))
@@ -6534,7 +6759,8 @@ for (col in seq_along(iris)){
 
 ```
 
-```{r 1.4}
+```{r}
+# Question 1.4
 # Generate 10 random normals from distributions with means of -10, 0, 10, 100
 n = 10
 means_vector <- c(-10, 0, 10, 100)
@@ -6545,7 +6771,8 @@ for(i in seq(1,10)){
 }
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # out <- ""
 # for(x in letters) {
 #   out <- stringr::str_c(out, x)
@@ -6554,7 +6781,8 @@ for(i in seq(1,10)){
 out <- str_c(letters, collapse = "")
 ```
 
-```{r 2.1}
+```{r}
+# Quesion 2.1
 x <- sample(100)
 # sd <- 0
 # for (i in seq_along(x)) {
@@ -6566,7 +6794,8 @@ sd(x)
 
 ```
 
-```{r 2.2}
+```{r}
+#  2.2
 # x <- runif(100)
 # out <- vector("numeric", length(x))
 # out[1] <- x[1]
@@ -6580,7 +6809,8 @@ cumsum(x)
 ```
 
 
-```{r 3.1}
+```{r}
+# Question 3.1
 # Alice the camel has five humps
 # Alice the camel has five humps
 # Alice the camel has five humps
@@ -6608,7 +6838,8 @@ cumsum(x)
 ```
 
 
-```{r 3.1}
+```{r}
+# Question 3.1
 # Alice the camel variables
 
 # n_repetitions_counting_lyric <- 3
@@ -6668,7 +6899,8 @@ print_child_song <- function(
 }
 ```
 
-```{r 3.1}
+```{r}
+# Question 3.1
 # n_repetitions_counting_lyric <- 3
 # pre_counting_lyric_string_concatonation_plural <- "Alice the camel has "
 # numeric_counts_vector <- c("five", "four", "three", "two", "one", "no")
@@ -6687,7 +6919,8 @@ print_child_song()
 
 ```
 
-```{r 3.2}
+```{r}
+# Question 3.2
 # There were ten in the bed
 # And the little one said, "Roll over, roll over"
 # So they all rolled over and one fell out
@@ -6721,7 +6954,8 @@ print_child_song()
 ```
 
 
-```{r 3.2}
+```{r}
+# Question 3.2
 n_repetitions_counting_lyric <- 1
 pre_counting_lyric_string_concatonation_plural <- "There were "
 numeric_counts_vector <- c('ten', 'nine', 'eight', 'seven', 'six', 'five', 'four', 'three', 'two', 'one')
@@ -6899,7 +7133,8 @@ capitalize_first_letter_in_string("string")
 ```
 
 
-```{r 3.3}
+```{r}
+# Question 3.3
 
 capitalize_first_letter_in_string <- function(initial_string){
   characters <- str_split_1(initial_string, pattern = "")
@@ -7378,7 +7613,8 @@ print_child_song(
 
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 x <- seq(1, 100)
 growing_vector <- function(x){
   output <- vector("integer", 0)
@@ -7453,7 +7689,8 @@ flip <- function() sample(c("T", "H"), 1)
 ```
 
 #### Section 21.3.5: Exercises
-```{r 1}
+```{r}
+# Question 1
 file_path <- str_c(getwd(), "/data/")
 files <- dir(file_path, pattern = "\\.csv$", full.names = TRUE)
 index <- 1
@@ -7465,7 +7702,8 @@ while (index <= length(files)){
 }
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # When 'for (nm in names(y))' is used and y is an unnamed vector, nothing is returned by the for loop and there are no errors or warnings. 
 # When there is an inconsistency in the number of named items in a vector, the names of the named items are accessible to be printed whereas the names of the unnamed items print "". If the unnamed name is used to address inside y, then NA is returned. If the names are not unique, the first instance of the name will be used as the index.
 
@@ -7474,12 +7712,13 @@ for (nm in names(y)) {
 }
 ```
 ```{r}
-install.packages("DescTools")
+if(!require("DescTools")) install.packages("DescTools")
 library(DescTools)
 ```
 
 
-```{r 3}
+```{r}
+# Quesion 3
 x
 show_mean <- function(data) {
   y <- character()
@@ -7501,7 +7740,8 @@ show_mean <- function(data) {
 show_mean(iris)
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 # This function will create a list that: 
 # 1. scales an input value "x"
 # 2. creates a factor of "x" with labels of "auto" and "manual"
@@ -7519,10 +7759,6 @@ for (var in names(trans)) {
 }
 ```
 
-```{r}
-trans[[]]
-```
-
 
 ```{r}
 mtcars <- datasets::mtcars
@@ -7535,7 +7771,8 @@ mtcars <- datasets::mtcars
 ```
 
 #### Section 21.4.1: Exercises
-```{r 1}
+```{r}
+# Question 1
 # lappy will return an array of dimension c(n, dim(X) [MARGIN]) if n > 1.
 ```
 
@@ -7543,12 +7780,23 @@ mtcars <- datasets::mtcars
 df <- tibble(0.585731553977938, "string")
 ```
 
-```{r 2}
+```{r eval = FALSE}
+# Quesion 2
 # Adapt col_summary() so that it only applies to numeric columns
+
+# col_summary <- function(df, fun) {
+#   out <- vector("double", length(df))
+#   for (i in seq_along(df)) {
+#     out[i] <- fun(df[[i]])
+#   }
+#   out
+# }
+# 
+# col_summary(mtcars, summary)
 
 col_summary <- function(df, fun) {
   out <- vector("double", length(df))
-  
+
   for (i in seq_along(df)) {
     if(is.numeric(df[[i]])) {
       out[i] <- fun(df[[i]])
@@ -7556,9 +7804,9 @@ col_summary <- function(df, fun) {
   }
   out
 }
-col_summary(df, median)
+col_summary(mtcars, median)
 #> [1] -0.51850298  0.02779864  0.17295591 -0.61163819
-col_summary(df, mean)
+col_summary(mtcars, mean)
 #> [1] -0.3260369  0.1356639  0.4291403 -0.2498034
 ```
 
@@ -7596,39 +7844,47 @@ models %>%
 ```
 
 #### Section 21.5.3: Exercises
-```{r 1.1}
+```{r}
+#  1.1
 mtcars %>% map_dbl(mean)
 ```
 
-```{r 1.2}
+```{r}
+#  1.2
 # Determine the type of each column in nycflights13::flights
 flights <- nycflights13::flights
 flights %>% map(typeof)
 ```
 
-```{r 1.3}
+```{r}
+# Question 1.3
 # Compute the number of unique values in each column of iris
 iris %>% map(unique) %>% map(length)
 ```
-```{r 1.4} 
+```{r}
+# Question 1.4 
 # Generate 10 random normals from distributions with means of -10, 0, 10, and 100
-map_dbl(rnorm(10, mean = c(-10, 0, 10, 100)))
+mu <- list(-10, 0, 10, 100)
+mu %>% map(rnorm, n = 10) %>% str()
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # This will determine if each column in a dataframe is a factor.
 
 tb <- tibble(c(1,2,3,4))
 tb %>% map(is.factor)
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 # What happens when you use the map functions on vectors that aren't lists?
 # What does map(1:5, runif) do? Why?
 # When functions are mapped to vectors that are not lists, the values are passed to the function as if the function was called using the values directly. This is becuase the values are being mapped to the function where map uses an ellipses as a catch all to pass values to the function. 
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 
 # map(-2:2, rnorm, n = 5) in the previous mapping, n is the number of observations that are created and -2:2 are used to calculate the mean from within that range of values and the number of times the function rnorm is run.
 
@@ -7638,7 +7894,8 @@ map_dbl(-1:1, rnorm, n = 1) # This function will create a number of random sampl
 
 ```
 
-```{r 5}
+```{r}
+# Quesion 5
 # Rewrite map(x, function(df) lm(mpg ~ wt, data = df))
 # df %>% map(~lm(mpg ~ wt, data = df))
 ```
@@ -7766,7 +8023,8 @@ x %>% accumulate(`-`)
 ```
 
 #### Section 21.9.3: Exercises
-```{r 1}
+```{r}
+# Question 1
 # Implementing every(): This version of every will map an input to a function, and verify that "FALSE" is not in the list of returned values from the mappings. Like every, custom_every will accept both lists and vectors.
 x <- seq(1:10)
 custom_every <- function(x, func) {
@@ -7780,7 +8038,8 @@ custom_every <- function(x, func) {
 custom_every(x, is.factor)
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # Create an advanced col_summary that applies a summary function to every column in a data frame.
 col_summary <- function(df, fun) {
   out <- vector("double", length(df))
@@ -7793,7 +8052,8 @@ col_summary <- function(df, fun) {
 col_summary(mtcars, summary)
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 adv_col_summary <- function(df, fun) {
   out <- vector("double", length(df))
   for (i in seq_along(df)) {
@@ -7804,7 +8064,8 @@ adv_col_summary <- function(df, fun) {
 adv_col_summary(mtcars, summary)
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 col_sum3 <- function(df, f) {
   is_num <- sapply(df, is.numeric)
   df_num <- df[, is_num]
@@ -7813,7 +8074,8 @@ col_sum3 <- function(df, f) {
 }
 ```
 
-```{r 3}
+```{r eval = FALSE}
+# Quesion 3
 df <- tibble(
   x = 1:3, 
   y = 3:1,
@@ -7824,9 +8086,11 @@ col_sum3(df, mean)
 # Has problems: don't always return numeric vector
 col_sum3(df[1:2], mean)
 col_sum3(df[1], mean)
-col_sum3(df[0], mean)
+# col_sum3(df[0], mean)
 ```
-```{r 3}
+
+```{r}
+# Quesion 3
 df[0]
 is_num_error <- sapply(df[0], is.numeric) # df[0] is an empty tibble containing 3 rows and zero columns. Sapply returns a named list when this tibble is computed using the function "is.numeric" (rather than returning the expected values of either TRUE or FALSE. The "named list()" is next used to index all rows where the columns match "named list()" which results in an error because the subset must be subset with a logical, numeric, or character rather than an empty list. 
 is_num_1 <- sapply(df[1], is.numeric)
@@ -7975,7 +8239,8 @@ ggplot(sim1, aes(x, y)) +
 
 
 #### Section 23.2.1: Exercises
-```{r 1}
+```{r}
+# Question 1
 # Fit a linear model to the simulated data below, and visualise the results. Rerun a few times to generate different simulated datasets. What do you notice about the model?
 
 sim1a <- tibble(
@@ -8084,12 +8349,14 @@ ggplot(sim1a, aes(x, y)) +
 
 
 
-```{r 1}
+```{r}
+# Question 1
 # The models will map linearly to outliers. There is not a general trend between the three sets of lines that are visualized with respect to slope. 
 ```
 
 
-```{r 2}
+```{r}
+# Quesion 2
 # Newton-Raphson search
 # Select a point, find the steepest slope (tangent to a curve). Search for another point and repeat this process.
 # optim() represents this mathematical minimization search
@@ -8121,7 +8388,8 @@ ggplot(sim1, aes(x, y)) +
 ```
 
 
-```{r 3}
+```{r}
+# Quesion 3
 
 # The problem with optimising a three parameter model is that the global optimal value may never be found. A local optimal value may be identified as the maximum or minimum optimal value, but the true global maximum or minimum is established elsewhere. 
 model1 <- function(a, data) {
@@ -8180,7 +8448,8 @@ ggplot(sim1, aes(x, resid)) +
 
 
 #### Section 23.3.3: Exercises
-```{r 1}
+```{r}
+# Question 1
 # Repeat the process of model fitting, grid generation, predictions, and visualisation on sim1 using loess() instead of lm(). How does the result compare to geom_smooth()?
 # Create an evenly spaced grid of values
 # fit a model to data using loess
@@ -8202,25 +8471,29 @@ sim1_loess_residuals <- sim1 %>% add_residuals(sim_loess_mod)
 sim1_loess_residuals
 ```
 
-```{r 1}
+```{r}
+# Question 1
 ggplot(sim1, aes(x)) +
   geom_point(aes(y = y)) + 
   geom_line(aes(y = pred), size = 2, color = "red", data = grid_loess)
 ```
 
-```{r 1}
+```{r}
+# Question 1
 ggplot(sim1_loess_residuals) +
   geom_freqpoly(aes(resid))
 ```
 
-```{r 1}
+```{r}
+# Question 1
 # The residuals from the loess model are similar but not identical to the random noise that was shown in the plot of the residuals stemming from the linear model.
 ggplot(sim1_loess_residuals, aes(x)) + 
   geom_ref_line(h = 0) + 
   geom_point(aes(y = resid))
 ```
 
-```{r 1}
+```{r}
+# Question 1
 # How do the results compare to geom_smooth?
 ggplot(sim1, aes(x)) +
   geom_point(aes(y = y)) + 
@@ -8231,7 +8504,8 @@ ggplot(sim1, aes(x)) +
 # These two lines look nearly identical. The "smoothed" line does not have as sharp a change in slope as the geom_line does.
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # add_predictions: adds a new single column to the dataframe (default name "pred") to the data.
 # gather_predictions: gather_predictions adds two columns (model and pred); repeats the input rows for each model. Adds each prediction as a row.
 # spread_predictions: spread predictions adds one column for each model.
@@ -8240,14 +8514,16 @@ ggplot(sim1, aes(x)) +
 ```
 
 
-```{r 3}
+```{r}
+# Quesion 3
 # What does geom_ref_line() do? What package does it come from? Why is displaying a reference line in plots showing residuals useful and important?
 
 # geom_ref_line creates a horizontal reference line. This is a space by default. This comes from the "modelr" package. Displaying a reference line in plots showing residuals is usefule because it allows one to identify a common difference between all points with respect to the reference. It is important because with out a reference line, there is no common means with which to compare points at a glance. 
 
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 # Why might you want to look at a frequency polygon of absolute residuals? What are the pros and cons compared to looking at the raw residuals?
 
 # A frequency polygon of absolute residuals indicates the number of times the absolute value of a residual occurs. The line of best fit will have the greatest count of residuals at zero. By examining the absolute value of the residuals, the frequency of their occurences are comparable with respect to zero regardless of sign.
@@ -8370,7 +8646,8 @@ ggplot(seq2, aes(x,y)) +
 
 
 #### Section 23.4.5: Exercises
-```{r 1}
+```{r}
+# Question 1
 # What happens if you repeat the analysis of sim2 using a model without an intercept. 
 
 # What happens to the model equation? What happens to the predictions?
@@ -8400,7 +8677,8 @@ ggplot(sim2, aes(x)) +
 ```
 
 
-```{r 1}
+```{r}
+# Question 1
 # Model & Plot of sim2 without Intercept
 mod2_no_intercept <- lm(y ~ x - 1, data = sim2)
 summary(mod2_no_intercept)
@@ -8413,13 +8691,15 @@ ggplot(sim2, aes(x)) +
 ```
 
 
-```{r 1}
+```{r}
+# Question 1
 # Predictions: Intercept vs. No intercept.
 grid_no_intercept$pred
 grid$pred
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # Use model_matrix() to explore the equations generated for the models I fit to sim3 and sim4. Why is * a good shorthand for interaction?
 # * is a good shorthand for interaction because + indicates the inclusion of another variable in a given equation. * indicates the interaction between the two variables.
 
@@ -8451,7 +8731,8 @@ model_matrix(sim3, y ~ x1 + x2)
 ```
 
 
-```{r 3}
+```{r}
+# Quesion 3
 mod2 <- lm(y ~ x1 * x2, data = sim3)
 model_matrix(sim3, y ~ x1 * x2)
 sim3 %>% mutate(x2 = as.numeric(x2)) %>% count(x2)
@@ -8459,7 +8740,8 @@ sim3 %>% mutate(x2 = as.numeric(x2)) %>% count(x2)
 # y = a_0 + a_1 * x1 + a_2 * x2b + a_3 * x2c + a_4 * x2d + a_5 * x1 * x2b + a_6 * x1 * x2c + a_7 * x1 * x2d
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 # For sim4, which of mod1 and mod2 is better? I think mod2 does a slightly better job at removing patterns, but it’s pretty subtle. Can you come up with a plot to support my claim?
 
 # Gathering predictions:
@@ -8561,9 +8843,6 @@ nobs(mod)
 ## Section 24.1: Introduction
 #### Section 24.1.1: Prerequisites
 ```{r}
-
-#???
-
 if(!require("tidyverse")) install.packages("tidyverse")
 if(!require("modelr")) install.packages("modelr")
 if(!require("nycflights13")) install.packages("nycflights13")
@@ -8780,11 +9059,13 @@ diamonds2 %>% filter(abs(lresid2) > 1) %>%
   arrange(price)
 ```
 #### Section 24.2.3: Exercises
-```{r 1}
+```{r}
+# Question 1
 # In plot of lcarat vs. lprice, the bright vertical strips represent a greater number of diamonds present at that combination of lcarat and lprice.
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # log(price) = a_0 + a_1 * log(carat) is a linear relationship.
 ```
 
@@ -8900,7 +9181,7 @@ diamonds2 %>% filter(cut == "Fair", color == "F", clarity == "VVS2") %>% group_b
 
 
 ```{r}
-reduced_filtered_diamonds2 <- anti_join(filtered_diamonds2, fiar_f_vvs2)
+reduced_filtered_diamonds2 <- anti_join(filtered_diamonds2, fair_f_vvs2)
 (reduced_filtered_diamonds2)
 
 ```
@@ -8972,7 +9253,8 @@ reduced_filtered_diamonds2
 (cut_comparison)
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 # Answer
 
 # These diamonds vary by price. Diamonds in this set of diamonds are incorrectly priced. There exists at least one diamond in this set that is underpiced and more than a few diamonds that are overpriced in this set of outliers. I believe these are pricing errors. 
@@ -9044,7 +9326,8 @@ mod_diamond2
 ```
 
 
-```{r 4}
+```{r}
+# Quesion 4
 # Does the final model do a good job of predicting diamond prices? 
 # Would you trust it to tell you how much to spend if you were buying a diamond?
 
@@ -9293,7 +9576,8 @@ daily %>%
 
 
 #### Section 24.3.5: Exercises
-```{r 1}
+```{r}
+# Question 1
 # jan 20, may 26, sept 1st
 
 # On the days of January 20th 2013, May 26th 2013, and September 1st 2013 There were windspeeds that peaked at 39mph, 30mph, and 16 mph at the hottest times of the days which include 54, 66, and 84 degrees respectively. According to the National Weather Service, these wind speeds are categorized as moderate, low, and very low threat to life and property from High Wind. According to skyscanner.com, crosswinds at about 34 - 40 mph are generally prohibitive of take-off and landing. Tropical Storms are categorized by the Saffir-Simpson scale to hvae 39-73 mph winds and form in warm weather. I believe the evidence suggests that on these days preventative measures were taken to prevent takeoffs and landings during strong crosswinds and possible tropical storms. These conditions can generalize to another year by categorizing the wind speeds and temperature and factoring these variables into further models. 
@@ -9301,7 +9585,8 @@ daily %>%
 
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # What do the three days with high positive residuals represent? How would these days generalise to another year?
 
 # These are days when the actual number of flights were much greater than the predicted number of flights. These flights appear to be seasonal given that they are during the same Thanksgiving and Christmas season. I believe these flights are return trips from Thanksgiving and Christmas. These could be generalised by creating a term that includes the period after Thanksgiving and the period after Christmas in order to break the dates into terms that include spring, summer, fall, Thanksgiving, and Christmas before fitting a model.
@@ -9313,7 +9598,8 @@ daily %>%
 
 
 
-```{r 3}
+```{r}
+# Quesion 3
 # Split the wday variable into terms but only for Saturdays. Include Thurs, Fri, Sat-summer, Sat-spring, Sat-fall.
 # How does this model compare with the model with every combination of wday and term?
 # 
@@ -9336,7 +9622,8 @@ daily %>%
 #   scale_x_date(NULL, date_breaks = "1 month", date_labels = "%b")
 ```
 
-```{r 3.1}
+```{r}
+# Question 3.1
 # ymd(20130101, 20130605,20130825, 20140101)
 
 # Sun: 1
@@ -9368,7 +9655,8 @@ daily_wterm <- daily %>% mutate(wterm = wterm(date))
 ```
 
 
-```{r 3.1}
+```{r}
+# Question 3.1
 
 
 
@@ -9494,7 +9782,8 @@ ggplot() +
 # Summary: I had anticipated that creating a model where the Saturdays where separated into Sat-spring, Sat-summer, & Sat-fall would have grouped the residuals tighter about zero based upon the trend of the residuals varying less in model 2 when a term was added to the weekday versus the lone model predicting the count based upon the weekday alone. However, after successfully creating an appropriate naming scheme where each date corresponds to a day of the week and each Saturday corresponds to every combination of Saturday and term (spring, summer, & fall), the residuals are greater in amplitude from zero than that in model 2 about the periods following July and January. However, there is a tighter grouping of residuals that cluster closer in amplitude to zero from the periods prior to April to approximately June and from approximately September to the end of the 2013 year. Significant outliers still remain in the residuals of both model 2 and model 4, however.
 ```
 
-```{r 4.1}
+```{r}
+# Question 4.1
 public_holidays_labels <- c("New Year's Day", "Martin Luther King Jr. Day", "President's Day", "Memorial Day", "Independence Day", "Labor Day", "Columbus Day", "Veterans Day", "Thanksgiving Day", "Christmas Day")
 public_holidays <- c("2013-01-01", "2013-01-21", "2013-02-18", "2013-05-27", "2013-07-04", "2013-09-02", "2013-10-14", "2013-11-11", "2013-11-28", "2013-12-25")
 daily_wterm_final[1,]
@@ -9544,7 +9833,8 @@ daily_wterm_public_holidays_final %>% filter( date %in% public_holidays)
 (daily_wterm_public_holidays_final)
 ```
 
-```{r 4.2}
+```{r}
+# Question 4.2
 mod1 <- lm(n ~ wday, data = daily) 
 mod2 <- lm(n ~ wday * term, data = daily)
 # mod4 <- lm(n ~ wday * as.numeric(as.factor(wterm)), data = daily_wterm_final)
@@ -9593,11 +9883,13 @@ ggplot() +
   labs(title = "Model 5 Residuals From Count of Daily NYC Flight Predictions", x = "Date", y = "Residual")
 
 ```
-```{r 4.3}
+```{r}
+# Question 4.3
 # Summary: The addition of public holidays reduced the residuals to zero during those public holidays in comparison to models 4 & 2 which don't include holidays or seasonal Saturdays respectively. The clustering of residuals, the amplitude of residuals, & the presence of significant outliers remains otherwise unchanged between models 4 & 5. Model 5 appears to be the strongest predictor of the number of daily nyc flights.
 ```
 
-```{r 5}
+```{r}
+# Quesion 5
 
 daily
 offset_week_number = 0
@@ -9675,7 +9967,8 @@ ggplot() +
 # It is not very helpful to fit a day of week effect that varies by month (i.e. n ~ wday * month) because the effect of the number of flights per month is already captured within the predictions based on the number of flights per weekday. This model has the tightest groupings with respect to the residuals. However, this indicates that the model is overfit to the data and will not generalize well to days beyond those that do not appear in the current dataset. 
 ```
 
-```{r 6}
+```{r}
+# Quesion 6
 # What would you expect the model n ~ wday + ns(date, 5) to look like? Knowing what you know about the data, why would you expect it to be not particularly effective?
 # I expect the model n ~ wday + ns(date, 5) to look like smooth polynomial lines separated by weekday with a 5th degree polynomial. I expect it not to be particularly effective because outside the bounds of the data, a Taylor Series polynomial will spread towards the limits of negative and positive infinity. This dillutes accurate predictions. Furthermore, this model does not take into account the effects of seasonality within the data nor trends that are present due to pubilc holidays which require prior domain knowledge to incorporate into the model.
 
@@ -9691,11 +9984,16 @@ daily %>%
 
 ```
 
-```{r 7}
+
+```{r}
+# Quesion 7
 # We hypothesised that people leaving on Sundays are more likely to be business travellers who need to be somewhere on Monday. Explore that hypothesis by seeing how it breaks down based on distance and time: if it’s true, you’d expect to see more Sunday evening flights to places that are far away.
+
 nycflights13::flights
 ```
 ```{r 7.1}
+wday2 <- function(x) wday(x, label = TRUE)
+
 daily_business <- nycflights13::flights
 daily_business <- daily_business %>% mutate(date = make_date(year, month, day)) %>% select(date, everything())
 # (daily_business)
@@ -9719,8 +10017,6 @@ daily_business[1,]
 daily_business_sun <- daily_business %>% filter(wday == "Sun")
 daily_business_sun <- daily_business_sun %>% mutate(flight_id = row_number()) %>% select(flight_id, everything())
 (daily_business_sun)
-
-
 ```
 
 
@@ -9737,7 +10033,9 @@ daily_business_sun <- daily_business_sun %>% mutate(flight_id = row_number()) %>
 # ggplot(daily_business) +
 #   geom_point(aes(date, distance)) + 
   # facet_wrap(~wday)
-daily_business_thousand <- daily_business %>% filter(flight_id <= 1000)
+
+daily_business_flight_id <- daily_business %>% mutate(flight_id = row_number()) %>% select(flight_id, everything())
+daily_business_thousand <- daily_business_flight_id %>% filter(flight_id <= 1000)
 
 # (daily_business)
 (daily_business_thousand)
@@ -9824,7 +10122,8 @@ ggplot(daily_business_sun_hour_distance_greater_than_1000) +
 # After closer inspection, their is a significant impulse in the number of flights for distances that are greater than 1000 miles. Considering flights that are greater than 1000 miles are long-distance flights, and upon examining the frequency of long-distance flights with respect to hour of the day, it is clear that there is a bi-modal distribution of flights with peaks before and after evening. I cannot suggest that the distribution is right-skewed, which would indicate that the majority of long-distance flights are evening flights. Although the presence of a significant portion of long-distance flights during evening hours does exist, this portion is not greater than the number of flights during other hours on the same day. 
 ```
 
-```{r 8}
+```{r}
+# Quesion 8
 # It’s a little frustrating that Sunday and Saturday are on separate ends of the plot. Write a small function to set the levels of the factor so that the week starts on Monday.
 reorder_wday <- function(data) {
   new_order <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
@@ -10062,26 +10361,30 @@ by_country_mean_zero_year_nest_qmod_qresids <- by_country_mean_zero_year_nest_qm
 (by_country_mean_zero_year_nest_qmod_qresids)
 ```
 
-```{r 1}
+```{r}
+# Question 1
 qresids <- by_country_mean_zero_year_nest_qmod_qresids %>% unnest(country, qresids)
 qresids$qmod[[1]]
 # The coefficients are providing a weight to the Taylor Series polynomial for each degree of the variable mean_zero_year.
 ```
-```{r 1}
+```{r}
+# Question 1
 ggplot(qresids) +
   geom_line(aes(year, resid)) + 
   geom_smooth(aes(year, resid), se = FALSE)
 ```
 
-```{r 2}
-# install.packages("ggbeeswarm")
+```{r}
+# Quesion 2
+# if(!require("ggbeeswarm")) install.packages("ggbeeswarm")
 # library(ggbeeswarm)
 
 
 
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 
 ```
 
@@ -10126,19 +10429,22 @@ mtcars %>%
 
 
 #### Section 25.4.5: Exercises
-```{r 1}
+```{r}
+# Question 1
 # Invokemap will take a tribble and return a list;
 # stringr::split will take an atomic vector and return a list;
 # list() will take an atomic vector and return a list.
 
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # quantile will return multiple values
 # glance will return multiple values
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 # What's missing from the following dataframe? How does quantile() return that missing piece? Why isn't that helpful here?
 # The probabilities are missing from this dataframe. This is not helpful because the probability of the mpg given the cylinder is a fixed listed quantity. 
 
@@ -10148,7 +10454,8 @@ mtcars %>%
   unnest(q)
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 # Grouping on a column then summarising all into a list of list will create an series of rows where each observation contains one unique element from the group and every column on the same row contains a list of all elements that relate to the unique variable in the group on the same row. This is a helpful way to view individual column values that are grouped in reference to another column (i.e. all values of horsepower that relate to 4 or six cylinders)
 
 summarise_all_cylinders <- mtcars %>%
@@ -10236,14 +10543,16 @@ df2 %>% unnest(c(y, z))
 
 
 #### Section 25.5.3: Exercises
-```{r 1}
+```{r}
+# Question 1
 # Why might the lengths() function be useful for creating atomic vector columns from list-columns?
 # The ".f" function must return a lengths - 1 vector of the appropriate type when creating atomic vector columns from list-columns. lengths() can be used to verify the correct return length. 
 
 
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # List the most common types of vector found in a data frame. What makes lists different?
 # character vectors
 # double vectors
@@ -10277,7 +10586,8 @@ broom::augment(nz_mod, nz)
 
 
 #### Section 27.2.1: Exercises
-```{r 3}
+```{r}
+# Quesion 3
 # The R notebook contains a header file. The output of the cells in the R Notebook and the R Markdown file are both the same. Copying the output from the R Notebook to the R Markdown file allows the R Markdown file to behave as an R Notebook. 
 ```
 
@@ -10395,7 +10705,8 @@ comma(.12358124331)
 
 
 #### Section 27.4.7: Exercises
-```{r 1}
+```{r}
+# Question 1
 knitr::opts_chunk$set(
   echo = FALSE
 )
@@ -10407,7 +10718,8 @@ ggplot(diamonds, aes(cut, fill = clarity)) +
 
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 # Set up a network of chunks where d depends on c and b, and both b and c depend on a. Have each chunk print lubridate::now(), set cache = TRUE, then verify your understanding of caching. 
 ```
 
@@ -10563,7 +10875,8 @@ ggplot(df, aes(x, y)) +
   coord_fixed() 
 ```
 #### Section 28.4.4: Exercises
-```{r 1}
+```{r eval = FALSE}
+# Question 1
 # Why doesn't the following code override the default scale?
 
 # geom_point is not implementing a color scale to be modified. No color scale is applied.
@@ -10573,32 +10886,35 @@ ggplot(df, aes(x, y)) +
   coord_fixed()
 
 
-ggplot(df, aes(x, y)) + 
-  geom_point(aes(color = z2)) + 
+ggplot(df, aes(x, y)) +
+  geom_point(aes(color = z2)) +
   scale_color_gradient(low = "white", high = "red") +
   coord_fixed()
 ```
 
 
-```{r 1.1}
+```{r}
+#  1.1
 # Working Example
-# df <- data.frame(
-#   x = runif(100),
-#   y = runif(100),
-#   z1 = rnorm(100),
-#   z2 = abs(rnorm(100))
-# )
-# 
-# ggplot(df, aes(x, y)) +
-#   geom_point(aes(colour = z2)) +
-#   scale_colour_gradient(low = "white", high = "black")
+df <- data.frame(
+  x = runif(100),
+  y = runif(100),
+  z1 = rnorm(100),
+  z2 = abs(rnorm(100))
+)
+
+ggplot(df, aes(x, y)) +
+  geom_point(aes(colour = z2)) +
+  scale_colour_gradient(low = "white", high = "black")
 ```
 
-```{r 2}
+```{r}
+# Quesion 2
 # The first argument to every scale is the color or palette that you want to assign to the scale. "labs" will allow a variety of choices for the first argument including title, x, etc.
 ```
 
-```{r 3}
+```{r}
+# Quesion 3
 
 # Change the display of the presidential terms by:
 # 
@@ -10610,7 +10926,8 @@ ggplot(df, aes(x, y)) +
 
 ```
 
-```{r 4}
+```{r}
+# Quesion 4
 # Use override.aes to make the legend on the following plot easier to see.
 ggplot(diamonds, aes(carat, price)) + 
   geom_point(aes(color = cut), alpha = 1/20)
